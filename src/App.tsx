@@ -8,6 +8,7 @@ import { AnimatedRocketScene } from './components/AnimatedRocketScene';
 import { CosmicGame } from './components/CosmicGame';
 import { ChangelogView } from './components/ChangelogView';
 import { InvestmentAgentView } from './components/InvestmentAgentView';
+import { BartPlannerView } from './components/BartPlannerView';
 import { RocketLogo } from './components/RocketLogo';
 import { playKeyClick } from './utils/audio';
 
@@ -20,7 +21,9 @@ interface RouteState {
 
 const getPathForState = (tab: Tab, project: string | null): string => {
   if (tab === 'projects') {
-    return project ? `/myprojects/${project}` : '/myprojects';
+    if (project === 'roboinvestor') return '/myprojects/roboinvestor';
+    if (project === 'bart') return '/myprojects/bart';
+    return '/myprojects';
   }
   if (tab === 'games') return '/mygames';
   if (tab === 'changelog') return '/version-history';
@@ -31,6 +34,9 @@ const getPathForState = (tab: Tab, project: string | null): string => {
 const getStateForPath = (pathname: string): RouteState => {
   const clean = pathname.toLowerCase().replace(/\/+$/, '') || '/';
 
+  if (clean === '/myprojects/bart' || clean === '/projects/bart') {
+    return { tab: 'projects', project: 'bart' };
+  }
   if (clean === '/myprojects/roboinvestor' || clean === '/projects/roboinvestor') {
     return { tab: 'projects', project: 'roboinvestor' };
   }
@@ -128,6 +134,16 @@ export default function App() {
                     >
                       &rarr; RoboInvestor
                     </button>
+                    <button
+                      onClick={() => navigateTo('projects', 'bart')}
+                      className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
+                        activeProject === 'bart'
+                          ? 'text-emerald-400 font-semibold'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      &rarr; BART Planner
+                    </button>
                   </div>
                 )}
               </div>
@@ -178,23 +194,30 @@ export default function App() {
             {/* TAB: MY PROJECTS */}
             {activeTab === 'projects' && (
               <>
-                {/* Isolated Sub-Project: RoboInvestor */}
-                {activeProject === 'roboinvestor' ? (
+                {/* Sub-Project 1: RoboInvestor */}
+                {activeProject === 'roboinvestor' && (
                   <InvestmentAgentView onBack={() => navigateTo('projects', null)} />
-                ) : (
-                  /* Parent Projects Directory */
+                )}
+
+                {/* Sub-Project 2: BART Schedule Planner */}
+                {activeProject === 'bart' && (
+                  <BartPlannerView onBack={() => navigateTo('projects', null)} />
+                )}
+
+                {/* Parent Projects Directory */}
+                {!activeProject && (
                   <div className="space-y-6 animate-fadeIn">
                     <div className="border-b border-slate-800/80 pb-5">
                       <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                         My Projects
                       </h2>
                       <p className="text-sm text-slate-400 mt-1">
-                        Directory of active experiments, autonomous agents, and explorations.
+                        Directory of active experiments, transit tools, and autonomous agents.
                       </p>
                     </div>
 
                     <div className="space-y-4">
-                      {/* Featured Project Card: RoboInvestor */}
+                      {/* Project 1: RoboInvestor */}
                       <div
                         onClick={() => navigateTo('projects', 'roboinvestor')}
                         className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-emerald-500/60 transition-all duration-200 cursor-pointer backdrop-blur-md space-y-4 group"
@@ -208,8 +231,8 @@ export default function App() {
                               RoboInvestor
                             </h3>
                           </div>
-                          <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 self-start sm:self-auto font-medium">
-                            ACTIVE · MONITORING
+                          <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 self-start sm:self-auto font-medium">
+                            READ-ONLY AUDIT MODE
                           </span>
                         </div>
 
@@ -228,10 +251,44 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Placeholder for Next Project */}
+                      {/* Project 2: BART Schedule Planner */}
+                      <div
+                        onClick={() => navigateTo('projects', 'bart')}
+                        className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-yellow-500/60 transition-all duration-200 cursor-pointer backdrop-blur-md space-y-4 group"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-3">
+                          <div>
+                            <span className="text-xs font-mono text-yellow-400 uppercase tracking-wider font-semibold">
+                              Bay Area Rapid Transit System
+                            </span>
+                            <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-yellow-400 transition-colors">
+                              BART Schedule Planner
+                            </h3>
+                          </div>
+                          <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-yellow-950/60 border border-yellow-800/60 text-yellow-400 self-start sm:self-auto font-medium">
+                            ACTIVE · LIVE ROUTER
+                          </span>
+                        </div>
+
+                        <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                          Interactive transit itinerary and schedule planner for the SF Bay Area BART network. Instant departure calculation, fare estimates, Transbay Tube crossing routes, and color-coded line directories.
+                        </p>
+
+                        <div className="flex items-center justify-between pt-2 text-xs font-mono">
+                          <span className="text-slate-400">
+                            5 Color-Coded Lines &bull; Clipper Fares &bull; Station Directory
+                          </span>
+                          <span className="text-yellow-400 font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                            <span>Open BART Planner</span>
+                            <span>&rarr;</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Project 3 Placeholder */}
                       <div className="p-6 rounded-2xl bg-slate-900/30 border border-slate-800/40 backdrop-blur-sm space-y-2 opacity-60">
                         <div className="flex items-center justify-between text-xs font-mono">
-                          <span className="text-slate-400">PROJECT TWO</span>
+                          <span className="text-slate-400">PROJECT THREE</span>
                           <span className="px-2 py-0.5 rounded bg-slate-950 text-slate-500 text-[11px]">PLANNED</span>
                         </div>
                         <h3 className="text-base font-semibold text-white">Upcoming Exploration</h3>

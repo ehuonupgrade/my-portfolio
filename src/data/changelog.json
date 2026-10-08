@@ -1,5 +1,35 @@
 [
   {
+    "version": "v0.7.0",
+    "date": "October 8, 2026",
+    "title": "BART Schedule Planner — Bay Area Rapid Transit Engine",
+    "summary": "Launched the second core project under My Projects: a high-speed route, departure, and fare calculator for the San Francisco Bay Area BART rail network.",
+    "tag": "Transit",
+    "changes": [
+      {
+        "type": "project",
+        "description": "Added BART Schedule Planner as second sub-project in My Projects with dedicated route: /myprojects/bart."
+      },
+      {
+        "type": "feature",
+        "description": "Implemented origin/destination trip calculator with direct line verification, estimated trip times, and transfer guidance."
+      },
+      {
+        "type": "design",
+        "description": "Built color-coded BART line directory (Yellow, Red, Green, Orange, Blue) covering all 50 Bay Area stations."
+      },
+      {
+        "type": "feature",
+        "description": "Integrated Clipper fare estimates, Transbay Tube indicators, and live departure simulations."
+      },
+      {
+        "type": "api",
+        "description": "Documented BART open REST and GTFS API endpoints for real-time ETD integration."
+      }
+    ],
+    "commits": ["HEAD"]
+  },
+  {
     "version": "v0.6.0",
     "date": "October 8, 2026",
     "title": "Robinhood Agentic Investment Sentinel — Transparency Dashboard",

@@ -1,0 +1,100 @@
+{
+  "systemStatus": {
+    "status": "NORMAL SERVICE",
+    "advisory": "Trains are operating on schedule across all 5 active lines.",
+    "lastUpdated": "Today · Just now"
+  },
+  "lines": [
+    {
+      "id": "yellow",
+      "name": "Yellow Line (Antioch ↔ SFO / Millbrae)",
+      "color": "#facc15",
+      "bgColor": "bg-yellow-400",
+      "textColor": "text-yellow-400",
+      "stations": ["ANTC", "PCTR", "PITT", "NCON", "CONC", "PHIL", "WCRK", "LAFY", "ORIN", "ROCK", "MCAR", "19TH", "12TH", "WOAK", "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY", "COLM", "SSAN", "SBRN", "SFIA", "MLBR"]
+    },
+    {
+      "id": "red",
+      "name": "Red Line (Richmond ↔ Millbrae / SFO)",
+      "color": "#ef4444",
+      "bgColor": "bg-red-500",
+      "textColor": "text-red-400",
+      "stations": ["RICH", "DELN", "PLZA", "NBRK", "DBRK", "ASHB", "MCAR", "19TH", "12TH", "WOAK", "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY", "COLM", "SSAN", "SBRN", "SFIA", "MLBR"]
+    },
+    {
+      "id": "green",
+      "name": "Green Line (Berryessa / North San José ↔ Daly City)",
+      "color": "#22c55e",
+      "bgColor": "bg-green-500",
+      "textColor": "text-green-400",
+      "stations": ["BERY", "MLPT", "WARM", "FRMT", "UCTY", "SHAY", "HAYW", "BAYF", "SANL", "COLS", "FTVL", "LAKE", "WOAK", "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY"]
+    },
+    {
+      "id": "orange",
+      "name": "Orange Line (Richmond ↔ Berryessa / North San José)",
+      "color": "#f97316",
+      "bgColor": "bg-orange-500",
+      "textColor": "text-orange-400",
+      "stations": ["RICH", "DELN", "PLZA", "NBRK", "DBRK", "ASHB", "MCAR", "19TH", "12TH", "LAKE", "FTVL", "COLS", "SANL", "BAYF", "HAYW", "SHAY", "UCTY", "FRMT", "WARM", "MLPT", "BERY"]
+    },
+    {
+      "id": "blue",
+      "name": "Blue Line (Dublin / Pleasanton ↔ Daly City)",
+      "color": "#3b82f6",
+      "bgColor": "bg-blue-500",
+      "textColor": "text-blue-400",
+      "stations": ["DUBL", "WDUB", "CAST", "BAYF", "SANL", "COLS", "FTVL", "LAKE", "WOAK", "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY"]
+    }
+  ],
+  "stations": [
+    { "code": "EMBR", "name": "Embarcadero", "city": "San Francisco", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "MONT", "name": "Montgomery St", "city": "San Francisco", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "POWL", "name": "Powell St", "city": "San Francisco", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "CIVC", "name": "Civic Center / UN Plaza", "city": "San Francisco", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "16TH", "name": "16th St Mission", "city": "San Francisco", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "24TH", "name": "24th St Mission", "city": "San Francisco", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "GLEN", "name": "Glen Park", "city": "San Francisco", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "BALB", "name": "Balboa Park", "city": "San Francisco", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "DALY", "name": "Daly City", "city": "Daly City", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "COLM", "name": "Colma", "city": "Colma", "lines": ["yellow", "red"] },
+    { "code": "SSAN", "name": "South San Francisco", "city": "South San Francisco", "lines": ["yellow", "red"] },
+    { "code": "SBRN", "name": "San Bruno", "city": "San Bruno", "lines": ["yellow", "red"] },
+    { "code": "SFIA", "name": "San Francisco Int'l Airport", "city": "SFO", "lines": ["yellow", "red"] },
+    { "code": "MLBR", "name": "Millbrae", "city": "Millbrae", "lines": ["yellow", "red"] },
+    { "code": "12TH", "name": "12th St Oakland City Center", "city": "Oakland", "lines": ["yellow", "red", "orange"] },
+    { "code": "19TH", "name": "19th St Oakland", "city": "Oakland", "lines": ["yellow", "red", "orange"] },
+    { "code": "MCAR", "name": "MacArthur", "city": "Oakland", "lines": ["yellow", "red", "orange"] },
+    { "code": "ROCK", "name": "Rockridge", "city": "Oakland", "lines": ["yellow"] },
+    { "code": "LAKE", "name": "Lake Merritt", "city": "Oakland", "lines": ["green", "orange", "blue"] },
+    { "code": "FTVL", "name": "Fruitvale", "city": "Oakland", "lines": ["green", "orange", "blue"] },
+    { "code": "COLS", "name": "Coliseum (OAK Airport)", "city": "Oakland", "lines": ["green", "orange", "blue"] },
+    { "code": "WOAK", "name": "West Oakland", "city": "Oakland", "lines": ["yellow", "red", "green", "blue"] },
+    { "code": "DBRK", "name": "Downtown Berkeley", "city": "Berkeley", "lines": ["red", "orange"] },
+    { "code": "NBRK", "name": "North Berkeley", "city": "Berkeley", "lines": ["red", "orange"] },
+    { "code": "ASHB", "name": "Ashby", "city": "Berkeley", "lines": ["red", "orange"] },
+    { "code": "PLZA", "name": "El Cerrito Plaza", "city": "El Cerrito", "lines": ["red", "orange"] },
+    { "code": "DELN", "name": "El Cerrito del Norte", "city": "El Cerrito", "lines": ["red", "orange"] },
+    { "code": "RICH", "name": "Richmond", "city": "Richmond", "lines": ["red", "orange"] },
+    { "code": "WCRK", "name": "Walnut Creek", "city": "Walnut Creek", "lines": ["yellow"] },
+    { "code": "LAFY", "name": "Lafayette", "city": "Lafayette", "lines": ["yellow"] },
+    { "code": "ORIN", "name": "Orinda", "city": "Orinda", "lines": ["yellow"] },
+    { "code": "PHIL", "name": "Pleasant Hill / Contra Costa", "city": "Pleasant Hill", "lines": ["yellow"] },
+    { "code": "CONC", "name": "Concord", "city": "Concord", "lines": ["yellow"] },
+    { "code": "NCON", "name": "North Concord / Martinez", "city": "Concord", "lines": ["yellow"] },
+    { "code": "PITT", "name": "Pittsburg / Bay Point", "city": "Pittsburg", "lines": ["yellow"] },
+    { "code": "PCTR", "name": "Pittsburg Center", "city": "Pittsburg", "lines": ["yellow"] },
+    { "code": "ANTC", "name": "Antioch", "city": "Antioch", "lines": ["yellow"] },
+    { "code": "SANL", "name": "San Leandro", "city": "San Leandro", "lines": ["green", "orange", "blue"] },
+    { "code": "BAYF", "name": "Bay Fair", "city": "San Leandro", "lines": ["green", "orange", "blue"] },
+    { "code": "HAYW", "name": "Hayward", "city": "Hayward", "lines": ["green", "orange"] },
+    { "code": "SHAY", "name": "South Hayward", "city": "Hayward", "lines": ["green", "orange"] },
+    { "code": "UCTY", "name": "Union City", "city": "Union City", "lines": ["green", "orange"] },
+    { "code": "FRMT", "name": "Fremont", "city": "Fremont", "lines": ["green", "orange"] },
+    { "code": "WARM", "name": "Warm Springs / South Fremont", "city": "Fremont", "lines": ["green", "orange"] },
+    { "code": "MLPT", "name": "Milpitas", "city": "Milpitas", "lines": ["green", "orange"] },
+    { "code": "BERY", "name": "Berryessa / North San José", "city": "San José", "lines": ["green", "orange"] },
+    { "code": "CAST", "name": "Castro Valley", "city": "Castro Valley", "lines": ["blue"] },
+    { "code": "WDUB", "name": "West Dublin / Pleasanton", "city": "Dublin", "lines": ["blue"] },
+    { "code": "DUBL", "name": "Dublin / Pleasanton", "city": "Dublin", "lines": ["blue"] }
+  ]
+}

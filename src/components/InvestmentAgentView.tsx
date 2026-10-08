@@ -16,13 +16,16 @@ export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack
   const [copiedCode, setCopiedCode] = useState(false);
 
   const getActionColor = (action: string) => {
+    if (action.includes('PAPER')) {
+      return 'text-cyan-400 bg-cyan-950/60 border-cyan-800/80';
+    }
     if (action.includes('BUY')) {
       return 'text-emerald-400 bg-emerald-950/60 border-emerald-800/80';
     }
     if (action.includes('SELL') || action.includes('TRIM')) {
       return 'text-amber-400 bg-amber-950/60 border-amber-800/80';
     }
-    return 'text-cyan-400 bg-cyan-950/60 border-cyan-800/80';
+    return 'text-slate-300 bg-slate-900 border-slate-800';
   };
 
   const handleSimulateTrade = () => {
@@ -121,9 +124,12 @@ python3 scripts/robo_investor_agent.py
             </h2>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
             <span className="px-3 py-1 rounded-full bg-slate-950 border border-slate-800 text-slate-300">
-              STATUS: <strong className="text-emerald-400">{agentData.status}</strong>
+              STATUS: <strong className="text-cyan-400">{agentData.status}</strong>
+            </span>
+            <span className="px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/80 text-cyan-300 text-[11px] font-semibold">
+              ZERO CAPITAL AT RISK
             </span>
           </div>
         </div>
@@ -387,6 +393,19 @@ python3 scripts/robo_investor_agent.py
                 {simulationLog}
               </div>
             )}
+          </div>
+
+          {/* Read-Only Safeguards Callout Box */}
+          <div className="p-6 rounded-2xl bg-cyan-950/40 border border-cyan-800/80 space-y-3">
+            <div className="flex items-center gap-2.5">
+              <span className="text-cyan-400 font-bold text-sm">🛡️ How Read-Only Mode Is Enforced</span>
+            </div>
+            <ul className="space-y-2 text-xs text-slate-300 leading-relaxed pl-1">
+              <li>&bull; <strong>No Real Orders Sent</strong>: The runner script in <code className="text-cyan-400 font-mono">scripts/robo_investor_agent.py</code> has <code className="text-cyan-400 font-mono">EXECUTION_MODE = &quot;READ_ONLY&quot;</code> enabled by default. Live order placement is strictly blocked in code.</li>
+              <li>&bull; <strong>Read-Only API Permissions</strong>: When creating your Robinhood Agentic token, grant only <code className="text-slate-200 font-mono">read:portfolio</code> and <code className="text-slate-200 font-mono">read:quotes</code> scopes. Do not grant <code className="text-slate-400 font-mono">write:orders</code>.</li>
+              <li>&bull; <strong>Full Analytical Validation</strong>: The bot queries real-time NBBO market prices and runs all constraint checks against your real account balance, outputting paper audit records for Huon.si with zero capital at risk.</li>
+              <li>&bull; <strong>Switching to Live Later</strong>: Whenever you are ready to place real trades, switch <code className="text-emerald-400 font-mono">EXECUTION_MODE = &quot;APPROVAL_REQUIRED&quot;</code> to require mobile push approval on your phone before any order goes to market.</li>
+            </ul>
           </div>
 
           {/* Setup Steps Timeline */}
