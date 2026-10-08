@@ -1,0 +1,6 @@
+{
+  "name": "Terminal Portfolio Hub",
+  "description": "High-speed developer portfolio and subdomain application hub with high-end terminal aesthetic, interactive CLI, and Astro project architecture.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

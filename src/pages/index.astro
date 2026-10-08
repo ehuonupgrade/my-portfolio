@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+import projectsData from '../data/projects.json';
+
+const lastLoginTime = new Date().toUTCString();
+---
+
+<Layout title="Terminal Portfolio Hub">
+  <main class="max-w-6xl mx-auto px-4 py-8 text-[#00ff41] font-mono">
+    <!-- Top System Telemetry -->
+    <header class="border-b border-[#1a331c] pb-6 mb-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between text-xs text-[#008f11] mb-2 gap-1">
+        <span>HOST: hub.terminal.internal</span>
+        <span>LAST_LOGIN: {lastLoginTime}</span>
+        <span>TTY: pts/0</span>
+      </div>
+      <div class="text-xl md:text-2xl font-bold tracking-tight text-[#00ff41] flex items-center gap-2">
+        <span class="text-[#008f11]">$</span>
+        <span>USER_IDENT: GUEST_DEVELOPER</span>
+        <span class="inline-block w-2.5 h-5 bg-[#00ff41] animate-pulse"></span>
+      </div>
+    </header>
+
+    <!-- Simulated Terminal Command: cat about_me.txt -->
+    <section class="border border-[#1a331c] bg-[#0e140e] p-5 rounded-none mb-8">
+      <div class="flex items-center gap-2 text-xs text-[#008f11] border-b border-[#1a331c] pb-2 mb-3">
+        <span>guest@hub:~</span>
+        <span class="text-[#00ff41] font-semibold">&gt;&gt; cat about_me.txt</span>
+      </div>
+      <div class="space-y-2 text-sm leading-relaxed text-[#c0ffc9]">
+        <p>Full-stack systems engineer &amp; interface architect building high-speed edge applications, developer tooling, and distributed systems.</p>
+        <p class="text-[#008f11] text-xs pt-1">
+          CORE STACK: Astro · TypeScript · Tailwind CSS · Vercel Edge · Distributed Subdomain Routing
+        </p>
+      </div>
+    </section>
+
+    <!-- Applications Hub Grid -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between border-b border-[#1a331c] pb-2">
+        <h2 class="text-sm font-semibold tracking-wider text-[#00ff41] uppercase flex items-center gap-2">
+          <span>&gt;&gt;</span> APPLICATIONS [{projectsData.length}]
+        </h2>
+        <span class="text-xs text-[#008f11]">SOURCE: src/data/projects.json</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+        {projectsData.map((project) => (
+          <article class="border border-[#1a331c] bg-[#0c120c] hover:border-[#00ff41] transition-colors p-4 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="text-base font-bold text-[#00ff41] group-hover:underline">
+                  {project.name}
+                </h3>
+                <span class="text-[10px] text-[#008f11] font-mono uppercase">
+                  {project.status || "ONLINE"}
+                </span>
+              </div>
+              <p class="text-xs text-[#8cb08f] leading-relaxed mb-4">
+                {project.description}
+              </p>
+            </div>
+
+            <div class="space-y-3 pt-2 border-t border-[#142616]">
+              <!-- Clean unboxed tech tags with typographic separators -->
+              <div class="flex flex-wrap items-center gap-1.5 text-[11px] text-[#008f11]">
+                {project.tech.map((t, idx) => (
+                  <span>
+                    {t}{idx < project.tech.length - 1 ? ' ·' : ''}
+                  </span>
+                ))}
+              </div>
+
+              <!-- Links -->
+              <div class="flex items-center justify-between text-xs pt-1">
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-[#00ff41] hover:text-[#c0ffc9] flex items-center gap-1"
+                >
+                  <span>Launch</span>
+                  <span aria-hidden="true">&rarr;</span>
+                </a>
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-[#008f11] hover:text-[#00ff41]"
+                >
+                  GitHub
+                </a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-12 pt-6 border-t border-[#1a331c] text-xs text-[#008f11] flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>TERMINAL_PORTFOLIO_HUB // ASTRO + TAILWIND</div>
+      <div>READY FOR VERCEL DEPLOYMENT</div>
+    </footer>
+  </main>
+</Layout>

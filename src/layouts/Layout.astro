@@ -1,0 +1,59 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Terminal Portfolio Hub",
+  description = "A high-speed developer portfolio and subdomain application hub."
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#0a0a0a] text-[#00ff41] antialiased selection:bg-[#00ff41] selection:text-[#0a0a0a] min-h-screen relative font-mono">
+    <!-- Scanline Overlay -->
+    <div class="pointer-events-none fixed inset-0 z-50 opacity-30 mix-blend-screen scanline-effect" aria-hidden="true"></div>
+
+    <slot />
+
+    <style is:global>
+      @import "tailwindcss";
+
+      @theme {
+        --color-terminal-bg: #0a0a0a;
+        --color-terminal-green: #00ff41;
+        --color-terminal-dim: #008f11;
+        --color-terminal-amber: #ffb000;
+        --color-terminal-cyan: #00e5ff;
+        --font-mono: 'JetBrains Mono', monospace;
+      }
+
+      .scanline-effect {
+        background: linear-gradient(
+          rgba(18, 16, 16, 0) 50%,
+          rgba(0, 0, 0, 0.45) 50%
+        ),
+        linear-gradient(
+          90deg,
+          rgba(0, 255, 65, 0.02),
+          rgba(0, 255, 65, 0.01),
+          rgba(0, 255, 65, 0.02)
+        );
+        background-size: 100% 3px, 6px 100%;
+      }
+    </style>
+  </body>
+</html>
