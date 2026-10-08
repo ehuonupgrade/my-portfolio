@@ -8,6 +8,7 @@ import { AnimatedRocketScene } from './components/AnimatedRocketScene';
 import { CosmicGame } from './components/CosmicGame';
 import { ChangelogView } from './components/ChangelogView';
 import { InvestmentAgentView } from './components/InvestmentAgentView';
+import { RocketLogo } from './components/RocketLogo';
 import { playKeyClick } from './utils/audio';
 
 type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'about';
@@ -41,12 +42,14 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
           {/* Left Column: Brand & Integrated Navigation */}
           <div className="md:col-span-4 space-y-8">
-            {/* huon.si on the top left navigates back to blank home */}
+            {/* Static picture of the animated rocket acting as the home page link */}
             <button
               onClick={() => handleSelectTab('home')}
-              className="text-3xl sm:text-4xl font-bold tracking-tight text-white hover:text-slate-300 transition-colors text-left cursor-pointer block"
+              className="group cursor-pointer block p-1 -ml-1 hover:opacity-90 transition-opacity"
+              title="Home"
+              aria-label="Home"
             >
-              Huon.si
+              <RocketLogo className="w-16 h-10 sm:w-20 sm:h-12" />
             </button>
 
             {/* Simple Integrated Navigation */}
