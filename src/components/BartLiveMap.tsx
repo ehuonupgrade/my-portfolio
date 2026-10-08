@@ -366,7 +366,7 @@ export const BartLiveMap: React.FC = () => {
             <text x={stationCoords.BERY.x + 10} y={stationCoords.BERY.y + 4} textAnchor="start" fill="#4ade80">Berryessa (SJ)</text>
           </g>
 
-          {/* REAL-TIME LIVE TRAINS AT STATIONS */}
+          {/* REAL-TIME LIVE TRAINS AT STATIONS (SOLID, STATIONARY REAL POSITIONS) */}
           {filteredTrains.map((train) => {
             const isSelected = selectedTrain?.id === train.id;
 
@@ -378,51 +378,68 @@ export const BartLiveMap: React.FC = () => {
                   playBeep(720, 0.05);
                   setSelectedTrain(train);
                 }}
-                className="cursor-pointer group"
+                className="cursor-pointer group transition-transform duration-200"
               >
-                {/* Proximity Ping Ring */}
-                <circle
-                  r={isSelected ? '15' : '11'}
-                  fill="none"
-                  stroke={train.hexcolor}
-                  strokeWidth="1.5"
-                  className="animate-ping opacity-75 origin-center"
-                />
+                {/* Subtle steady halo for selected train only */}
+                {isSelected && (
+                  <circle
+                    r="16"
+                    fill="none"
+                    stroke={train.hexcolor}
+                    strokeWidth="1.5"
+                    strokeDasharray="3 3"
+                    className="opacity-90"
+                  />
+                )}
 
                 {/* Train Icon Badge Container */}
                 <rect
-                  x="-12"
-                  y="-12"
-                  width="24"
-                  height="24"
-                  rx="6"
-                  fill="#07120a"
+                  x="-11"
+                  y="-11"
+                  width="22"
+                  height="22"
+                  rx="5"
+                  fill="#050a07"
                   stroke={train.hexcolor}
                   strokeWidth={isSelected ? '2.5' : '1.8'}
-                  filter="url(#trainGlowLive)"
+                  className="group-hover:scale-110 transition-transform origin-center"
                 />
 
                 {/* Iconic Train Front SVG Graphic */}
                 <path
-                  d="M-6 -6 H6 V2 Q6 6 0 6 Q-6 6 -6 2 Z"
+                  d="M-5 -5 H5 V2 Q5 5 0 5 Q-5 5 -5 2 Z"
                   fill={train.hexcolor}
                 />
-                <rect x="-4" y="-4" width="8" height="4" rx="1" fill="#040805" />
-                <circle cx="-3" cy="2" r="1" fill="#ffffff" />
-                <circle cx="3" cy="2" r="1" fill="#ffffff" />
+                <rect x="-3.5" y="-3.5" width="7" height="3" rx="0.8" fill="#040805" />
+                <circle cx="-2.5" cy="1.5" r="0.8" fill="#ffffff" />
+                <circle cx="2.5" cy="1.5" r="0.8" fill="#ffffff" />
 
-                {/* Real-time Cars Count Badge */}
+                {/* Real-time Cars Count Badge Above */}
                 <text
                   x="0"
-                  y="-15"
+                  y="-13"
                   textAnchor="middle"
-                  fontSize="8.5"
+                  fontSize="8"
                   fontFamily="monospace"
                   fontWeight="bold"
                   fill="#ffffff"
-                  className="drop-shadow-md"
+                  className="select-none pointer-events-none drop-shadow-xs"
                 >
                   {train.cars}c
+                </text>
+
+                {/* Destination tag below */}
+                <text
+                  x="0"
+                  y="18"
+                  textAnchor="middle"
+                  fontSize="7.5"
+                  fontFamily="monospace"
+                  fontWeight="bold"
+                  fill={train.hexcolor}
+                  className="select-none pointer-events-none"
+                >
+                  {train.destAbbr}
                 </text>
               </g>
             );
