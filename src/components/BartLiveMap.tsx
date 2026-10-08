@@ -507,6 +507,90 @@ export const BartLiveMap: React.FC = () => {
           <span className="text-lg font-bold text-white">LIVE CONNECTED</span>
         </div>
       </div>
+
+      {/* Live Train Dispatch Ledger */}
+      <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-md space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <h4 className="text-base font-bold text-white tracking-tight">
+              Live BART Train Dispatch Ledger ({filteredTrains.length} Active Consists)
+            </h4>
+            <p className="text-xs text-slate-400">
+              Click any train row to highlight its exact physical location on the track map above.
+            </p>
+          </div>
+          <span className="text-xs font-mono text-emerald-400">ZERO SIMULATION &bull; 100% REAL GTFS</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-slate-800/80 text-slate-400 font-mono text-[11px] uppercase">
+                <th className="py-2.5 px-3">Line</th>
+                <th className="py-2.5 px-3">Destination</th>
+                <th className="py-2.5 px-3">Current Station</th>
+                <th className="py-2.5 px-3">Status / Platform</th>
+                <th className="py-2.5 px-3">Cars</th>
+                <th className="py-2.5 px-3">Delay</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/40">
+              {filteredTrains.map((train) => {
+                const isSelected = selectedTrain?.id === train.id;
+                return (
+                  <tr
+                    key={train.id}
+                    onClick={() => {
+                      playBeep(720, 0.05);
+                      setSelectedTrain(train);
+                    }}
+                    className={`cursor-pointer transition-colors ${
+                      isSelected
+                        ? 'bg-slate-800/80 text-white'
+                        : 'hover:bg-slate-800/40 text-slate-300'
+                    }`}
+                  >
+                    <td className="py-3 px-3">
+                      <span
+                        className="inline-block w-3 h-3 rounded-full mr-2 align-middle"
+                        style={{ backgroundColor: train.hexcolor }}
+                      />
+                      <span className="font-mono uppercase font-bold text-[11px]">
+                        {train.lineId}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 font-semibold text-white">
+                      {train.destination} <span className="text-[10px] text-slate-400">({train.direction})</span>
+                    </td>
+                    <td className="py-3 px-3 font-mono text-emerald-300">
+                      {train.stationName}
+                    </td>
+                    <td className="py-3 px-3 font-mono">
+                      {train.minutes === 'Leaving' ? (
+                        <span className="text-emerald-400 font-bold">● Boarding / Departing</span>
+                      ) : (
+                        <span className="text-slate-300">Arriving in {train.minutes}m</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-3 font-mono text-slate-300">
+                      {train.cars} cars
+                    </td>
+                    <td className="py-3 px-3 font-mono">
+                      {train.delaySec > 0 ? (
+                        <span className="text-amber-400 font-bold">
+                          +{Math.round(train.delaySec / 60)}m
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">On Time</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
