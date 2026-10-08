@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="text-base font-bold tracking-tight text-inherit select-none hover:opacity-80 transition-opacity flex items-center gap-2"
         >
           <span className="text-[#00ff41]">&gt;</span>
-          <span>ERIC HUON</span>
+          <span>HUON.SI</span>
           <span className="text-[11px] opacity-60 font-mono hidden sm:inline">// PORTFOLIO</span>
         </a>
 

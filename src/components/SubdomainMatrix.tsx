@@ -26,7 +26,7 @@ export const SubdomainMatrix: React.FC<SubdomainMatrixProps> = ({
   const [statuses, setStatuses] = useState<Record<string, { latency: string; status: string }>>({});
 
   // Interactive Namecheap DNS Generator state
-  const [userDomain, setUserDomain] = useState('yourdomain.com');
+  const [userDomain, setUserDomain] = useState('huon.si');
   const [targetPlatform, setTargetPlatform] = useState<'vercel' | 'github_pages'>('vercel');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -85,7 +85,7 @@ export const SubdomainMatrix: React.FC<SubdomainMatrixProps> = ({
     setTimeout(() => setCopiedKey(null), 1500);
   };
 
-  const cleanDomain = userDomain.trim().replace(/^https?:\/\//, '').replace(/\/$/, '') || 'yourdomain.com';
+  const cleanDomain = userDomain.trim().replace(/^https?:\/\//, '').replace(/\/$/, '') || 'huon.si';
 
   const exportZoneFile = () => {
     playKeyClick();
@@ -203,7 +203,7 @@ export const SubdomainMatrix: React.FC<SubdomainMatrixProps> = ({
               type="text"
               value={userDomain}
               onChange={(e) => setUserDomain(e.target.value)}
-              placeholder="e.g. erichuon.dev, mydomain.com"
+              placeholder="e.g. huon.si"
               className="bg-transparent text-xs text-[#00ff41] font-mono outline-none flex-1 placeholder:opacity-40"
             />
           </div>

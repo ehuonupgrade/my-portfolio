@@ -1,137 +1,90 @@
-import React, { useState } from 'react';
-import { playKeyClick, playSuccessChime } from '../utils/audio';
+import React from 'react';
 
 interface AboutSectionProps {
   accentColorClass: string;
 }
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ accentColorClass }) => {
-  const [copiedEmail, setCopiedEmail] = useState(false);
-
-  const handleCopyEmail = () => {
-    playKeyClick();
-    navigator.clipboard.writeText('eric.huon@gmail.com');
-    setCopiedEmail(true);
-    playSuccessChime();
-    setTimeout(() => setCopiedEmail(false), 2000);
-  };
-
   return (
-    <div className="space-y-10">
-      {/* Bio Card */}
-      <section className="border border-[#1a331c] bg-[#0c120c] p-6 sm:p-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#142616] pb-6">
-          <div>
-            <span className="text-[11px] opacity-60 font-mono tracking-widest uppercase">
-              BIOGRAPHY // SYSTEMS ARCHITECT
-            </span>
-            <h2 className={`text-2xl sm:text-3xl font-bold mt-1 tracking-tight ${accentColorClass}`}>
-              Eric Huon
-            </h2>
-            <p className="text-sm opacity-80 mt-1">
-              Full-Stack Software Engineer &amp; Edge Infrastructure Architect
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleCopyEmail}
-              className="px-3.5 py-1.5 bg-[#142916] hover:bg-[#00ff41] hover:text-black border border-[#1a3d1e] text-xs font-semibold transition-colors"
-            >
-              {copiedEmail ? '✓ EMAIL COPIED' : 'Copy Email'}
-            </button>
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3.5 py-1.5 border border-[#1a3d1e] hover:border-[#00ff41] text-xs transition-colors"
-            >
-              GitHub &nearr;
-            </a>
-          </div>
+    <div className="space-y-10 font-sans">
+      {/* Studio Bio Card */}
+      <section className="border border-slate-800 bg-slate-900/80 backdrop-blur-md rounded-2xl p-6 sm:p-10 space-y-6">
+        <div className="border-b border-slate-800 pb-6">
+          <span className="text-xs text-slate-400 font-mono tracking-widest uppercase">
+            ABOUT // CREATIVE DIRECTION &amp; DESIGN
+          </span>
+          <h2 className={`text-3xl sm:text-4xl font-bold mt-1 tracking-tight ${accentColorClass}`}>
+            Huon.si
+          </h2>
+          <p className="text-base text-slate-300 mt-1 font-normal">
+            Digital Design Showcase &amp; Interactive Studio
+          </p>
         </div>
 
         {/* Narrative Prose */}
-        <div className="space-y-4 text-xs sm:text-sm opacity-90 leading-relaxed font-mono">
+        <div className="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed font-normal max-w-3xl">
           <p>
-            I specialize in designing and engineering high-velocity web applications, developer tooling,
-            and distributed edge architectures. With a focus on sub-50ms latency, zero layout shift, and tactile
-            developer aesthetics, I build systems where performance and user interface harmonize.
+            Huon.si is an independent creative portfolio exploring digital design,
+            cosmic aesthetics, visual brand systems, and playful interactive web experiences.
           </p>
           <p>
-            My engineering philosophy centers on decoupled micro-frontends: instead of brittle monoliths, I prefer
-            modular applications operating on isolated DNS subdomains with automated CI/CD and edge caching.
+            Every concept focuses on visual craft, clean typography, and tactile digital details —
+            from cosmic-themed brand identities and editorial publication layouts to retro arcade game design.
           </p>
         </div>
       </section>
 
-      {/* Technical Competencies Grid */}
+      {/* Creative Disciplines Grid */}
       <section className="space-y-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider opacity-80">
-          TECHNICAL COMPETENCY MATRIX
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-slate-400 font-mono">
+          DESIGN DISCIPLINES &amp; CRAFT
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="border border-[#1a331c] bg-[#0b100b] p-5 space-y-3">
-            <h4 className="text-xs font-bold text-[#00ff41] uppercase tracking-wider border-b border-[#142616] pb-2">
-              Core Languages
-            </h4>
-            <div className="space-y-1.5 text-xs opacity-85">
-              <p>• TypeScript &amp; Modern JavaScript</p>
-              <p>• SQL (PostgreSQL, SQLite, Drizzle)</p>
-              <p>• Python &amp; Data Pipeline Scripts</p>
-              <p>• GLSL / WebGL Shader Math</p>
-              <p>• Bash &amp; Linux Shell Scripting</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-6 space-y-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm">
+              01
             </div>
+            <h4 className="text-base font-bold text-white">
+              Digital Product Design
+            </h4>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Design systems, user interface craft, responsive layouts, and intuitive interaction architecture built with modern visual hierarchy.
+            </p>
           </div>
 
-          <div className="border border-[#1a331c] bg-[#0b100b] p-5 space-y-3">
-            <h4 className="text-xs font-bold text-[#00ff41] uppercase tracking-wider border-b border-[#142616] pb-2">
-              Frameworks &amp; UI
-            </h4>
-            <div className="space-y-1.5 text-xs opacity-85">
-              <p>• Astro (Static &amp; SSR Edge)</p>
-              <p>• React 19 &amp; Next.js App Router</p>
-              <p>• Tailwind CSS v4 &amp; Modern Design</p>
-              <p>• Web Audio API &amp; HTML5 Canvas</p>
-              <p>• WebAssembly (WASM) Integration</p>
+          <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-6 space-y-3">
+            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-sm">
+              02
             </div>
+            <h4 className="text-base font-bold text-white">
+              Visual Identity &amp; Art Direction
+            </h4>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Brand systems, celestial &amp; space aesthetics, typographic palettes, color systems, and distinctive digital identities.
+            </p>
           </div>
 
-          <div className="border border-[#1a331c] bg-[#0b100b] p-5 space-y-3">
-            <h4 className="text-xs font-bold text-[#00ff41] uppercase tracking-wider border-b border-[#142616] pb-2">
-              Infrastructure &amp; DevOps
-            </h4>
-            <div className="space-y-1.5 text-xs opacity-85">
-              <p>• Vercel Edge &amp; Cloudflare Workers</p>
-              <p>• CNAME Subdomain DNS Routing</p>
-              <p>• GitHub Actions Automated CI/CD</p>
-              <p>• Let&apos;s Encrypt Automatic SSL</p>
-              <p>• Docker &amp; Containerization</p>
+          <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-6 space-y-3">
+            <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-400 flex items-center justify-center font-bold text-sm">
+              03
             </div>
+            <h4 className="text-base font-bold text-white">
+              Games &amp; Interactive Media
+            </h4>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Playful in-browser arcade games, canvas motion graphics, generative visuals, and interactive narrative experiments.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Terminal Command Proof */}
-      <section className="border border-[#1a331c] bg-[#080d08] p-5 space-y-2 text-xs font-mono">
-        <div className="flex items-center gap-2 opacity-70 border-b border-[#142616] pb-2">
-          <span>guest@hub:~</span>
-          <span className="text-[#00ff41] font-semibold">&gt;&gt; cat contact_info.json</span>
-        </div>
-        <pre className="text-[#c0ffc9] overflow-x-auto text-[11px] pt-1">
-{`{
-  "name": "Eric Huon",
-  "email": "eric.huon@gmail.com",
-  "status": "Available for Select Contracts & Engineering Roles",
-  "location": "Global / Remote",
-  "specialties": [
-    "Astro & React Edge Architecture",
-    "Developer Tooling & Terminal UIs",
-    "Subdomain CNAME Infrastructure"
-  ]
-}`}
-        </pre>
+      {/* Studio Philosophy Card */}
+      <section className="border border-slate-800 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-slate-950/80 rounded-2xl p-8">
+        <h3 className="text-lg font-bold text-white">Design Philosophy</h3>
+        <p className="text-sm text-slate-400 mt-2 max-w-2xl leading-relaxed">
+          Simplicity, intentional typography, and fluid movement. Every experience published under huon.si is crafted to balance visual impact with effortless navigation.
+        </p>
       </section>
     </div>
   );

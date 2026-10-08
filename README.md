@@ -6,8 +6,8 @@ Designed with a high-end developer terminal aesthetic: `#0a0a0a` dark obsidian b
 
 ## Architecture
 
-- **Root Domain (`yourdomain.com`)**: Hosts the terminal portfolio hub.
-- **CNAME Subdomains (`*.yourdomain.com`)**: Host individual micro-applications (e.g. `timer.yourdomain.com` for Neon Pomodoro).
+- **Root Domain (`huon.si`)**: Hosts the portfolio.
+- **CNAME Subdomains (`*.huon.si`)**: Host individual projects.
 
 ## File Structure
 

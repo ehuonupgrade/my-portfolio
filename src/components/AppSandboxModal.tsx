@@ -409,7 +409,7 @@ export const AppSandboxModal: React.FC<AppSandboxModalProps> = ({
               )}
 
               {/* Default/Other apps */}
-              {['telemetry', 'shader', 'vault'].includes(project.demoType) && (
+              {['telemetry', 'shader', 'vault'].includes(project.demoType || '') && (
                 <div className="space-y-4 border border-[#1a3d1e] bg-[#070d07] p-6 text-center">
                   <div className="text-2xl font-bold tracking-tight text-[#00ff41]">
                     {project.name} Subsystem Initialized
