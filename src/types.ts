@@ -15,6 +15,8 @@ export interface ProjectItem {
 
 export type TerminalTheme = 'green' | 'amber' | 'cyan' | 'white';
 
+export type PortfolioTab = 'projects' | 'games' | 'about' | 'cli' | 'subdomains' | 'astro';
+
 export interface CommandHistoryItem {
   id: string;
   command: string;

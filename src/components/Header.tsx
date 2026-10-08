@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { TerminalTheme } from '../types';
-import { playKeyClick, playBeep, playSuccessChime } from '../utils/audio';
-import { downloadProjectZip } from '../utils/exportZip';
+import React from 'react';
+import { TerminalTheme, PortfolioTab } from '../types';
+import { playKeyClick, playBeep } from '../utils/audio';
 
 interface HeaderProps {
-  activeTab: 'overview' | 'apps' | 'subdomains' | 'cli' | 'astro';
-  setActiveTab: (tab: 'overview' | 'apps' | 'subdomains' | 'cli' | 'astro') => void;
+  activeTab: PortfolioTab;
+  setActiveTab: (tab: PortfolioTab) => void;
   theme: TerminalTheme;
   setTheme: (t: TerminalTheme) => void;
   scanlines: boolean;
@@ -24,21 +23,6 @@ export const Header: React.FC<HeaderProps> = ({
   audioEnabled,
   setAudioEnabled,
 }) => {
-  const [downloading, setDownloading] = useState(false);
-
-  const handleDownload = async () => {
-    playKeyClick();
-    setDownloading(true);
-    try {
-      await downloadProjectZip();
-      playSuccessChime();
-    } catch {
-      // ignore
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   const handleThemeCycle = () => {
     playBeep(520, 0.05);
     const order: TerminalTheme[] = ['green', 'amber', 'cyan', 'white'];
@@ -58,96 +42,98 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="border-b border-[#1a331c] bg-[#0a0a0a]/90 backdrop-blur-md sticky top-0 z-40">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-4">
         {/* Zone 1: Single text element wordmark (Top Bar Contract) */}
         <a
           href="#top"
           onClick={(e) => {
             e.preventDefault();
             playKeyClick();
-            setActiveTab('overview');
+            setActiveTab('projects');
           }}
-          className="text-base font-bold tracking-tight text-inherit select-none hover:opacity-80 transition-opacity"
+          className="text-base font-bold tracking-tight text-inherit select-none hover:opacity-80 transition-opacity flex items-center gap-2"
         >
-          TERMINAL_HUB
+          <span className="text-[#00ff41]">&gt;</span>
+          <span>ERIC HUON</span>
+          <span className="text-[11px] opacity-60 font-mono hidden sm:inline">// PORTFOLIO</span>
         </a>
 
-        {/* Zone 2: 4-6 clean text navigation links */}
-        <nav className="hidden md:flex items-center gap-6 text-xs font-mono">
+        {/* Zone 2: Navigation links: Projects, Games, About Me */}
+        <nav className="hidden md:flex items-center gap-7 text-xs font-mono">
           <button
             onClick={() => {
               playKeyClick();
-              setActiveTab('overview');
+              setActiveTab('projects');
             }}
-            className={`hover:underline transition-opacity ${
-              activeTab === 'overview' ? 'font-bold opacity-100' : 'opacity-65 hover:opacity-100'
+            className={`hover:underline transition-all ${
+              activeTab === 'projects'
+                ? 'font-bold text-[#00ff41] underline underline-offset-4'
+                : 'opacity-70 hover:opacity-100'
             }`}
           >
-            Overview
+            Projects
           </button>
           <button
             onClick={() => {
               playKeyClick();
-              setActiveTab('apps');
+              setActiveTab('games');
             }}
-            className={`hover:underline transition-opacity ${
-              activeTab === 'apps' ? 'font-bold opacity-100' : 'opacity-65 hover:opacity-100'
+            className={`hover:underline transition-all ${
+              activeTab === 'games'
+                ? 'font-bold text-[#00ff41] underline underline-offset-4'
+                : 'opacity-70 hover:opacity-100'
             }`}
           >
-            Applications
+            Games
           </button>
           <button
             onClick={() => {
               playKeyClick();
-              setActiveTab('subdomains');
+              setActiveTab('about');
             }}
-            className={`hover:underline transition-opacity ${
-              activeTab === 'subdomains' ? 'font-bold opacity-100' : 'opacity-65 hover:opacity-100'
+            className={`hover:underline transition-all ${
+              activeTab === 'about'
+                ? 'font-bold text-[#00ff41] underline underline-offset-4'
+                : 'opacity-70 hover:opacity-100'
             }`}
           >
-            Subdomains
+            About Me
           </button>
           <button
             onClick={() => {
               playKeyClick();
               setActiveTab('cli');
             }}
-            className={`hover:underline transition-opacity ${
-              activeTab === 'cli' ? 'font-bold opacity-100' : 'opacity-65 hover:opacity-100'
+            className={`hover:underline transition-all ${
+              activeTab === 'cli'
+                ? 'font-bold text-[#00ff41] underline underline-offset-4'
+                : 'opacity-50 hover:opacity-90'
             }`}
           >
-            Interactive CLI
+            Terminal CLI
           </button>
           <button
             onClick={() => {
               playKeyClick();
-              setActiveTab('astro');
+              setActiveTab('subdomains');
             }}
-            className={`hover:underline transition-opacity ${
-              activeTab === 'astro' ? 'font-bold opacity-100' : 'opacity-65 hover:opacity-100'
+            className={`hover:underline transition-all ${
+              activeTab === 'subdomains'
+                ? 'font-bold text-[#00ff41] underline underline-offset-4'
+                : 'opacity-50 hover:opacity-90'
             }`}
           >
-            Astro Spec
+            DNS Matrix
           </button>
         </nav>
 
-        {/* Zone 3: Actions + Download Code */}
+        {/* Zone 3: Actions */}
         <div className="flex items-center gap-2">
-          {/* Download ZIP Button */}
-          <button
-            onClick={handleDownload}
-            disabled={downloading}
-            title="Download full project repository as ZIP"
-            className="px-2.5 py-1 text-xs bg-[#00ff41] text-[#0a0a0a] font-bold hover:bg-[#52ff7d] transition-colors font-mono whitespace-nowrap"
-          >
-            {downloading ? 'PACKING...' : 'DOWNLOAD .ZIP'}
-          </button>
-
           {/* Theme Phosphor cycle */}
           <button
             onClick={handleThemeCycle}
             title="Cycle phosphor color scheme"
-            className="px-2.5 py-1 text-xs border border-[#1a331c] bg-[#0d140d] hover:border-[#00ff41] transition-colors font-mono whitespace-nowrap hidden sm:inline-block"
+            className="px-2.5 py-1 text-xs border border-[#1a331c] bg-[#0d140d] hover:border-[#00ff41] transition-colors font-mono whitespace-nowrap"
           >
             {theme.toUpperCase()}
           </button>
@@ -157,7 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={handleScanlineToggle}
             title="Toggle CRT Scanline overlay"
             className={`px-2.5 py-1 text-xs border border-[#1a331c] transition-colors font-mono whitespace-nowrap ${
-              scanlines ? 'bg-[#142916] font-semibold' : 'bg-transparent opacity-60'
+              scanlines ? 'bg-[#142916] font-semibold text-[#00ff41]' : 'bg-transparent opacity-60'
             }`}
           >
             CRT: {scanlines ? 'ON' : 'OFF'}
@@ -175,51 +161,42 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Mobile nav row */}
-      <div className="flex md:hidden items-center justify-around border-t border-[#1a331c] px-2 py-1.5 text-[11px] overflow-x-auto">
+      <div className="flex md:hidden items-center justify-around border-t border-[#1a331c] px-2 py-2 text-xs">
         <button
           onClick={() => {
             playKeyClick();
-            setActiveTab('overview');
+            setActiveTab('projects');
           }}
-          className={`px-2 py-1 ${activeTab === 'overview' ? 'font-bold text-[#00ff41]' : 'opacity-65'}`}
+          className={`px-2 py-1 ${activeTab === 'projects' ? 'font-bold text-[#00ff41] underline' : 'opacity-65'}`}
         >
-          Overview
+          Projects
         </button>
         <button
           onClick={() => {
             playKeyClick();
-            setActiveTab('apps');
+            setActiveTab('games');
           }}
-          className={`px-2 py-1 ${activeTab === 'apps' ? 'font-bold text-[#00ff41]' : 'opacity-65'}`}
+          className={`px-2 py-1 ${activeTab === 'games' ? 'font-bold text-[#00ff41] underline' : 'opacity-65'}`}
         >
-          Apps
+          Games
         </button>
         <button
           onClick={() => {
             playKeyClick();
-            setActiveTab('subdomains');
+            setActiveTab('about');
           }}
-          className={`px-2 py-1 ${activeTab === 'subdomains' ? 'font-bold text-[#00ff41]' : 'opacity-65'}`}
+          className={`px-2 py-1 ${activeTab === 'about' ? 'font-bold text-[#00ff41] underline' : 'opacity-65'}`}
         >
-          Subdomains
+          About Me
         </button>
         <button
           onClick={() => {
             playKeyClick();
             setActiveTab('cli');
           }}
-          className={`px-2 py-1 ${activeTab === 'cli' ? 'font-bold text-[#00ff41]' : 'opacity-65'}`}
+          className={`px-2 py-1 ${activeTab === 'cli' ? 'font-bold text-[#00ff41]' : 'opacity-50'}`}
         >
           CLI
-        </button>
-        <button
-          onClick={() => {
-            playKeyClick();
-            setActiveTab('astro');
-          }}
-          className={`px-2 py-1 ${activeTab === 'astro' ? 'font-bold text-[#00ff41]' : 'opacity-65'}`}
-        >
-          Astro
         </button>
       </div>
     </header>

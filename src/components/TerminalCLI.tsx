@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ProjectItem, TerminalTheme, CommandHistoryItem } from '../types';
+import { ProjectItem, TerminalTheme, CommandHistoryItem, PortfolioTab } from '../types';
 import { playKeyClick, playBeep, playSuccessChime, playErrorBuzz } from '../utils/audio';
 
 interface TerminalCLIProps {
@@ -11,7 +11,7 @@ interface TerminalCLIProps {
   audioEnabled: boolean;
   setAudioEnabled: (a: boolean) => void;
   onLaunchProject: (project: ProjectItem) => void;
-  onSelectTab: (tab: 'overview' | 'apps' | 'subdomains' | 'cli' | 'astro') => void;
+  onSelectTab: (tab: PortfolioTab) => void;
 }
 
 export const TerminalCLI: React.FC<TerminalCLIProps> = ({

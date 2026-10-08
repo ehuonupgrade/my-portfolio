@@ -5,19 +5,21 @@
 
 import React, { useState, useEffect } from 'react';
 import initialProjectsData from './data/projects.json';
-import { ProjectItem, TerminalTheme } from './types';
+import { ProjectItem, TerminalTheme, PortfolioTab } from './types';
 import { Header } from './components/Header';
 import { ProjectCard } from './components/ProjectCard';
 import { TerminalCLI } from './components/TerminalCLI';
 import { AppSandboxModal } from './components/AppSandboxModal';
 import { SubdomainMatrix } from './components/SubdomainMatrix';
-import { AstroSpecViewer } from './components/AstroSpecViewer';
-import { setAudioEnabled } from './utils/audio';
+import { SpaceRocketBackground } from './components/SpaceRocketBackground';
+import { CosmicGame } from './components/CosmicGame';
+import { AboutSection } from './components/AboutSection';
+import { setAudioEnabled, playKeyClick } from './utils/audio';
 
 export default function App() {
   const [projects, setProjects] = useState<ProjectItem[]>(initialProjectsData as ProjectItem[]);
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'apps' | 'subdomains' | 'cli' | 'astro'>('overview');
+  const [activeTab, setActiveTab] = useState<PortfolioTab>('projects');
   const [theme, setTheme] = useState<TerminalTheme>('green');
   const [scanlines, setScanlines] = useState<boolean>(true);
   const [soundOn, setSoundOn] = useState<boolean>(true);
@@ -69,7 +71,7 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen bg-[#0a0a0a] ${currentTheme.text} font-mono selection:bg-[#00ff41] selection:text-[#0a0a0a] relative transition-colors duration-200`}
+      className={`min-h-screen bg-[#070b0e] ${currentTheme.text} font-mono selection:bg-[#00ff41] selection:text-[#0a0a0a] relative transition-colors duration-200 overflow-x-hidden`}
     >
       {/* Authentic CRT Scanline Overlay */}
       {scanlines && (
@@ -79,7 +81,7 @@ export default function App() {
         />
       )}
 
-      {/* Top Bar Contract Navigation */}
+      {/* Top Bar Navigation Bar: Projects, Games, About Me */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -91,160 +93,113 @@ export default function App() {
         setAudioEnabled={handleAudioChange}
       />
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-10">
-        {/* Top System Telemetry Bar */}
-        <section className={`border-b ${currentTheme.border} pb-6`}>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs opacity-70 mb-3 gap-1">
-            <div className="flex items-center gap-3">
-              <span>HOST: hub.terminal.internal</span>
-              <span aria-hidden="true">·</span>
-              <span>TTY: pts/0</span>
-              <span aria-hidden="true">·</span>
-              <span>EDGE: Vercel CDN</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span>LAST_LOGIN: {lastLogin || 'FETCHING...'}</span>
-              <span aria-hidden="true">·</span>
-              <span className="font-semibold text-emerald-400">200 OK</span>
-            </div>
+      {/* Hero Section with Cool Space Rocket Background */}
+      <section className="relative min-h-[380px] sm:min-h-[440px] flex items-center border-b border-[#142618] overflow-hidden">
+        {/* Background Visual Asset: Space Rocket in Cosmos */}
+        <SpaceRocketBackground />
+
+        {/* Hero Foreground Content */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 sm:py-16 w-full space-y-6">
+          <div className="flex flex-wrap items-center gap-3 text-xs opacity-75 font-mono">
+            <span className="text-[#00ff41] font-bold tracking-widest bg-[#0a180f]/90 px-2.5 py-1 border border-[#1a3d1e]">
+              ORBITAL SYSTEMS ENGINEER
+            </span>
+            <span>HOST: hub.terminal.internal</span>
+            <span aria-hidden="true" className="opacity-40">·</span>
+            <span>LAST_LOGIN: {lastLogin || '2026-10-08'}</span>
+            <span aria-hidden="true" className="opacity-40">·</span>
+            <span className="text-emerald-400 font-bold">ALL SYSTEMS NOMINAL</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="text-xl sm:text-2xl font-bold tracking-tight flex items-center gap-2">
-              <span className="opacity-60">$</span>
-              <span className={currentTheme.glow}>USER_IDENT: GUEST_DEVELOPER</span>
-              <span className="inline-block w-2.5 h-5 bg-current cursor-blink"></span>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs">
-              <button
-                onClick={() => {
-                  const pomodoro = projects.find((p) => p.demoType === 'pomodoro') || projects[0];
-                  setSelectedProject(pomodoro);
-                }}
-                className="px-3 py-1.5 bg-[#142916] hover:bg-current hover:text-[#0a0a0a] transition-colors border border-[#1a3d1e] font-semibold"
-              >
-                Launch Pomodoro &rarr;
-              </button>
-              <button
-                onClick={() => setActiveTab('cli')}
-                className="px-3 py-1.5 border border-[#1a3d1e] hover:border-current transition-colors"
-              >
-                Open Full CLI
-              </button>
-            </div>
+          <div className="space-y-3 max-w-2xl">
+            <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
+              Eric Huon
+            </h1>
+            <p className="text-sm sm:text-base text-[#a3d8ab] leading-relaxed max-w-xl">
+              Architecting high-velocity edge applications, distributed subdomain micro-services,
+              and interactive developer tools.
+            </p>
           </div>
-        </section>
 
-        {/* Tab 1: OVERVIEW */}
-        {activeTab === 'overview' && (
-          <div className="space-y-10">
-            {/* Simulated Terminal Command: >> cat about_me.txt */}
-            <section className={`border ${currentTheme.border} bg-[#0e140e] p-5 shadow-md`}>
-              <div className={`flex items-center justify-between text-xs opacity-75 border-b ${currentTheme.border} pb-2.5 mb-3.5`}>
-                <div className="flex items-center gap-2">
-                  <span>guest@hub:~</span>
-                  <span className="font-semibold text-current">&gt;&gt; cat about_me.txt</span>
-                </div>
-                <span className="opacity-50">UTF-8 · 412 bytes</span>
-              </div>
-
-              <div className="space-y-3 text-sm leading-relaxed text-[#c0ffc9]">
-                <p>
-                  Full-stack systems engineer &amp; interface architect building high-speed edge applications,
-                  developer tooling, and distributed systems.
-                </p>
-                <p className="text-xs opacity-80 pt-1 border-t border-[#142616]">
-                  CORE ARCHITECTURE: Root domain acts as the developer terminal portfolio hub, mapping isolated
-                  CNAME records to specialized micro-applications hosted across subdomains.
-                </p>
-                <div className="flex flex-wrap items-center gap-2 text-xs opacity-65 pt-1">
-                  <span>Astro</span>
-                  <span aria-hidden="true">·</span>
-                  <span>TypeScript</span>
-                  <span aria-hidden="true">·</span>
-                  <span>Tailwind CSS v4</span>
-                  <span aria-hidden="true">·</span>
-                  <span>Vercel Edge</span>
-                  <span aria-hidden="true">·</span>
-                  <span>Distributed Subdomains</span>
-                  <span aria-hidden="true">·</span>
-                  <span>Gemini API</span>
-                </div>
-              </div>
-            </section>
-
-            {/* Live Interactive CLI Terminal Shell */}
-            <section className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-                  <span>&gt;&gt;</span> INTERACTIVE COMMAND RUNNER
-                </h2>
-                <span className="text-xs opacity-60">type &apos;help&apos;, &apos;ls&apos;, or &apos;run pomodoro&apos;</span>
-              </div>
-              <TerminalCLI
-                projects={projects}
-                theme={theme}
-                setTheme={setTheme}
-                scanlines={scanlines}
-                setScanlines={setScanlines}
-                audioEnabled={soundOn}
-                setAudioEnabled={handleAudioChange}
-                onLaunchProject={(p) => setSelectedProject(p)}
-                onSelectTab={setActiveTab}
-              />
-            </section>
-
-            {/* Applications Terminal Blocks Grid */}
-            <section className="space-y-4">
-              <div className={`flex flex-col sm:flex-row sm:items-center justify-between border-b ${currentTheme.border} pb-2 gap-2`}>
-                <h2 className="text-sm font-bold tracking-wider uppercase flex items-center gap-2">
-                  <span>&gt;&gt;</span> APPLICATIONS [{projects.length}]
-                </h2>
-                <div className="flex items-center gap-3 text-xs opacity-75">
-                  <span>SOURCE: src/data/projects.json</span>
-                  <button
-                    onClick={() => setActiveTab('apps')}
-                    className="hover:underline font-semibold"
-                  >
-                    View All &rarr;
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {projects.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    onLaunch={(p) => setSelectedProject(p)}
-                    accentColorClass={currentTheme.text}
-                  />
-                ))}
-              </div>
-            </section>
+          {/* Quick Action Navigation CTAs */}
+          <div className="flex flex-wrap items-center gap-3 pt-2 text-xs">
+            <button
+              onClick={() => {
+                playKeyClick();
+                setActiveTab('projects');
+              }}
+              className={`px-4 py-2 font-bold transition-colors border ${
+                activeTab === 'projects'
+                  ? 'bg-[#00ff41] text-black border-[#00ff41]'
+                  : 'bg-[#0f1d12] hover:bg-[#19321f] text-[#00ff41] border-[#1a3d1e]'
+              }`}
+            >
+              Explore Projects &rarr;
+            </button>
+            <button
+              onClick={() => {
+                playKeyClick();
+                setActiveTab('games');
+              }}
+              className={`px-4 py-2 font-bold transition-colors border ${
+                activeTab === 'games'
+                  ? 'bg-[#00ff41] text-black border-[#00ff41]'
+                  : 'bg-[#0f1d12] hover:bg-[#19321f] text-[#00ff41] border-[#1a3d1e]'
+              }`}
+            >
+              Play Games 🚀
+            </button>
+            <button
+              onClick={() => {
+                playKeyClick();
+                setActiveTab('about');
+              }}
+              className={`px-4 py-2 font-bold transition-colors border ${
+                activeTab === 'about'
+                  ? 'bg-[#00ff41] text-black border-[#00ff41]'
+                  : 'bg-[#0f1d12] hover:bg-[#19321f] text-[#00ff41] border-[#1a3d1e]'
+              }`}
+            >
+              About Me
+            </button>
+            <button
+              onClick={() => {
+                playKeyClick();
+                setActiveTab('cli');
+              }}
+              className="px-3.5 py-2 border border-[#1a3d1e] bg-black/50 hover:border-[#00ff41] transition-colors text-xs"
+            >
+              $ Open Terminal CLI
+            </button>
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* Tab 2: APPLICATIONS */}
-        {activeTab === 'apps' && (
-          <div className="space-y-6">
-            <div className={`border-b ${currentTheme.border} pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3`}>
+      {/* Main Content Sections based on Active Tab */}
+      <main className="max-w-6xl mx-auto px-4 py-10 space-y-10 relative z-10">
+        {/* TAB 1: PROJECTS */}
+        {activeTab === 'projects' && (
+          <div className="space-y-8 animate-fadeIn">
+            {/* Section Header & Filters */}
+            <div className={`border-b ${currentTheme.border} pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
               <div>
-                <h2 className="text-base font-bold uppercase tracking-wider">
-                  SUBDOMAIN APPLICATION DIRECTORY
+                <h2 className="text-lg sm:text-xl font-bold tracking-tight uppercase flex items-center gap-2">
+                  <span>&gt;&gt;</span> FEATURED APPLICATIONS &amp; SUBDOMAIN TOOLS
                 </h2>
-                <p className="text-xs opacity-70 mt-1">
-                  Autonomous developer tools hosted on isolated CNAME endpoints.
+                <p className="text-xs opacity-75 mt-1">
+                  Each application is deployed autonomously to an edge subdomain using CNAME DNS delegation.
                 </p>
               </div>
 
-              {/* Functional interactive category filter (Allowed by guidelines) */}
+              {/* Functional interactive category filter */}
               <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#0c140c] border border-[#1a331c]">
                 {categories.map((cat) => (
                   <button
                     key={cat}
-                    onClick={() => setAppFilter(cat)}
+                    onClick={() => {
+                      playKeyClick();
+                      setAppFilter(cat);
+                    }}
                     className={`px-2.5 py-1 text-xs font-mono transition-colors ${
                       appFilter === cat
                         ? 'bg-[#142916] text-[#00ff41] font-bold border border-[#1a3d1e]'
@@ -257,6 +212,7 @@ export default function App() {
               </div>
             </div>
 
+            {/* Projects Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredProjects.map((project) => (
                 <ProjectCard
@@ -267,29 +223,50 @@ export default function App() {
                 />
               ))}
             </div>
+
+            {/* Embedded Terminal Snippet on Projects View */}
+            <section className={`border ${currentTheme.border} bg-[#0a120c] p-4 mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono`}>
+              <div className="flex items-center gap-3">
+                <span className="text-[#00ff41] font-bold">$</span>
+                <span className="opacity-80">Want to run these from a command line shell?</span>
+              </div>
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  setActiveTab('cli');
+                }}
+                className="px-3 py-1.5 bg-[#142916] hover:bg-[#00ff41] hover:text-black border border-[#1a3d1e] font-semibold text-xs transition-colors shrink-0"
+              >
+                Launch CLI Runner &rarr;
+              </button>
+            </section>
           </div>
         )}
 
-        {/* Tab 3: SUBDOMAINS */}
-        {activeTab === 'subdomains' && (
-          <SubdomainMatrix
-            projects={projects}
-            onAddProject={handleAddProject}
-            onLaunchProject={(p) => setSelectedProject(p)}
-            accentColorClass={currentTheme.text}
-          />
+        {/* TAB 2: GAMES */}
+        {activeTab === 'games' && (
+          <div className="animate-fadeIn">
+            <CosmicGame accentColorClass={currentTheme.text} />
+          </div>
         )}
 
-        {/* Tab 4: INTERACTIVE CLI */}
+        {/* TAB 3: ABOUT ME */}
+        {activeTab === 'about' && (
+          <div className="animate-fadeIn">
+            <AboutSection accentColorClass={currentTheme.text} />
+          </div>
+        )}
+
+        {/* TAB 4: INTERACTIVE CLI */}
         {activeTab === 'cli' && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fadeIn">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-base font-bold uppercase tracking-wider">
-                  FULL-SCREEN TERMINAL SHELL
+                  FULL-SCREEN INTERACTIVE POSIX CLI
                 </h2>
                 <p className="text-xs opacity-70 mt-1">
-                  Native POSIX-style CLI interface for navigating projects, testing DNS endpoints, and running mini-apps.
+                  Simulated developer environment with filesystem inspection, ICMP pings, and in-terminal app execution.
                 </p>
               </div>
             </div>
@@ -308,27 +285,34 @@ export default function App() {
           </div>
         )}
 
-        {/* Tab 5: ASTRO SPEC */}
-        {activeTab === 'astro' && (
-          <AstroSpecViewer
-            projects={projects}
-            accentColorClass={currentTheme.text}
-          />
+        {/* TAB 5: SUBDOMAINS / DNS */}
+        {activeTab === 'subdomains' && (
+          <div className="animate-fadeIn">
+            <SubdomainMatrix
+              projects={projects}
+              onAddProject={handleAddProject}
+              onLaunchProject={(p) => setSelectedProject(p)}
+              accentColorClass={currentTheme.text}
+            />
+          </div>
         )}
 
         {/* Quiet Footer */}
-        <footer className={`mt-16 pt-6 border-t ${currentTheme.border} text-xs opacity-60 flex flex-col sm:flex-row items-center justify-between gap-3 select-none`}>
+        <footer className={`mt-20 pt-6 border-t ${currentTheme.border} text-xs opacity-60 flex flex-col sm:flex-row items-center justify-between gap-3 select-none`}>
           <div className="flex items-center gap-3">
-            <span>TERMINAL_PORTFOLIO_HUB</span>
+            <span>ERIC HUON // PORTFOLIO</span>
             <span aria-hidden="true">·</span>
-            <span>ASTRO + TAILWIND V4 + VERCEL</span>
+            <span>ASTRO · TAILWIND V4 · VERCEL</span>
           </div>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setActiveTab('astro')}
+              onClick={() => {
+                playKeyClick();
+                setActiveTab('subdomains');
+              }}
               className="hover:underline hover:opacity-100"
             >
-              Export Astro Specs
+              Namecheap DNS Wizard
             </button>
             <span aria-hidden="true">·</span>
             <span>STATUS: 200 OK</span>
