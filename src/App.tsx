@@ -8,10 +8,11 @@ import { AnimatedRocketScene } from './components/AnimatedRocketScene';
 import { CosmicGame } from './components/CosmicGame';
 import { playKeyClick } from './utils/audio';
 
-type Tab = 'projects' | 'games' | 'about';
+type Tab = 'home' | 'projects' | 'games' | 'about';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('projects');
+  // Default to 'home' (blank page) when first accessing huon.si
+  const [activeTab, setActiveTab] = useState<Tab>('home');
 
   const handleSelectTab = (tab: Tab) => {
     playKeyClick();
@@ -28,9 +29,13 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
           {/* Left Column: Brand & Integrated Navigation */}
           <div className="md:col-span-4 space-y-8">
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+            {/* huon.si on the top left navigates back to blank home */}
+            <button
+              onClick={() => handleSelectTab('home')}
+              className="text-3xl sm:text-4xl font-bold tracking-tight text-white hover:text-slate-300 transition-colors text-left cursor-pointer block"
+            >
               Huon.si
-            </h1>
+            </button>
 
             {/* Simple Integrated Navigation */}
             <nav className="flex flex-col space-y-2">
@@ -74,6 +79,9 @@ export default function App() {
 
           {/* Right Column: Content for Selected Tab */}
           <div className="md:col-span-8 min-h-[360px]">
+            {/* DEFAULT 'HOME' VIEW: Completely blank as requested */}
+            {activeTab === 'home' && null}
+
             {/* TAB: MY PROJECTS */}
             {activeTab === 'projects' && (
               <div className="space-y-6 animate-fadeIn">
