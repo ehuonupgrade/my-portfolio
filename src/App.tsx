@@ -6,9 +6,10 @@
 import React, { useState } from 'react';
 import { AnimatedRocketScene } from './components/AnimatedRocketScene';
 import { CosmicGame } from './components/CosmicGame';
+import { ChangelogView } from './components/ChangelogView';
 import { playKeyClick } from './utils/audio';
 
-type Tab = 'home' | 'projects' | 'games' | 'about';
+type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'about';
 
 export default function App() {
   // Default to 'home' (blank page) when first accessing huon.si
@@ -64,6 +65,18 @@ export default function App() {
               </button>
 
               <button
+                onClick={() => handleSelectTab('changelog')}
+                className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer ${
+                  activeTab === 'changelog'
+                    ? 'text-white font-bold translate-x-1.5'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {activeTab === 'changelog' && <span className="text-emerald-400 mr-2">&bull;</span>}
+                Version History
+              </button>
+
+              <button
                 onClick={() => handleSelectTab('about')}
                 className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer ${
                   activeTab === 'about'
@@ -111,6 +124,9 @@ export default function App() {
               </div>
             )}
 
+            {/* TAB: VERSION HISTORY / CHANGELOG */}
+            {activeTab === 'changelog' && <ChangelogView />}
+
             {/* TAB: ABOUT ME (No content for now) */}
             {activeTab === 'about' && (
               <div className="space-y-6 animate-fadeIn">
@@ -124,8 +140,11 @@ export default function App() {
       </div>
 
       {/* Simple Minimal Footer */}
-      <footer className="relative z-10 max-w-5xl mx-auto px-6 sm:px-12 py-8 w-full text-xs text-slate-500 font-mono">
+      <footer className="relative z-10 max-w-5xl mx-auto px-6 sm:px-12 py-8 w-full text-xs text-slate-500 font-mono flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-900/60">
         <span>Huon.si</span>
+        <span className="text-slate-400">
+          Built with Google AI Studio &amp; Google Antigravity
+        </span>
       </footer>
     </div>
   );

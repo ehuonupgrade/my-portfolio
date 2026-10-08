@@ -1,0 +1,128 @@
+[
+  {
+    "version": "v0.5.0",
+    "date": "October 8, 2026",
+    "title": "Cosmic Dodger Combat Mechanics & Plasma Cannons",
+    "summary": "Transformed Cosmic Dodger from an evasion-only runner into an active arcade combat game with responsive shooting controls, sound effects, and particle physics.",
+    "tag": "Gameplay",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Added wing-mounted plasma laser cannons with fire rate limiter (SPACEBAR, W, ↑, or on-screen FIRE button)."
+      },
+      {
+        "type": "feature",
+        "description": "Implemented laser-asteroid collision detection with real-time radial explosion particles and scoring (+25 pts per hit)."
+      },
+      {
+        "type": "audio",
+        "description": "Synthesized retro laser firing and asteroid impact audio sweeps using the Web Audio API."
+      },
+      {
+        "type": "ui",
+        "description": "Added real-time 'Destroyed' asteroid count tracker to the in-game telemetry dashboard."
+      },
+      {
+        "type": "footer",
+        "description": "Added platform attribution notice: 'Built with Google AI Studio & Google Antigravity'."
+      }
+    ],
+    "commits": ["ce4b0a2", "90a46b0"]
+  },
+  {
+    "version": "v0.4.0",
+    "date": "October 8, 2026",
+    "title": "Minimalist Layout Integration & Default Blank Canvas",
+    "summary": "Redesigned the layout so the left navigation is naturally integrated into the page without a detached sidebar, eliminated duplicate buttons, and established the default blank state on Huon.si.",
+    "tag": "Layout",
+    "changes": [
+      {
+        "type": "ux",
+        "description": "Configured Huon.si on the top left to navigate to a peaceful blank state, and set it as the default arrival screen."
+      },
+      {
+        "type": "design",
+        "description": "Integrated left navigation directly into the main page grid, removing full-height sidebar borders."
+      },
+      {
+        "type": "cleanup",
+        "description": "Eliminated duplicate CTA buttons on the homepage for a pure, distraction-free interface."
+      },
+      {
+        "type": "privacy",
+        "description": "Removed all mock design work cards and personal identity data, keeping the About Me page blank for now."
+      }
+    ],
+    "commits": ["8df8cfa", "6d14343", "5390ac0", "d56d47e"]
+  },
+  {
+    "version": "v0.3.0",
+    "date": "October 8, 2026",
+    "title": "Custom Domain Integration & Automated CI/CD",
+    "summary": "Configured custom domain routing for huon.si with Namecheap DNS and automated the deployment pipeline using GitHub Actions.",
+    "tag": "Infrastructure",
+    "changes": [
+      {
+        "type": "infra",
+        "description": "Bound huon.si apex domain and CNAME records to GitHub Pages via Namecheap Advanced DNS."
+      },
+      {
+        "type": "ci/cd",
+        "description": "Created .github/workflows/deploy.yml for zero-touch Vite builds and automated GitHub Pages artifact deployment."
+      },
+      {
+        "type": "fix",
+        "description": "Resolved npm peer dependency resolution conflicts (vite vs esbuild) with .npmrc legacy-peer-deps configuration."
+      },
+      {
+        "type": "infra",
+        "description": "Added root and public CNAME files for automated SSL/TLS provisioning on huon.si."
+      }
+    ],
+    "commits": ["fd20a5d", "b42fc25", "77a7ce1", "febf6bd"]
+  },
+  {
+    "version": "v0.2.0",
+    "date": "October 8, 2026",
+    "title": "60fps Animated Canvas Rocketship & Cosmic Dodger",
+    "summary": "Built a custom HTML5 canvas deep space environment with physics-driven rocketship animations, followed by the first playable prototype of Cosmic Dodger.",
+    "tag": "Canvas",
+    "changes": [
+      {
+        "type": "visual",
+        "description": "Created AnimatedRocketScene canvas with multi-layer starfields, twinkling stars, celestial nebulae, and shooting stars."
+      },
+      {
+        "type": "animation",
+        "description": "Engineered sinusoidal floating physics, glowing ion thrusters, and active particle exhaust emitting from rocket nozzles."
+      },
+      {
+        "type": "game",
+        "description": "Prototyped the initial Cosmic Dodger canvas arcade game with player movement, asteroid spawning, and collision detection."
+      }
+    ],
+    "commits": ["ebb69c2", "bb4e128"]
+  },
+  {
+    "version": "v0.1.0",
+    "date": "October 8, 2026",
+    "title": "Genesis: Project Specification & Hub Setup",
+    "summary": "Initialized the experimental portfolio codebase with Astro, Tailwind CSS v4, and subdomain routing architecture.",
+    "tag": "Genesis",
+    "changes": [
+      {
+        "type": "init",
+        "description": "Initialized local Git repository with branch main and established project structure."
+      },
+      {
+        "type": "arch",
+        "description": "Configured Astro spec, Layout.astro, and Vercel edge deployment settings."
+      },
+      {
+        "type": "docs",
+        "description": "Authored README.md documenting architecture and local development workflows."
+      }
+    ],
+    "commits": ["3d3b441", "3083bf4"]
+  }
+]
