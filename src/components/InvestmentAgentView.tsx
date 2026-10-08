@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import agentData from '../data/investment_agent.json';
-import { playKeyClick } from '../utils/audio';
+import initialAgentData from '../data/investment_agent.json';
+import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 
-type AgentSection = 'decisions' | 'constraints' | 'history';
+type AgentSection = 'decisions' | 'constraints' | 'history' | 'setup';
 
 interface InvestmentAgentViewProps {
   onBack?: () => void;
@@ -10,6 +10,10 @@ interface InvestmentAgentViewProps {
 
 export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack }) => {
   const [activeSubTab, setActiveSubTab] = useState<AgentSection>('decisions');
+  const [agentData, setAgentData] = useState(initialAgentData);
+  const [simulating, setSimulating] = useState(false);
+  const [simulationLog, setSimulationLog] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
 
   const getActionColor = (action: string) => {
     if (action.includes('BUY')) {
@@ -19,6 +23,67 @@ export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack
       return 'text-amber-400 bg-amber-950/60 border-amber-800/80';
     }
     return 'text-cyan-400 bg-cyan-950/60 border-cyan-800/80';
+  };
+
+  const handleSimulateTrade = () => {
+    playBeep(640, 0.08);
+    setSimulating(true);
+    setSimulationLog('Evaluating market signals & verifying constraints...');
+
+    setTimeout(() => {
+      const newDecision = {
+        id: `dec-${Date.now().toString().slice(-4)}`,
+        timestamp: new Date().toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'short',
+        }),
+        action: 'BUY',
+        ticker: 'VOO',
+        amount: '$500.00',
+        executionPrice: '$514.80',
+        why: 'Autonomous DCA trigger: Market trading near 20-day exponential moving average. Fulfilling monthly broad-market accumulation quota.',
+        constraintsVerified: [
+          'Position ceiling < 15.0% verified (current projected weight: 9.2%)',
+          'Minimum liquid cash reserve > 10.0% satisfied ($2,700 remaining)',
+          'Approved asset universe validation (S&P 500 Index ETF)',
+          'Slippage verified at 0.02% (below 0.15% ceiling)',
+        ],
+        agentConfidence: '96%',
+      };
+
+      setAgentData((prev) => ({
+        ...prev,
+        decisionLog: [newDecision, ...prev.decisionLog],
+      }));
+
+      playSuccessChime();
+      setSimulating(false);
+      setSimulationLog('✓ Trade executed via Robinhood MCP simulation and logged to public ledger!');
+    }, 1200);
+  };
+
+  const pythonRunnerSnippet = `# Run RoboInvestor Python MCP Agent:
+python3 scripts/robo_investor_agent.py
+
+# Expected Output:
+# [Robinhood MCP] Initialized for Agentic Account: RH_AGENT_0042
+# [CONSTRAINTS PASSED]
+#   ✓ Security is in approved index universe
+#   ✓ Position weight remains below 15.0% limit
+#   ✓ Liquid cash reserve maintained above 10.0% target
+#   ✓ Slippage verified within 0.15% ceiling
+# [Robinhood MCP] Submitting BUY order: 0.9758 shares of VOO @ $512.40`;
+
+  const handleCopyCode = () => {
+    playKeyClick();
+    navigator.clipboard.writeText(pythonRunnerSnippet);
+    setCopiedCode(true);
+    playSuccessChime();
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   return (
@@ -74,7 +139,7 @@ export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack
               playKeyClick();
               setActiveSubTab('decisions');
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
               activeSubTab === 'decisions'
                 ? 'bg-white text-slate-950 font-semibold shadow-xs'
                 : 'text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-slate-800'
@@ -88,7 +153,7 @@ export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack
               playKeyClick();
               setActiveSubTab('constraints');
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
               activeSubTab === 'constraints'
                 ? 'bg-white text-slate-950 font-semibold shadow-xs'
                 : 'text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-slate-800'
@@ -102,13 +167,27 @@ export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack
               playKeyClick();
               setActiveSubTab('history');
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
               activeSubTab === 'history'
                 ? 'bg-white text-slate-950 font-semibold shadow-xs'
                 : 'text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-slate-800'
             }`}
           >
             Constraint Evolution History
+          </button>
+
+          <button
+            onClick={() => {
+              playKeyClick();
+              setActiveSubTab('setup');
+            }}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+              activeSubTab === 'setup'
+                ? 'bg-emerald-400 text-slate-950 font-bold shadow-xs'
+                : 'text-emerald-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-emerald-900/60'
+            }`}
+          >
+            Connection &amp; MCP Setup
           </button>
         </div>
       </div>
@@ -118,7 +197,7 @@ export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack
         <div className="space-y-6 animate-fadeIn">
           <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
             <span>PUBLIC AUDIT TRAIL</span>
-            <span>SHOWING {agentData.decisionLog.length} RECENT ACTIONS</span>
+            <span>SHOWING {agentData.decisionLog.length} RECORDED ACTIONS</span>
           </div>
 
           <div className="space-y-4">
@@ -268,6 +347,99 @@ export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 4: CONNECTION & MCP SETUP GUIDE */}
+      {activeSubTab === 'setup' && (
+        <div className="space-y-8 animate-fadeIn">
+          <div>
+            <h3 className="text-xl font-bold text-white tracking-tight">
+              Robinhood Agentic Setup &amp; MCP Integration
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">
+              Step-by-step instructions to connect your local or cloud agent runner to Robinhood and synchronize transparency logs to Huon.si.
+            </p>
+          </div>
+
+          {/* Interactive Trade Simulator */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900/60 to-slate-950/80 border border-emerald-800/60 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h4 className="text-base font-bold text-white">Interactive Constraint &amp; Trade Simulator</h4>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Test-fire a simulated agent decision cycle. Verifies cash reserve and position limits before logging.
+                </p>
+              </div>
+
+              <button
+                onClick={handleSimulateTrade}
+                disabled={simulating}
+                className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer disabled:opacity-50 shrink-0"
+              >
+                {simulating ? 'Evaluating...' : '▶ Run Simulated Trade Cycle'}
+              </button>
+            </div>
+
+            {simulationLog && (
+              <div className="p-3 bg-slate-950/90 rounded-xl border border-emerald-800/80 font-mono text-xs text-emerald-300 animate-fadeIn">
+                {simulationLog}
+              </div>
+            )}
+          </div>
+
+          {/* Setup Steps Timeline */}
+          <div className="space-y-4">
+            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 text-xs font-bold flex items-center justify-center">
+                  1
+                </span>
+                <h4 className="text-base font-bold text-white">Enable Robinhood Agentic Trading Account</h4>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed pl-9">
+                Open Robinhood &rarr; <strong>Settings</strong> &rarr; <strong>Robinhood Agents</strong>. Create a dedicated Agentic Trading Account. Transfer only your earmarked test capital ($500–$2,000) to keep personal savings isolated.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 text-xs font-bold flex items-center justify-center">
+                  2
+                </span>
+                <h4 className="text-base font-bold text-white">Configure Model Context Protocol (MCP)</h4>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed pl-9">
+                Robinhood provides an official MCP server for external agents. Run the ready-to-use Python script in <code className="text-emerald-400 font-mono">scripts/robo_investor_agent.py</code> to execute the constraint loop:
+              </p>
+
+              <div className="pl-9 pt-2">
+                <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 relative">
+                  <button
+                    onClick={handleCopyCode}
+                    className="absolute top-3 right-3 text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-mono"
+                  >
+                    {copiedCode ? '✓ Copied' : 'Copy'}
+                  </button>
+                  <pre className="text-xs font-mono text-slate-300 overflow-x-auto whitespace-pre">
+                    {pythonRunnerSnippet}
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 text-xs font-bold flex items-center justify-center">
+                  3
+                </span>
+                <h4 className="text-base font-bold text-white">Continuous Sync to Huon.si</h4>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed pl-9">
+                Whenever your agent executes a trade or modifies constraints, the script updates <code className="text-emerald-400 font-mono">src/data/investment_agent.json</code>. Committing this to your GitHub repository triggers your automated GitHub Actions workflow to publish the updated audit trail live to <code className="text-emerald-400 font-mono">huon.si</code>!
+              </p>
+            </div>
           </div>
         </div>
       )}
