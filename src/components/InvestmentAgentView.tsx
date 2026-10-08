@@ -4,7 +4,11 @@ import { playKeyClick } from '../utils/audio';
 
 type AgentSection = 'decisions' | 'constraints' | 'history';
 
-export const InvestmentAgentView: React.FC = () => {
+interface InvestmentAgentViewProps {
+  onBack?: () => void;
+}
+
+export const InvestmentAgentView: React.FC<InvestmentAgentViewProps> = ({ onBack }) => {
   const [activeSubTab, setActiveSubTab] = useState<AgentSection>('decisions');
 
   const getActionColor = (action: string) => {
@@ -19,6 +23,24 @@ export const InvestmentAgentView: React.FC = () => {
 
   return (
     <div className="space-y-8 font-sans animate-fadeIn">
+      {/* Breadcrumb Navigation */}
+      {onBack && (
+        <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+          <button
+            onClick={() => {
+              playKeyClick();
+              onBack();
+            }}
+            className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+          >
+            <span>&larr;</span>
+            <span>My Projects</span>
+          </button>
+          <span>/</span>
+          <span className="text-emerald-400 font-semibold">{agentData.projectTitle}</span>
+        </div>
+      )}
+
       {/* Project Header & Agent Status Banner */}
       <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-6 sm:p-7 backdrop-blur-md space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">

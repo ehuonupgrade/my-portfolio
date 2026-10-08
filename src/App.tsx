@@ -15,10 +15,20 @@ type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'about';
 export default function App() {
   // Default to 'home' (blank page) when first accessing huon.si
   const [activeTab, setActiveTab] = useState<Tab>('home');
+  const [activeProject, setActiveProject] = useState<string | null>(null);
 
   const handleSelectTab = (tab: Tab) => {
     playKeyClick();
     setActiveTab(tab);
+    if (tab !== 'projects') {
+      setActiveProject(null);
+    }
+  };
+
+  const handleOpenProject = (projectId: string) => {
+    playKeyClick();
+    setActiveTab('projects');
+    setActiveProject(projectId);
   };
 
   return (
@@ -41,17 +51,40 @@ export default function App() {
 
             {/* Simple Integrated Navigation */}
             <nav className="flex flex-col space-y-2">
-              <button
-                onClick={() => handleSelectTab('projects')}
-                className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer ${
-                  activeTab === 'projects'
-                    ? 'text-white font-bold translate-x-1.5'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                {activeTab === 'projects' && <span className="text-emerald-400 mr-2">&bull;</span>}
-                My Projects
-              </button>
+              <div>
+                <button
+                  onClick={() => {
+                    handleSelectTab('projects');
+                    setActiveProject(null);
+                  }}
+                  className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer w-full ${
+                    activeTab === 'projects' && !activeProject
+                      ? 'text-white font-bold translate-x-1.5'
+                      : activeTab === 'projects'
+                      ? 'text-white font-semibold'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {activeTab === 'projects' && <span className="text-emerald-400 mr-2">&bull;</span>}
+                  My Projects
+                </button>
+
+                {/* Sub-projects list under My Projects */}
+                {activeTab === 'projects' && (
+                  <div className="pl-5 space-y-1 pt-1 animate-fadeIn">
+                    <button
+                      onClick={() => handleOpenProject('roboinvestor')}
+                      className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
+                        activeProject === 'roboinvestor'
+                          ? 'text-emerald-400 font-semibold'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      &rarr; RoboInvestor
+                    </button>
+                  </div>
+                )}
+              </div>
 
               <button
                 onClick={() => handleSelectTab('games')}
@@ -97,7 +130,74 @@ export default function App() {
             {activeTab === 'home' && null}
 
             {/* TAB: MY PROJECTS */}
-            {activeTab === 'projects' && <InvestmentAgentView />}
+            {activeTab === 'projects' && (
+              <>
+                {/* Isolated Sub-Project: RoboInvestor */}
+                {activeProject === 'roboinvestor' ? (
+                  <InvestmentAgentView onBack={() => setActiveProject(null)} />
+                ) : (
+                  /* Parent Projects Directory */
+                  <div className="space-y-6 animate-fadeIn">
+                    <div className="border-b border-slate-800/80 pb-5">
+                      <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                        My Projects
+                      </h2>
+                      <p className="text-sm text-slate-400 mt-1">
+                        Directory of active experiments, autonomous agents, and explorations.
+                      </p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Featured Project Card: RoboInvestor */}
+                      <div
+                        onClick={() => handleOpenProject('roboinvestor')}
+                        className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-emerald-500/60 transition-all duration-200 cursor-pointer backdrop-blur-md space-y-4 group"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-3">
+                          <div>
+                            <span className="text-xs font-mono text-emerald-400 uppercase tracking-wider font-semibold">
+                              Robinhood Agentic Integration
+                            </span>
+                            <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-emerald-400 transition-colors">
+                              RoboInvestor
+                            </h3>
+                          </div>
+                          <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 self-start sm:self-auto font-medium">
+                            ACTIVE · MONITORING
+                          </span>
+                        </div>
+
+                        <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                          Constraint-bound autonomous investment agent built for Robinhood&apos;s agentic solution. Engineered with radical transparency: real-time decision rationale, hard risk boundaries, and an ongoing constraint evolution log.
+                        </p>
+
+                        <div className="flex items-center justify-between pt-2 text-xs font-mono">
+                          <span className="text-slate-400">
+                            6 Active Constraints &bull; Decision Ledger &bull; Evolution Log
+                          </span>
+                          <span className="text-emerald-400 font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                            <span>Open Project Dashboard</span>
+                            <span>&rarr;</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Placeholder for Next Project */}
+                      <div className="p-6 rounded-2xl bg-slate-900/30 border border-slate-800/40 backdrop-blur-sm space-y-2 opacity-60">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-slate-400">PROJECT TWO</span>
+                          <span className="px-2 py-0.5 rounded bg-slate-950 text-slate-500 text-[11px]">PLANNED</span>
+                        </div>
+                        <h3 className="text-base font-semibold text-white">Upcoming Exploration</h3>
+                        <p className="text-xs text-slate-400">
+                          Next experimental project in development.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
 
             {/* TAB: MY GAMES */}
             {activeTab === 'games' && (
