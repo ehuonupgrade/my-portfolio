@@ -1,5 +1,31 @@
 [
   {
+    "version": "v0.6.0",
+    "date": "October 8, 2026",
+    "title": "Robinhood Agentic Investment Sentinel — Transparency Dashboard",
+    "summary": "Launched the first core project: an autonomous investment agent integrating with Robinhood's agentic solution, designed with radical public transparency across constraints, evolution logs, and execution rationale.",
+    "tag": "Agentic",
+    "changes": [
+      {
+        "type": "project",
+        "description": "Featured the Transparent Investment Agent in 'My Projects' with active monitoring telemetry."
+      },
+      {
+        "type": "constraints",
+        "description": "Defined full active constraint rulebook (15% position caps, 10% dry powder reserve, -6.5% trailing stop, asset universe, sector limits)."
+      },
+      {
+        "type": "audit",
+        "description": "Implemented public Decision Ledger detailing exact buy/sell actions with deep analytical 'Why' rationale and constraint verification checks."
+      },
+      {
+        "type": "history",
+        "description": "Built Constraint Evolution History timeline documenting what rules changed over time and the strategic reasoning behind each refinement."
+      }
+    ],
+    "commits": ["HEAD"]
+  },
+  {
     "version": "v0.5.0",
     "date": "October 8, 2026",
     "title": "Cosmic Dodger Combat Mechanics & Plasma Cannons",

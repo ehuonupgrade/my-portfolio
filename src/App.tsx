@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { AnimatedRocketScene } from './components/AnimatedRocketScene';
 import { CosmicGame } from './components/CosmicGame';
 import { ChangelogView } from './components/ChangelogView';
+import { InvestmentAgentView } from './components/InvestmentAgentView';
 import { playKeyClick } from './utils/audio';
 
 type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'about';
@@ -96,23 +97,7 @@ export default function App() {
             {activeTab === 'home' && null}
 
             {/* TAB: MY PROJECTS */}
-            {activeTab === 'projects' && (
-              <div className="space-y-6 animate-fadeIn">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                  My Projects
-                </h2>
-                <div className="space-y-4 pt-2">
-                  <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-md">
-                    <h3 className="text-base font-semibold text-white">Project One</h3>
-                    <p className="text-sm text-slate-400 mt-1">Coming soon.</p>
-                  </div>
-                  <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-md">
-                    <h3 className="text-base font-semibold text-white">Project Two</h3>
-                    <p className="text-sm text-slate-400 mt-1">Coming soon.</p>
-                  </div>
-                </div>
-              </div>
-            )}
+            {activeTab === 'projects' && <InvestmentAgentView />}
 
             {/* TAB: MY GAMES */}
             {activeTab === 'games' && (

@@ -1,0 +1,123 @@
+{
+  "projectTitle": "Transparent Investment Agent",
+  "platform": "Robinhood Agentic Integration",
+  "status": "MONITORING & EXECUTING",
+  "agentModel": "Constraint-Bound Autonomous Agent",
+  "lastAudited": "October 8, 2026",
+  "cashReserveBuffer": "10.0%",
+  "philosophy": "Every rule defined, every constraint modified, and every trade executed by the autonomous agent is logged publicly with full analytical rationale.",
+  "activeConstraints": [
+    {
+      "id": "c1",
+      "category": "Capital Allocation",
+      "name": "Max Single Position Limit",
+      "value": "15.0% of Portfolio",
+      "rationale": "Strictly prevents idiosyncratic concentration risk in any single equity, preventing severe drawdown from single-stock negative surprises."
+    },
+    {
+      "id": "c2",
+      "category": "Capital Allocation",
+      "name": "Minimum Liquid Cash Reserve",
+      "value": "10.0% Cash Buffer",
+      "rationale": "Guarantees liquid buying power ('dry powder') to capitalize on sudden macro pullbacks without forced selling of core assets."
+    },
+    {
+      "id": "c3",
+      "category": "Risk Management",
+      "name": "Automated Trailing Stop-Loss",
+      "value": "-6.5% from High",
+      "rationale": "Automated downside protection that cuts capital losses during systemic breaks, removing emotional hold bias."
+    },
+    {
+      "id": "c4",
+      "category": "Asset Universe",
+      "name": "Eligible Securities",
+      "value": "S&P 500 Equities & Core Index ETFs",
+      "rationale": "Explicitly prohibits illiquid micro-caps, penny stocks, leveraged tokens, and high-decay options to prioritize capital preservation."
+    },
+    {
+      "id": "c5",
+      "category": "Sector Exposure",
+      "name": "Maximum Sector Allocation",
+      "value": "30.0% (Tech, Financials, Healthcare)",
+      "rationale": "Ensures systematic sector diversification across differing interest rate regimes and macroeconomic cycles."
+    },
+    {
+      "id": "c6",
+      "category": "Execution Quality",
+      "name": "Slippage Ceiling",
+      "value": "Max 0.15% limit order deviation",
+      "rationale": "Protects against bad execution fills during volatile market open or closing auction imbalances."
+    }
+  ],
+  "constraintHistory": [
+    {
+      "date": "October 6, 2026",
+      "constraint": "Minimum Liquid Cash Reserve",
+      "previousValue": "5.0%",
+      "updatedValue": "10.0%",
+      "reason": "Anticipating high macroeconomic data prints and upcoming earnings season; raised buffer to ensure dry powder availability."
+    },
+    {
+      "date": "September 28, 2026",
+      "constraint": "Max Single Position Limit",
+      "previousValue": "20.0%",
+      "updatedValue": "15.0%",
+      "reason": "Stress tests demonstrated unacceptable portfolio variance during concentrated tech pullbacks; lowered cap to spread risk."
+    },
+    {
+      "date": "September 14, 2026",
+      "constraint": "Eligible Securities Universe",
+      "previousValue": "Individual Equities Only",
+      "updatedValue": "Equities + Broad Index ETFs (VOO, QQQ, VTI)",
+      "reason": "Permits systematic dollar-cost averaging into diversified index beta when individual equity valuations appear stretched."
+    }
+  ],
+  "decisionLog": [
+    {
+      "id": "dec-104",
+      "timestamp": "Oct 8, 2026 · 10:14 AM EST",
+      "action": "BUY",
+      "ticker": "VOO",
+      "amount": "$1,200.00",
+      "executionPrice": "$512.40",
+      "why": "Systematic dollar-cost-averaging schedule triggered. Valuations currently trade near 20-day exponential moving average, providing steady beta capture.",
+      "constraintsVerified": [
+        "Position weight remains below 15% limit (currently 8.4%)",
+        "Liquid cash reserve maintained above 10% target",
+        "Slippage verified at 0.03% (within 0.15% ceiling)"
+      ],
+      "agentConfidence": "94%"
+    },
+    {
+      "id": "dec-103",
+      "timestamp": "Oct 7, 2026 · 02:45 PM EST",
+      "action": "TRIM / SELL",
+      "ticker": "NVDA",
+      "amount": "$850.00",
+      "executionPrice": "$134.20",
+      "why": "Mandatory risk rebalancing: Recent run-up elevated NVDA position weight to 16.3%, violating the 15.0% single-asset risk boundary.",
+      "constraintsVerified": [
+        "15.0% Single Position Ceiling breach detected",
+        "Sold 6.33 shares to return weight to 14.8%",
+        "Capital routed back into liquid Cash Reserve"
+      ],
+      "agentConfidence": "99%"
+    },
+    {
+      "id": "dec-102",
+      "timestamp": "Oct 5, 2026 · 11:20 AM EST",
+      "action": "HOLD / MONITOR",
+      "ticker": "AAPL",
+      "amount": "$0.00",
+      "executionPrice": "$228.10",
+      "why": "Observed short-term momentum deceleration, but trailing stop-loss of -6.5% was not triggered (-2.1% drawdown from local high). Position retained.",
+      "constraintsVerified": [
+        "Drawdown -2.1% within -6.5% stop threshold",
+        "Weight is 12.4% (compliant with 15% cap)",
+        "No forced intervention required"
+      ],
+      "agentConfidence": "88%"
+    }
+  ]
+}
