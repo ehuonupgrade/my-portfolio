@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatedRocketScene } from './components/AnimatedRocketScene';
 import { CosmicGame } from './components/CosmicGame';
 import { ChangelogView } from './components/ChangelogView';
@@ -13,23 +13,69 @@ import { playKeyClick } from './utils/audio';
 
 type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'about';
 
-export default function App() {
-  // Default to 'home' (blank page) when first accessing huon.si
-  const [activeTab, setActiveTab] = useState<Tab>('home');
-  const [activeProject, setActiveProject] = useState<string | null>(null);
+interface RouteState {
+  tab: Tab;
+  project: string | null;
+}
 
-  const handleSelectTab = (tab: Tab) => {
+const getPathForState = (tab: Tab, project: string | null): string => {
+  if (tab === 'projects') {
+    return project ? `/myprojects/${project}` : '/myprojects';
+  }
+  if (tab === 'games') return '/mygames';
+  if (tab === 'changelog') return '/version-history';
+  if (tab === 'about') return '/aboutme';
+  return '/';
+};
+
+const getStateForPath = (pathname: string): RouteState => {
+  const clean = pathname.toLowerCase().replace(/\/+$/, '') || '/';
+
+  if (clean === '/myprojects/roboinvestor' || clean === '/projects/roboinvestor') {
+    return { tab: 'projects', project: 'roboinvestor' };
+  }
+  if (clean === '/myprojects' || clean === '/projects') {
+    return { tab: 'projects', project: null };
+  }
+  if (clean === '/mygames' || clean === '/games') {
+    return { tab: 'games', project: null };
+  }
+  if (clean === '/version-history' || clean === '/changelog') {
+    return { tab: 'changelog', project: null };
+  }
+  if (clean === '/aboutme' || clean === '/about') {
+    return { tab: 'about', project: null };
+  }
+
+  return { tab: 'home', project: null };
+};
+
+export default function App() {
+  const initial = getStateForPath(typeof window !== 'undefined' ? window.location.pathname : '/');
+  const [activeTab, setActiveTab] = useState<Tab>(initial.tab);
+  const [activeProject, setActiveProject] = useState<string | null>(initial.project);
+
+  // Sync state with browser Back/Forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const state = getStateForPath(window.location.pathname);
+      setActiveTab(state.tab);
+      setActiveProject(state.project);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = (tab: Tab, project: string | null = null) => {
     playKeyClick();
     setActiveTab(tab);
-    if (tab !== 'projects') {
-      setActiveProject(null);
-    }
-  };
+    setActiveProject(project);
 
-  const handleOpenProject = (projectId: string) => {
-    playKeyClick();
-    setActiveTab('projects');
-    setActiveProject(projectId);
+    const newPath = getPathForState(tab, project);
+    if (window.location.pathname !== newPath) {
+      window.history.pushState(null, '', newPath);
+    }
   };
 
   return (
@@ -44,9 +90,9 @@ export default function App() {
           <div className="md:col-span-4 space-y-8">
             {/* Static picture of the animated rocket acting as the home page link */}
             <button
-              onClick={() => handleSelectTab('home')}
+              onClick={() => navigateTo('home', null)}
               className="group cursor-pointer block p-1 -ml-1 hover:opacity-90 transition-opacity"
-              title="Home"
+              title="Home (huon.si)"
               aria-label="Home"
             >
               <RocketLogo className="w-16 h-10 sm:w-20 sm:h-12" />
@@ -56,10 +102,7 @@ export default function App() {
             <nav className="flex flex-col space-y-2">
               <div>
                 <button
-                  onClick={() => {
-                    handleSelectTab('projects');
-                    setActiveProject(null);
-                  }}
+                  onClick={() => navigateTo('projects', null)}
                   className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer w-full ${
                     activeTab === 'projects' && !activeProject
                       ? 'text-white font-bold translate-x-1.5'
@@ -76,7 +119,7 @@ export default function App() {
                 {activeTab === 'projects' && (
                   <div className="pl-5 space-y-1 pt-1 animate-fadeIn">
                     <button
-                      onClick={() => handleOpenProject('roboinvestor')}
+                      onClick={() => navigateTo('projects', 'roboinvestor')}
                       className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
                         activeProject === 'roboinvestor'
                           ? 'text-emerald-400 font-semibold'
@@ -90,7 +133,7 @@ export default function App() {
               </div>
 
               <button
-                onClick={() => handleSelectTab('games')}
+                onClick={() => navigateTo('games', null)}
                 className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer ${
                   activeTab === 'games'
                     ? 'text-white font-bold translate-x-1.5'
@@ -102,7 +145,7 @@ export default function App() {
               </button>
 
               <button
-                onClick={() => handleSelectTab('changelog')}
+                onClick={() => navigateTo('changelog', null)}
                 className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer ${
                   activeTab === 'changelog'
                     ? 'text-white font-bold translate-x-1.5'
@@ -114,7 +157,7 @@ export default function App() {
               </button>
 
               <button
-                onClick={() => handleSelectTab('about')}
+                onClick={() => navigateTo('about', null)}
                 className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer ${
                   activeTab === 'about'
                     ? 'text-white font-bold translate-x-1.5'
@@ -137,7 +180,7 @@ export default function App() {
               <>
                 {/* Isolated Sub-Project: RoboInvestor */}
                 {activeProject === 'roboinvestor' ? (
-                  <InvestmentAgentView onBack={() => setActiveProject(null)} />
+                  <InvestmentAgentView onBack={() => navigateTo('projects', null)} />
                 ) : (
                   /* Parent Projects Directory */
                   <div className="space-y-6 animate-fadeIn">
@@ -153,7 +196,7 @@ export default function App() {
                     <div className="space-y-4">
                       {/* Featured Project Card: RoboInvestor */}
                       <div
-                        onClick={() => handleOpenProject('roboinvestor')}
+                        onClick={() => navigateTo('projects', 'roboinvestor')}
                         className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-emerald-500/60 transition-all duration-200 cursor-pointer backdrop-blur-md space-y-4 group"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-3">
