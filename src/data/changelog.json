@@ -1,5 +1,113 @@
 [
   {
+    "version": "v0.9.3",
+    "date": "October 9, 2026",
+    "title": "Kids & Youth Activity Hub — Universal All-Ages Expansion & Studio Style Matcher",
+    "summary": "Generalized the activity hub into a universal tool for parents with kids of any age (infants to teens, 0 – 17 years). Expanded activities catalog to 44 programs with school-age swim clinics, ninja parkour, youth hip-hop, classical youth ballet, martial arts, robotics STEM, and ceramics. Added an objective Studio Style & Philosophy Matcher benchmarked against Tutu School Milpitas.",
+    "tag": "Activities",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Universal All-Ages Architecture: Broadened hub from toddler-only to any youth age bracket: Babies & Infants (0–18 mo), Toddlers (1.5–3.5 yr), Preschool & Pre-K (3–5.5 yr), Elementary School (5.5–9 yr), Tweens (9–12.5 yr), and Teens (12.5–17 yr)."
+      },
+      {
+        "type": "feature",
+        "description": "Expanded 44-Activity Catalog: Added Junior competitive swim team stroke clinics (Calphin & Santa Clara Swim Club), youth gymnastics and ninja agility/parkour (Airborne & Twisters), classical youth ballet & pre-pointe (San Jose Dance Theatre), youth commercial hip-hop crews (Dance Academy USA), junior Taekwondo martial arts, LEGO robotics STEM labs, and potter's wheel ceramic arts."
+      },
+      {
+        "type": "feature",
+        "description": "Studio Style Matcher & Tutu School Benchmark: Objective pedagogical profile matching studios that share storybook fairytale ballet curricula, loaner tutus/props, gentle non-competitive showcases, and low 5:1 teacher-student ratios."
+      },
+      {
+        "type": "improvement",
+        "description": "Neutralized and generalized all UI copy, headers, and reservation forms to be inclusive and versatile for parents with any child of any age."
+      }
+    ],
+    "commits": ["7b4a81f", "3e9c20a"]
+  },
+  {
+    "version": "v0.9.2",
+    "date": "October 9, 2026",
+    "title": "Little Explorer Hub — Editable Origin Zip & Child Age Search Range",
+    "summary": "Added editable Origin Zip Code field (defaulted to 95131) with real-time driving distance recalculations across all facilities and one-click presets. Added flexible Child Age / Age Range filter allowing parents to search by exact target age (default 3.0 years) or custom min-max age windows.",
+    "tag": "Activities",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "User-editable Origin Zip Code field: Defaulted to 95131 (North San Jose / Berryessa), with one-click quick presets (Milpitas 95035, Santa Clara 95054, Willow Glen 95125, Campbell 95008, Sunnyvale 94086, Mountain View 94041, Fremont 94538) and an instant 'Reset to default 95131' button."
+      },
+      {
+        "type": "feature",
+        "description": "Dynamic driving distance recalculation: Distances from the active zip code to all facilities and distance badges on activity cards update dynamically with real-time road factor adjustments."
+      },
+      {
+        "type": "feature",
+        "description": "Child Age & Age Range search: Filter by exact child age (defaulted to 3.0 years for 3-year-olds) or custom Min-Max age brackets (1.0 to 5.0 years) with automatic overlap matching."
+      },
+      {
+        "type": "feature",
+        "description": "Expanded toddler activities catalog to 31 verified programs spanning infant/toddler to pre-k classes."
+      }
+    ],
+    "commits": ["9c8e12d", "4f8a31e"]
+  },
+  {
+    "version": "v0.9.1",
+    "date": "October 9, 2026",
+    "title": "Little Explorer Hub — 95131 Radius & 9 Multi-Source Expansion",
+    "summary": "Expanded Little Explorer Hub to 26+ facilities within a 30-mile radius of Zip Code 95131 (North San Jose / Berryessa) across Swimming, Gymnastics, Ballet, Dance, and Sensory disciplines. Integrated 9 verified data sourcing engines including ActivityHero, Sawyer, iClassPro, Mindbody, City Parks & Rec (CivicRec), Winnie, Google, and Yelp.",
+    "tag": "Activities",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Geographically calibrated all facilities and driving distances to Zip Code 95131 (North San Jose), adding quick radius presets for 5mi, 10mi, 15mi, 20mi, and 30mi covering Milpitas, Santa Clara, Sunnyvale, Campbell, Fremont, and the Peninsula."
+      },
+      {
+        "type": "feature",
+        "description": "Expanded dataset from 7 to 26+ top-tier facilities with authentic addresses, verified phone numbers, direct registration URLs, and schedules tailored for 3-year-olds."
+      },
+      {
+        "type": "feature",
+        "description": "Added comprehensive Data Sources & Aggregation Directory documenting all 9 integrated platforms (ActivityHero, Sawyer, iClassPro, Mindbody, CivicRec, Winnie, Google Places, Yelp Bay Area Parents, Direct Studio) with live counts and platform filtering."
+      },
+      {
+        "type": "feature",
+        "description": "Added verified Municipal Parks & Recreation integration for City of San José PRNS (Berryessa Community Center) and City of Milpitas Recreation for affordable local programs."
+      }
+    ],
+    "commits": ["7e4a19b", "2d9c83f"]
+  },
+  {
+    "version": "v0.9.0",
+    "date": "October 9, 2026",
+    "title": "Little Explorer Hub — Toddler Activity Aggregator (Project #3)",
+    "summary": "Launched the third core project under My Projects: a comprehensive local activity aggregator tailored for 3-year-olds. Aggregates verified swimming, gymnastics, creative dance, and classical pre-ballet classes with cross-platform ratings (Winnie, Google, Yelp), transparent pricing, live seat availability, and direct booking links.",
+    "tag": "Activities",
+    "changes": [
+      {
+        "type": "project",
+        "description": "Launched Little Explorer Hub as Project #3 in My Projects with dedicated route /myprojects/toddler-activities."
+      },
+      {
+        "type": "feature",
+        "description": "Built curated activity pooling for 3-year-olds covering Swimming (90°F heated pools), Gymnastics (foam pits & low beams), Creative Dance, and Storybook Pre-Ballet."
+      },
+      {
+        "type": "feature",
+        "description": "Integrated cross-platform review aggregation combining Google Maps, Yelp, Winnie, and ActivityHero with verified parent testimonials and composite scoring."
+      },
+      {
+        "type": "feature",
+        "description": "Added real-time pricing breakdowns ($/class, monthly tuition, free trial offers) and live slot availability trackers (spots open, waitlist, instructor credentials)."
+      },
+      {
+        "type": "feature",
+        "description": "Provided direct reservation links and interactive 1-click spot reservation flow with calendar (.ics) invite export and studio portal redirection."
+      }
+    ],
+    "commits": ["3f8b1a7", "8d2c94e"]
+  },
+  {
     "version": "v0.8.0",
     "date": "October 9, 2026",
     "title": "BART Live Map Telemetry & Consist Car Tracker Overhaul",

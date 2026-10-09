@@ -9,6 +9,7 @@ import { CosmicGame } from './components/CosmicGame';
 import { ChangelogView } from './components/ChangelogView';
 import { InvestmentAgentView } from './components/InvestmentAgentView';
 import { BartPlannerView } from './components/BartPlannerView';
+import { ToddlerActivityHub } from './components/ToddlerActivityHub';
 import { RocketLogo } from './components/RocketLogo';
 import { playKeyClick } from './utils/audio';
 
@@ -23,6 +24,7 @@ const getPathForState = (tab: Tab, project: string | null): string => {
   if (tab === 'projects') {
     if (project === 'roboinvestor') return '/myprojects/roboinvestor';
     if (project === 'bart') return '/myprojects/bart';
+    if (project === 'toddler-activities' || project === 'activities') return '/myprojects/toddler-activities';
     return '/myprojects';
   }
   if (tab === 'games') return '/mygames';
@@ -34,6 +36,14 @@ const getPathForState = (tab: Tab, project: string | null): string => {
 const getStateForPath = (pathname: string): RouteState => {
   const clean = pathname.toLowerCase().replace(/\/+$/, '') || '/';
 
+  if (
+    clean === '/myprojects/toddler-activities' ||
+    clean === '/projects/toddler-activities' ||
+    clean === '/myprojects/activities' ||
+    clean === '/projects/activities'
+  ) {
+    return { tab: 'projects', project: 'toddler-activities' };
+  }
   if (clean === '/myprojects/bart' || clean === '/projects/bart') {
     return { tab: 'projects', project: 'bart' };
   }
@@ -285,6 +295,18 @@ export default function App() {
                     <span>&rarr; RoboInvestor (Robinhood Agent)</span>
                     {activeProject === 'roboinvestor' && <span className="text-cyan-400 text-[10px]">CURRENT</span>}
                   </button>
+
+                  <button
+                    onClick={() => navigateTo('projects', 'toddler-activities')}
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
+                      activeProject === 'toddler-activities'
+                        ? 'bg-pink-950/70 border border-pink-800 text-pink-300 font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>&rarr; Little Explorer (Toddler Classes)</span>
+                    {activeProject === 'toddler-activities' && <span className="text-pink-400 text-[10px]">CURRENT</span>}
+                  </button>
                 </div>
               </div>
 
@@ -377,6 +399,16 @@ export default function App() {
                     >
                       &rarr; BART Planner
                     </button>
+                    <button
+                      onClick={() => navigateTo('projects', 'toddler-activities')}
+                      className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
+                        activeProject === 'toddler-activities'
+                          ? 'text-pink-400 font-semibold'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      &rarr; Kids Activity Hub (Ages 0–17)
+                    </button>
                   </div>
                 )}
               </div>
@@ -435,6 +467,11 @@ export default function App() {
                 {/* Sub-Project 2: BART Schedule Planner */}
                 {activeProject === 'bart' && (
                   <BartPlannerView onBack={() => navigateTo('projects', null)} />
+                )}
+
+                {/* Sub-Project 3: Little Explorer (Toddler Activity Aggregator) */}
+                {activeProject === 'toddler-activities' && (
+                  <ToddlerActivityHub onBack={() => navigateTo('projects', null)} />
                 )}
 
                 {/* Parent Projects Directory */}
@@ -518,16 +555,38 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Project 3 Placeholder */}
-                      <div className="p-6 rounded-2xl bg-slate-900/30 border border-slate-800/40 backdrop-blur-sm space-y-2 opacity-60">
-                        <div className="flex items-center justify-between text-xs font-mono">
-                          <span className="text-slate-400">PROJECT THREE</span>
-                          <span className="px-2 py-0.5 rounded bg-slate-950 text-slate-500 text-[11px]">PLANNED</span>
+                      {/* Project 3: Kids & Youth Activity Hub */}
+                      <div
+                        onClick={() => navigateTo('projects', 'toddler-activities')}
+                        className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-pink-500/60 transition-all duration-200 cursor-pointer backdrop-blur-md space-y-4 group"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-3">
+                          <div>
+                            <span className="text-xs font-mono text-pink-400 uppercase tracking-wider font-semibold">
+                              Bay Area Youth &amp; Kids Activity Aggregator
+                            </span>
+                            <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-pink-300 transition-colors">
+                              Kids &amp; Youth Activity Hub
+                            </h3>
+                          </div>
+                          <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-pink-950/60 border border-pink-800/60 text-pink-300 self-start sm:self-auto font-medium">
+                            AGES 0 – 17 · ALL KIDS
+                          </span>
                         </div>
-                        <h3 className="text-base font-semibold text-white">Upcoming Exploration</h3>
-                        <p className="text-xs text-slate-400">
-                          Next experimental project in development.
+
+                        <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                          Comprehensive local youth activity aggregator for parents with kids of any age (infants to teens). Pools verified swimming programs, gymnastics &amp; ninja parkour, creative dance, classical ballet, martial arts, and STEM with cross-platform ratings (Google, Yelp, Winnie, Sawyer), transparent pricing, live seat availability, and direct registration links.
                         </p>
+
+                        <div className="flex items-center justify-between pt-2 text-xs font-mono">
+                          <span className="text-slate-400">
+                            Swim &bull; Gymnastics &bull; Dance &bull; Ballet &bull; STEM &bull; Martial Arts
+                          </span>
+                          <span className="text-pink-400 font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                            <span>Explore Kids Classes</span>
+                            <span>&rarr;</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
