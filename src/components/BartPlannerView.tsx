@@ -810,7 +810,15 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
                           <span>&bull;</span>
                           <span>{dep.cars}-Car Consist</span>
                           <span>&bull;</span>
-                          <span>{dep.direction}</span>
+                          <span
+                            className={
+                              dep.direction.toLowerCase().startsWith('n')
+                                ? 'text-sky-400 font-semibold'
+                                : 'text-amber-400 font-semibold'
+                            }
+                          >
+                            {dep.direction.toLowerCase().startsWith('n') ? '↑ Northbound' : '↓ Southbound'}
+                          </span>
                         </div>
                       </div>
                     </div>

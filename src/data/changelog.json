@@ -7,8 +7,20 @@
     "tag": "Transit",
     "changes": [
       {
+        "type": "feature",
+        "description": "Added Northbound and Southbound direction filters to live system map and dispatch ledger, with consist counts and interactive toggles."
+      },
+      {
         "type": "project",
         "description": "Added BART Schedule Planner as second sub-project in My Projects with dedicated route: /myprojects/bart."
+      },
+      {
+        "type": "feature",
+        "description": "Added multi-line color selection allowing users to select any combination of transit line colors simultaneously without restriction to one color."
+      },
+      {
+        "type": "feature",
+        "description": "Broke out train direction into its own dedicated column in the Live Train Dispatch Ledger with high-contrast Northbound and Southbound indicators."
       },
       {
         "type": "feature",

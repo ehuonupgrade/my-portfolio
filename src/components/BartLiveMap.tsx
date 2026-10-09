@@ -19,6 +19,9 @@ export interface LiveTrain {
   y: number;
 }
 
+// All 5 primary BART lines
+export const ALL_LINES = ['green', 'yellow', 'red', 'orange', 'blue'] as const;
+
 // Accurate schematic coordinates for all 49 BART stations across the Bay Area (viewBox 860 x 530)
 export const stationCoords: Record<string, { x: number; y: number; name: string }> = {
   // San Francisco Spine (Peninsula & Downtown)
@@ -387,7 +390,10 @@ export const BartLiveMap: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>('Live Connected');
   const [selectedTrain, setSelectedTrain] = useState<LiveTrain | null>(null);
-  const [selectedLine, setSelectedLine] = useState<string>('all');
+
+  // Multi-line selection: allows selecting multiple line colors simultaneously
+  const [selectedLines, setSelectedLines] = useState<string[]>([...ALL_LINES]);
+
   const [viewMode, setViewMode] = useState<'both' | 'map' | 'ledger'>('both');
   const [isLiveConnected, setIsLiveConnected] = useState<boolean>(true);
 
@@ -430,7 +436,8 @@ export const BartLiveMap: React.FC = () => {
                 const lineId = (est.color || 'yellow').toLowerCase();
 
                 // Platform separation: Northbound trains slightly offset left/up, Southbound right/down
-                const offsetX = est.direction === 'North' ? -7 : 7;
+                const isNorth = (est.direction || '').toLowerCase().startsWith('n');
+                const offsetX = isNorth ? -7 : 7;
                 const offsetY = 0;
 
                 parsedTrains.push({
@@ -441,8 +448,18 @@ export const BartLiveMap: React.FC = () => {
                   destAbbr: item.abbreviation,
                   lineId,
                   lineName: `${est.color || 'BART'} Line`,
-                  hexcolor: est.hexcolor || (lineId === 'green' ? '#22c55e' : lineId === 'orange' ? '#f97316' : lineId === 'red' ? '#ef4444' : lineId === 'blue' ? '#3b82f6' : '#facc15'),
-                  direction: est.direction || 'South',
+                  hexcolor:
+                    est.hexcolor ||
+                    (lineId === 'green'
+                      ? '#22c55e'
+                      : lineId === 'orange'
+                      ? '#f97316'
+                      : lineId === 'red'
+                      ? '#ef4444'
+                      : lineId === 'blue'
+                      ? '#3b82f6'
+                      : '#facc15'),
+                  direction: isNorth ? 'North' : 'South',
                   cars: est.length || '8',
                   minutes: est.minutes,
                   platform: est.platform ? `Platform ${est.platform}` : 'Platform 1',
@@ -478,11 +495,89 @@ export const BartLiveMap: React.FC = () => {
     return () => clearInterval(interval);
   }, [fetchLiveTrains]);
 
-  // Filtered train set according to selected line
+  // Multi-direction selection: allows filtering Northbound, Southbound, or both
+  const [selectedDirections, setSelectedDirections] = useState<string[]>(['North', 'South']);
+
+  // Multi-line filter handler: toggle individual lines on/off, supporting multiple lines
+  const toggleLine = (lineId: string) => {
+    playKeyClick();
+    setSelectedLines((prev) => {
+      // If currently ALL lines are selected, clicking one line isolates it to start a custom multi-selection
+      if (prev.length === ALL_LINES.length) {
+        return [lineId];
+      }
+      // If the line is already selected
+      if (prev.includes(lineId)) {
+        const next = prev.filter((l) => l !== lineId);
+        // If user deselects the last remaining line, revert back to all lines
+        return next.length === 0 ? [...ALL_LINES] : next;
+      }
+      // Otherwise, add this line to the active selection (multi-line select)
+      return [...prev, lineId];
+    });
+  };
+
+  const selectAllLines = () => {
+    playKeyClick();
+    setSelectedLines([...ALL_LINES]);
+  };
+
+  // Direction filter handler: toggle Northbound and/or Southbound
+  const toggleDirection = (dir: 'North' | 'South') => {
+    playKeyClick();
+    setSelectedDirections((prev) => {
+      // If currently BOTH directions are selected, clicking one isolates it
+      if (prev.length === 2) {
+        return [dir];
+      }
+      // If this direction is already selected
+      if (prev.includes(dir)) {
+        const next = prev.filter((d) => d !== dir);
+        // If user deselects the last remaining direction, revert back to both
+        return next.length === 0 ? ['North', 'South'] : next;
+      }
+      // Otherwise, add this direction to active selection (both are now active)
+      return [...prev, dir];
+    });
+  };
+
+  const selectAllDirections = () => {
+    playKeyClick();
+    setSelectedDirections(['North', 'South']);
+  };
+
+  const isNorthSelected = selectedDirections.includes('North');
+  const isSouthSelected = selectedDirections.includes('South');
+  const isAllDirectionsSelected = isNorthSelected && isSouthSelected;
+
+  // Real-time train counts categorized by direction matching the current line selection
+  const directionCounts = useMemo(() => {
+    const trainsInSelectedLines = trains.filter(
+      (t) => selectedLines.length === ALL_LINES.length || selectedLines.includes(t.lineId.toLowerCase())
+    );
+    const north = trainsInSelectedLines.filter((t) => (t.direction || '').toLowerCase().startsWith('n')).length;
+    const south = trainsInSelectedLines.filter((t) => !(t.direction || '').toLowerCase().startsWith('n')).length;
+    return {
+      total: trainsInSelectedLines.length,
+      north,
+      south,
+    };
+  }, [trains, selectedLines]);
+
+  // Filtered train set according to all selected lines AND selected directions
   const filteredTrains = useMemo(() => {
-    if (selectedLine === 'all') return trains;
-    return trains.filter((t) => t.lineId.toLowerCase() === selectedLine.toLowerCase());
-  }, [trains, selectedLine]);
+    return trains.filter((t) => {
+      const matchesLine =
+        selectedLines.length === ALL_LINES.length || selectedLines.includes(t.lineId.toLowerCase());
+      const isNorth = (t.direction || '').toLowerCase().startsWith('n');
+      const matchesDirection =
+        (isNorth && selectedDirections.includes('North')) ||
+        (!isNorth && selectedDirections.includes('South'));
+      return matchesLine && matchesDirection;
+    });
+  }, [trains, selectedLines, selectedDirections]);
+
+  const isAllLinesSelected = selectedLines.length === ALL_LINES.length;
 
   // Smooth scroll to ledger
   const scrollToLedger = () => {
@@ -500,7 +595,7 @@ export const BartLiveMap: React.FC = () => {
 
   return (
     <div className="space-y-6 font-sans">
-      {/* Header & Line Toggle Bar */}
+      {/* Header & Multi-Line Toggle Bar */}
       <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-5 backdrop-blur-md space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
           <div>
@@ -574,146 +669,236 @@ export const BartLiveMap: React.FC = () => {
           </div>
         </div>
 
-        {/* Dedicated Line Selection Buttons (Toggle for specific train lines) */}
+        {/* Multi-Line Selection Buttons */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold block">
-              Filter Active Trains by Line on Map &amp; Ledger:
-            </label>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div className="flex items-center gap-2">
+              <label className="text-[11px] font-mono uppercase tracking-wider text-slate-300 font-semibold block">
+                Filter Lines (Select Multiple Colors):
+              </label>
+              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800 px-2 py-0.5 rounded">
+                {selectedLines.length} of 5 Active
+              </span>
+            </div>
             <button
               onClick={scrollToLedger}
-              className="text-xs font-mono text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-xs font-mono text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto"
             >
               <span>↓ Jump to Dispatch Ledger ({filteredTrains.length})</span>
             </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {/* ALL LINES */}
+            {/* ALL LINES BUTTON */}
             <button
-              onClick={() => {
-                playKeyClick();
-                setSelectedLine('all');
-              }}
+              onClick={selectAllLines}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
-                selectedLine === 'all'
-                  ? 'bg-white text-slate-950 shadow-md ring-2 ring-white/20'
-                  : 'bg-slate-950 text-slate-300 hover:text-white border border-slate-800'
+                isAllLinesSelected
+                  ? 'bg-white text-slate-950 shadow-md ring-2 ring-white/30'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
               }`}
+              title="Select all 5 BART lines"
             >
-              ALL LINES ({trains.length})
+              {isAllLinesSelected ? '✓ ALL LINES (5)' : 'SELECT ALL LINES'}
             </button>
 
             {/* GREEN LINE TOGGLE */}
             <button
-              onClick={() => {
-                playKeyClick();
-                setSelectedLine('green');
-              }}
+              onClick={() => toggleLine('green')}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedLine === 'green'
-                  ? 'bg-emerald-500 text-slate-950 shadow-md ring-2 ring-emerald-400/40'
-                  : 'bg-emerald-950/40 text-emerald-400 hover:bg-emerald-950/70 border border-emerald-800/80'
+                selectedLines.includes('green')
+                  ? 'bg-emerald-500 text-slate-950 shadow-md ring-2 ring-emerald-400/50'
+                  : 'bg-slate-950 text-emerald-400/60 hover:text-emerald-300 border border-emerald-950 hover:border-emerald-800 opacity-60 hover:opacity-100'
               }`}
+              title="Toggle Green Line (Berryessa ↔ Daly City)"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>GREEN LINE</span>
-              <span className="text-[11px] opacity-80">
+              <span>{selectedLines.includes('green') ? '✓ GREEN' : '+ GREEN'}</span>
+              <span className="text-[11px] opacity-85">
                 ({trains.filter((t) => t.lineId === 'green').length})
               </span>
             </button>
 
             {/* YELLOW LINE TOGGLE */}
             <button
-              onClick={() => {
-                playKeyClick();
-                setSelectedLine('yellow');
-              }}
+              onClick={() => toggleLine('yellow')}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedLine === 'yellow'
-                  ? 'bg-yellow-400 text-slate-950 shadow-md ring-2 ring-yellow-400/40'
-                  : 'bg-yellow-950/40 text-yellow-400 hover:bg-yellow-950/70 border border-yellow-800/80'
+                selectedLines.includes('yellow')
+                  ? 'bg-yellow-400 text-slate-950 shadow-md ring-2 ring-yellow-400/50'
+                  : 'bg-slate-950 text-yellow-400/60 hover:text-yellow-300 border border-yellow-950 hover:border-yellow-800 opacity-60 hover:opacity-100'
               }`}
+              title="Toggle Yellow Line (Antioch ↔ SFO / Millbrae)"
             >
               <span className="w-2 h-2 rounded-full bg-yellow-400" />
-              <span>YELLOW LINE</span>
-              <span className="text-[11px] opacity-80">
+              <span>{selectedLines.includes('yellow') ? '✓ YELLOW' : '+ YELLOW'}</span>
+              <span className="text-[11px] opacity-85">
                 ({trains.filter((t) => t.lineId === 'yellow').length})
               </span>
             </button>
 
             {/* RED LINE TOGGLE */}
             <button
-              onClick={() => {
-                playKeyClick();
-                setSelectedLine('red');
-              }}
+              onClick={() => toggleLine('red')}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedLine === 'red'
-                  ? 'bg-red-500 text-white shadow-md ring-2 ring-red-400/40'
-                  : 'bg-red-950/40 text-red-400 hover:bg-red-950/70 border border-red-800/80'
+                selectedLines.includes('red')
+                  ? 'bg-red-500 text-white shadow-md ring-2 ring-red-400/50'
+                  : 'bg-slate-950 text-red-400/60 hover:text-red-300 border border-red-950 hover:border-red-800 opacity-60 hover:opacity-100'
               }`}
+              title="Toggle Red Line (Richmond ↔ Millbrae)"
             >
               <span className="w-2 h-2 rounded-full bg-red-400" />
-              <span>RED LINE</span>
-              <span className="text-[11px] opacity-80">
+              <span>{selectedLines.includes('red') ? '✓ RED' : '+ RED'}</span>
+              <span className="text-[11px] opacity-85">
                 ({trains.filter((t) => t.lineId === 'red').length})
               </span>
             </button>
 
             {/* ORANGE LINE TOGGLE */}
             <button
-              onClick={() => {
-                playKeyClick();
-                setSelectedLine('orange');
-              }}
+              onClick={() => toggleLine('orange')}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedLine === 'orange'
-                  ? 'bg-orange-500 text-slate-950 shadow-md ring-2 ring-orange-400/40'
-                  : 'bg-orange-950/40 text-orange-400 hover:bg-orange-950/70 border border-orange-800/80'
+                selectedLines.includes('orange')
+                  ? 'bg-orange-500 text-slate-950 shadow-md ring-2 ring-orange-400/50'
+                  : 'bg-slate-950 text-orange-400/60 hover:text-orange-300 border border-orange-950 hover:border-orange-800 opacity-60 hover:opacity-100'
               }`}
+              title="Toggle Orange Line (Richmond ↔ Berryessa)"
             >
               <span className="w-2 h-2 rounded-full bg-orange-400" />
-              <span>ORANGE LINE</span>
-              <span className="text-[11px] opacity-80">
+              <span>{selectedLines.includes('orange') ? '✓ ORANGE' : '+ ORANGE'}</span>
+              <span className="text-[11px] opacity-85">
                 ({trains.filter((t) => t.lineId === 'orange').length})
               </span>
             </button>
 
             {/* BLUE LINE TOGGLE */}
             <button
-              onClick={() => {
-                playKeyClick();
-                setSelectedLine('blue');
-              }}
+              onClick={() => toggleLine('blue')}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedLine === 'blue'
-                  ? 'bg-blue-500 text-white shadow-md ring-2 ring-blue-400/40'
-                  : 'bg-blue-950/40 text-blue-400 hover:bg-blue-950/70 border border-blue-800/80'
+                selectedLines.includes('blue')
+                  ? 'bg-blue-500 text-white shadow-md ring-2 ring-blue-400/50'
+                  : 'bg-slate-950 text-blue-400/60 hover:text-blue-300 border border-blue-950 hover:border-blue-800 opacity-60 hover:opacity-100'
               }`}
+              title="Toggle Blue Line (Dublin/Pleasanton ↔ Daly City)"
             >
               <span className="w-2 h-2 rounded-full bg-blue-400" />
-              <span>BLUE LINE</span>
-              <span className="text-[11px] opacity-80">
+              <span>{selectedLines.includes('blue') ? '✓ BLUE' : '+ BLUE'}</span>
+              <span className="text-[11px] opacity-85">
                 ({trains.filter((t) => t.lineId === 'blue').length})
               </span>
             </button>
           </div>
         </div>
 
-        {/* Selected Line Active Banner */}
-        {selectedLine !== 'all' && (
-          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-slate-300">
-            <div>
-              <span className="text-emerald-400 font-bold">● ISOLATING:</span>{' '}
-              <strong className="text-white uppercase font-bold">{selectedLine} LINE</strong>{' '}
-              ({filteredTrains.length} active consists currently tracked on map and ledger)
+        {/* Direction Selection Section (Northbound and/or Southbound) */}
+        <div className="space-y-2 pt-3 border-t border-slate-800/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div className="flex items-center gap-2">
+              <label className="text-[11px] font-mono uppercase tracking-wider text-slate-300 font-semibold block">
+                Filter Direction (Northbound &amp; Southbound):
+              </label>
+              <span
+                className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                  isAllDirectionsSelected
+                    ? 'text-emerald-400 bg-emerald-950/70 border-emerald-800'
+                    : isNorthSelected
+                    ? 'text-sky-400 bg-sky-950/70 border-sky-800'
+                    : 'text-amber-400 bg-amber-950/70 border-amber-800'
+                }`}
+              >
+                {isAllDirectionsSelected
+                  ? 'Both Directions Active'
+                  : isNorthSelected
+                  ? '↑ Northbound Only'
+                  : '↓ Southbound Only'}
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-slate-400">
+              {directionCounts.total} Trains in Current Line Selection
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* ALL / BOTH DIRECTIONS */}
+            <button
+              onClick={selectAllDirections}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                isAllDirectionsSelected
+                  ? 'bg-white text-slate-950 shadow-md ring-2 ring-white/30'
+                  : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+              title="Show both Northbound and Southbound trains"
+            >
+              {isAllDirectionsSelected ? '✓ ALL DIRECTIONS (2)' : 'BOTH DIRECTIONS'}
+            </button>
+
+            {/* NORTHBOUND TOGGLE */}
+            <button
+              onClick={() => toggleDirection('North')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                isNorthSelected
+                  ? 'bg-sky-500 text-slate-950 shadow-md ring-2 ring-sky-400/50'
+                  : 'bg-slate-950 text-sky-400/60 hover:text-sky-300 border border-sky-950 hover:border-sky-800 opacity-60 hover:opacity-100'
+              }`}
+              title="Filter Northbound trains"
+            >
+              <span className="text-sm font-black">↑</span>
+              <span>{isNorthSelected ? '✓ NORTHBOUND' : '+ NORTHBOUND'}</span>
+              <span className="text-[11px] opacity-85">({directionCounts.north})</span>
+            </button>
+
+            {/* SOUTHBOUND TOGGLE */}
+            <button
+              onClick={() => toggleDirection('South')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                isSouthSelected
+                  ? 'bg-amber-500 text-slate-950 shadow-md ring-2 ring-amber-400/50'
+                  : 'bg-slate-950 text-amber-400/60 hover:text-amber-300 border border-amber-950 hover:border-amber-800 opacity-60 hover:opacity-100'
+              }`}
+              title="Filter Southbound trains"
+            >
+              <span className="text-sm font-black">↓</span>
+              <span>{isSouthSelected ? '✓ SOUTHBOUND' : '+ SOUTHBOUND'}</span>
+              <span className="text-[11px] opacity-85">({directionCounts.south})</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Selected Filters Active Banner */}
+        {(!isAllLinesSelected || !isAllDirectionsSelected) && (
+          <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-300 animate-fadeIn">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-emerald-400 font-bold">● ACTIVE FILTER:</span>
+                {!isAllLinesSelected && (
+                  <span className="bg-slate-900 px-2 py-0.5 rounded border border-slate-700 text-white font-bold uppercase">
+                    Lines ({selectedLines.length}): {selectedLines.join(', ')}
+                  </span>
+                )}
+                {!isAllDirectionsSelected && (
+                  <span
+                    className={`px-2 py-0.5 rounded border font-bold uppercase ${
+                      isNorthSelected
+                        ? 'bg-sky-950 text-sky-300 border-sky-800'
+                        : 'bg-amber-950 text-amber-300 border-amber-800'
+                    }`}
+                  >
+                    Direction: {isNorthSelected ? '↑ Northbound Only' : '↓ Southbound Only'}
+                  </span>
+                )}
+              </div>
+              <div className="text-slate-400 text-[11px]">
+                Showing <strong className="text-white">{filteredTrains.length}</strong> active consists (out of{' '}
+                {trains.length} total across system) on map and ledger
+              </div>
             </div>
             <button
-              onClick={() => setSelectedLine('all')}
-              className="text-emerald-400 hover:underline cursor-pointer self-start sm:self-auto font-semibold"
+              onClick={() => {
+                selectAllLines();
+                selectAllDirections();
+              }}
+              className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-emerald-400 hover:text-emerald-300 text-xs font-mono font-bold cursor-pointer transition-colors self-start sm:self-auto shrink-0"
             >
-              Show All Lines &rarr;
+              Reset All Filters &rarr;
             </button>
           </div>
         )}
@@ -725,9 +910,15 @@ export const BartLiveMap: React.FC = () => {
           <div className="absolute top-4 left-4 pointer-events-none text-[11px] font-mono text-slate-500 space-y-0.5 z-10">
             <div className="text-slate-400 font-bold">BAY AREA RAPID TRANSIT NETWORK</div>
             <div>
-              {selectedLine === 'all'
-                ? 'REAL-TIME PHYSICAL TRAIN POSITIONS'
-                : `${selectedLine.toUpperCase()} LINE PHYSICAL PLATFORM LOCATIONS`}
+              {isAllLinesSelected && isAllDirectionsSelected
+                ? 'REAL-TIME PHYSICAL TRAIN POSITIONS (ALL LINES & DIRECTIONS)'
+                : `FILTERED: ${!isAllLinesSelected ? selectedLines.map((l) => l.toUpperCase()).join(' + ') : 'ALL LINES'}${
+                    !isAllDirectionsSelected
+                      ? isNorthSelected
+                        ? ' • [↑ NORTHBOUND ONLY]'
+                        : ' • [↓ SOUTHBOUND ONLY]'
+                      : ''
+                  }`}
             </div>
           </div>
 
@@ -763,7 +954,7 @@ export const BartLiveMap: React.FC = () => {
 
             {/* Line Track Rails */}
             {Object.entries(trackLines).map(([lId, config]) => {
-              const isHighlighted = selectedLine === 'all' || selectedLine === lId;
+              const isHighlighted = selectedLines.includes(lId);
               const pts = config.stations
                 .map((code) => stationCoords[code])
                 .filter(Boolean);
@@ -774,7 +965,7 @@ export const BartLiveMap: React.FC = () => {
               return (
                 <g
                   key={lId}
-                  opacity={isHighlighted ? 0.95 : 0.12}
+                  opacity={isHighlighted ? 0.95 : 0.1}
                   className="transition-opacity duration-300"
                 >
                   <path
@@ -790,7 +981,7 @@ export const BartLiveMap: React.FC = () => {
                     d={pathD}
                     fill="none"
                     stroke={config.color}
-                    strokeWidth={isHighlighted ? '3.2' : '1.5'}
+                    strokeWidth={isHighlighted ? '3.2' : '1.2'}
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
@@ -920,7 +1111,11 @@ export const BartLiveMap: React.FC = () => {
                     {selectedTrain.lineName} &bull; Bound for {selectedTrain.destination}
                   </div>
                   <div className="text-slate-400">
-                    Station: <strong className="text-white">{selectedTrain.stationName}</strong> &bull; {selectedTrain.cars} Cars &bull; {selectedTrain.platform}
+                    Station: <strong className="text-white">{selectedTrain.stationName}</strong> &bull;{' '}
+                    <span className="text-slate-300 font-mono font-semibold">
+                      {selectedTrain.direction.toLowerCase().startsWith('n') ? '↑ Northbound' : '↓ Southbound'}
+                    </span>{' '}
+                    &bull; {selectedTrain.cars} Cars &bull; {selectedTrain.platform}
                   </div>
                 </div>
               </div>
@@ -950,13 +1145,17 @@ export const BartLiveMap: React.FC = () => {
       {/* Real-Time Live Fleet Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
         <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
-          <span className="text-slate-400 text-[11px] block">ACTIVE TRAINS (TOTAL)</span>
+          <span className="text-slate-400 text-[11px] block">ACTIVE TRAINS (SYSTEM)</span>
           <span className="text-lg font-bold text-emerald-400">{trains.length} Trains</span>
         </div>
         <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
           <span className="text-slate-400 text-[11px] block">FILTERED ON SCREEN</span>
           <span className="text-lg font-bold text-cyan-400">
-            {filteredTrains.length} on {selectedLine === 'all' ? 'All Lines' : `${selectedLine.toUpperCase()} Line`}
+            {filteredTrains.length} Trains
+          </span>
+          <span className="text-[10px] text-slate-400 font-mono block mt-0.5">
+            {selectedLines.length} {selectedLines.length === 1 ? 'Line' : 'Lines'} &bull;{' '}
+            {isAllDirectionsSelected ? 'Both Directions' : isNorthSelected ? '↑ Northbound' : '↓ Southbound'}
           </span>
         </div>
         <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
@@ -969,7 +1168,7 @@ export const BartLiveMap: React.FC = () => {
         </div>
       </div>
 
-      {/* LIVE TRAIN DISPATCH LEDGER TABLE (Always Visible in 'both' and 'ledger' modes) */}
+      {/* LIVE TRAIN DISPATCH LEDGER TABLE WITH DEDICATED DIRECTION COLUMN */}
       {(viewMode === 'both' || viewMode === 'ledger') && (
         <div
           id="dispatch-ledger"
@@ -984,9 +1183,17 @@ export const BartLiveMap: React.FC = () => {
                 </h4>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                {selectedLine === 'all'
-                  ? 'Showing all active trains currently at stations across the network. Click any row to highlight on map.'
-                  : `Showing only active ${selectedLine.toUpperCase()} LINE trains. Click any row to highlight on map.`}
+                {isAllLinesSelected && isAllDirectionsSelected
+                  ? 'Showing active trains across all lines and directions. Direction is broken out into its own column. Click any row to highlight on map.'
+                  : `Showing ${filteredTrains.length} active trains (${
+                      !isAllLinesSelected ? selectedLines.map((l) => l.toUpperCase()).join(', ') : 'All Lines'
+                    } • ${
+                      !isAllDirectionsSelected
+                        ? isNorthSelected
+                          ? '↑ Northbound Only'
+                          : '↓ Southbound Only'
+                        : 'Both Directions'
+                    }). Click any row to highlight on map.`}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -1002,6 +1209,7 @@ export const BartLiveMap: React.FC = () => {
                 <thead>
                   <tr className="border-b border-slate-800/80 text-slate-400 font-mono text-[11px] uppercase">
                     <th className="py-2.5 px-3">Line</th>
+                    <th className="py-2.5 px-3">Direction</th>
                     <th className="py-2.5 px-3">Destination</th>
                     <th className="py-2.5 px-3">Current Station</th>
                     <th className="py-2.5 px-3">Status / Platform</th>
@@ -1012,6 +1220,8 @@ export const BartLiveMap: React.FC = () => {
                 <tbody className="divide-y divide-slate-800/40">
                   {filteredTrains.map((train) => {
                     const isSelected = selectedTrain?.id === train.id;
+                    const isNorth = (train.direction || '').toLowerCase().startsWith('n');
+
                     return (
                       <tr
                         key={train.id}
@@ -1025,7 +1235,8 @@ export const BartLiveMap: React.FC = () => {
                             : 'hover:bg-slate-800/40 text-slate-300'
                         }`}
                       >
-                        <td className="py-3 px-3">
+                        {/* Line Badge */}
+                        <td className="py-3 px-3 whitespace-nowrap">
                           <span
                             className="inline-block w-3 h-3 rounded-full mr-2 align-middle"
                             style={{ backgroundColor: train.hexcolor }}
@@ -1034,14 +1245,46 @@ export const BartLiveMap: React.FC = () => {
                             {train.lineId} Line
                           </span>
                         </td>
-                        <td className="py-3 px-3 font-semibold text-white">
-                          {train.destination}{' '}
-                          <span className="text-[10px] text-slate-400">({train.direction})</span>
+
+                        {/* Dedicated Direction Column with quick toggle filter */}
+                        <td className="py-3 px-3 whitespace-nowrap">
+                          {isNorth ? (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleDirection('North');
+                              }}
+                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-sky-950/80 border border-sky-800 hover:border-sky-600 hover:bg-sky-900/60 text-sky-400 font-mono font-bold text-[11px] cursor-pointer transition-colors"
+                              title="Click to toggle Northbound filter"
+                            >
+                              <span className="text-xs">↑</span> Northbound
+                            </button>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleDirection('South');
+                              }}
+                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-950/80 border border-amber-800 hover:border-amber-600 hover:bg-amber-900/60 text-amber-400 font-mono font-bold text-[11px] cursor-pointer transition-colors"
+                              title="Click to toggle Southbound filter"
+                            >
+                              <span className="text-xs">↓</span> Southbound
+                            </button>
+                          )}
                         </td>
-                        <td className="py-3 px-3 font-mono text-emerald-300 font-medium">
+
+                        {/* Destination */}
+                        <td className="py-3 px-3 font-semibold text-white whitespace-nowrap">
+                          {train.destination}
+                        </td>
+
+                        {/* Current Station */}
+                        <td className="py-3 px-3 font-mono text-emerald-300 font-medium whitespace-nowrap">
                           {train.stationName}
                         </td>
-                        <td className="py-3 px-3 font-mono">
+
+                        {/* Status / Platform */}
+                        <td className="py-3 px-3 font-mono whitespace-nowrap">
                           {train.minutes === 'Leaving' ? (
                             <span className="text-emerald-400 font-bold">● Boarding / Departing</span>
                           ) : (
@@ -1050,10 +1293,14 @@ export const BartLiveMap: React.FC = () => {
                             </span>
                           )}
                         </td>
-                        <td className="py-3 px-3 font-mono text-slate-300">
+
+                        {/* Cars */}
+                        <td className="py-3 px-3 font-mono text-slate-300 whitespace-nowrap">
                           {train.cars} cars
                         </td>
-                        <td className="py-3 px-3 font-mono">
+
+                        {/* Delay */}
+                        <td className="py-3 px-3 font-mono whitespace-nowrap">
                           {train.delaySec > 0 ? (
                             <span className="text-amber-400 font-bold">
                               +{Math.round(train.delaySec / 60)}m
@@ -1070,12 +1317,22 @@ export const BartLiveMap: React.FC = () => {
             </div>
           ) : (
             <div className="p-8 text-center text-slate-400 border border-dashed border-slate-800 rounded-xl text-xs space-y-2">
-              <p>No active trains detected on the {selectedLine.toUpperCase()} LINE right now.</p>
+              <p>
+                No active trains detected matching the current filters (Lines:{' '}
+                {selectedLines.map((l) => l.toUpperCase()).join(', ')} &bull; Direction:{' '}
+                {isNorthSelected ? 'Northbound' : ''}
+                {isNorthSelected && isSouthSelected ? ' & ' : ''}
+                {!isNorthSelected && isSouthSelected ? 'Southbound' : ''}
+                {isNorthSelected && isSouthSelected ? 'Southbound' : ''}).
+              </p>
               <button
-                onClick={() => setSelectedLine('all')}
-                className="text-emerald-400 underline font-mono cursor-pointer"
+                onClick={() => {
+                  selectAllLines();
+                  selectAllDirections();
+                }}
+                className="text-emerald-400 underline font-mono cursor-pointer font-bold"
               >
-                Reset to All Lines &rarr;
+                Reset All Line &amp; Direction Filters &rarr;
               </button>
             </div>
           )}
