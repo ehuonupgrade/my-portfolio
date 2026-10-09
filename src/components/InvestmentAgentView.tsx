@@ -110,7 +110,7 @@ python3 scripts/robo_investor_agent.py
       )}
 
       {/* Project Header & Agent Status Banner */}
-      <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-6 sm:p-7 backdrop-blur-md space-y-4">
+      <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-4 sm:p-6 lg:p-7 backdrop-blur-md space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
           <div>
             <div className="flex items-center gap-2.5">
@@ -139,7 +139,7 @@ python3 scripts/robo_investor_agent.py
         </p>
 
         {/* Sub-Navigation Tabs */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/60">
+        <div className="overflow-x-auto no-scrollbar pb-1.5 -mx-1 px-1 flex sm:flex-wrap items-center gap-1.5 sm:gap-2 pt-2 border-t border-slate-800/60">
           <button
             onClick={() => {
               playKeyClick();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import bartData from '../data/bart_data.json';
-import { BartLiveMap } from './BartLiveMap';
+import { BartLiveMap, normalizeBartDirection } from './BartLiveMap';
 import { BartAlertsFeed } from './BartAlertsFeed';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 
@@ -105,6 +105,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             const mins = est.minutes;
             const numericMins = mins === 'Leaving' ? 0 : parseInt(mins, 10) || 0;
             const serves = checkServesDestination(colorStr, item.abbreviation, orig, targetDest);
+            const normDir = normalizeBartDirection(colorStr.toLowerCase(), item.abbreviation, est.direction);
 
             parsedList.push({
               id: `${orig}-${item.abbreviation}-${est.direction}-${idx}-${numericMins}`,
@@ -113,7 +114,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               minutes: mins,
               numericMins,
               platform: est.platform ? `Platform ${est.platform}` : 'Platform 1',
-              direction: est.direction ? `${est.direction}bound` : 'Outbound',
+              direction: `${normDir}bound`,
               cars: est.length || '8',
               color: colorStr,
               hexcolor: hex,
@@ -147,7 +148,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             minutes: 'Leaving',
             numericMins: 0,
             platform: 'Platform 2',
-            direction: 'Southbound',
+            direction: 'Northbound',
             cars: '8',
             color: 'GREEN',
             hexcolor: '#22c55e',
@@ -162,7 +163,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             minutes: '6',
             numericMins: 6,
             platform: 'Platform 1',
-            direction: 'Northbound',
+            direction: 'Southbound',
             cars: '6',
             color: 'GREEN',
             hexcolor: '#22c55e',
@@ -411,14 +412,14 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
           Real-time schedule planner, fare calculator, and live physical train locator connected directly to the official BART GTFS engine. Track accurate travel durations, Clipper fares, and active platform movements across the Bay Area.
         </p>
 
-        {/* Sub-Navigation Tabs */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/60">
+        {/* Sub-Navigation Tabs (Horizontal scroll on phone, wrap on desktop) */}
+        <div className="overflow-x-auto no-scrollbar pb-1.5 -mx-1 px-1 flex sm:flex-wrap items-center gap-1.5 sm:gap-2 pt-2 border-t border-slate-800/60">
           <button
             onClick={() => {
               playKeyClick();
               setActiveTab('planner');
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+            className={`shrink-0 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
               activeTab === 'planner'
                 ? 'bg-white text-slate-950 font-semibold shadow-xs'
                 : 'text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-slate-800'
@@ -432,7 +433,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               playKeyClick();
               setActiveTab('map');
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`shrink-0 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'map'
                 ? 'bg-emerald-400 text-slate-950 font-bold shadow-xs'
                 : 'text-emerald-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-emerald-900/60'
@@ -447,7 +448,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               playKeyClick();
               setActiveTab('alerts');
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`shrink-0 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'alerts'
                 ? 'bg-cyan-400 text-slate-950 font-bold shadow-xs'
                 : 'text-cyan-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-cyan-900/60'
@@ -462,7 +463,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               playKeyClick();
               setActiveTab('lines');
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+            className={`shrink-0 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
               activeTab === 'lines'
                 ? 'bg-white text-slate-950 font-semibold shadow-xs'
                 : 'text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-slate-800'
@@ -476,7 +477,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               playKeyClick();
               setActiveTab('api');
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
+            className={`shrink-0 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
               activeTab === 'api'
                 ? 'bg-white text-slate-950 font-semibold shadow-xs'
                 : 'text-slate-400 hover:text-white bg-slate-950/60 hover:bg-slate-900 border border-slate-800'
@@ -491,11 +492,11 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
       {activeTab === 'planner' && (
         <div className="space-y-6 animate-fadeIn">
           {/* Popular Routes presets */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400 font-mono">Popular Routes:</span>
+          <div className="overflow-x-auto no-scrollbar pb-1 -mx-1 px-1 flex sm:flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="text-xs text-slate-400 font-mono shrink-0">Popular Routes:</span>
             <button
               onClick={() => handleSelectPreset('MLPT', 'EMBR')}
-              className={`px-3 py-1 rounded-lg border text-xs transition-colors cursor-pointer ${
+              className={`shrink-0 px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg border text-xs transition-colors cursor-pointer ${
                 originCode === 'MLPT' && destCode === 'EMBR'
                   ? 'bg-emerald-500 text-slate-950 font-bold border-emerald-400'
                   : 'bg-slate-900 border-slate-800 text-slate-200 hover:border-slate-700'
@@ -505,7 +506,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             </button>
             <button
               onClick={() => handleSelectPreset('EMBR', 'SFIA')}
-              className={`px-3 py-1 rounded-lg border text-xs transition-colors cursor-pointer ${
+              className={`shrink-0 px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg border text-xs transition-colors cursor-pointer ${
                 originCode === 'EMBR' && destCode === 'SFIA'
                   ? 'bg-emerald-500 text-slate-950 font-bold border-emerald-400'
                   : 'bg-slate-900 border-slate-800 text-slate-200 hover:border-slate-700'
@@ -515,7 +516,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             </button>
             <button
               onClick={() => handleSelectPreset('12TH', 'POWL')}
-              className={`px-3 py-1 rounded-lg border text-xs transition-colors cursor-pointer ${
+              className={`shrink-0 px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg border text-xs transition-colors cursor-pointer ${
                 originCode === '12TH' && destCode === 'POWL'
                   ? 'bg-emerald-500 text-slate-950 font-bold border-emerald-400'
                   : 'bg-slate-900 border-slate-800 text-slate-200 hover:border-slate-700'
@@ -525,7 +526,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             </button>
             <button
               onClick={() => handleSelectPreset('DBRK', 'MONT')}
-              className={`px-3 py-1 rounded-lg border text-xs transition-colors cursor-pointer ${
+              className={`shrink-0 px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg border text-xs transition-colors cursor-pointer ${
                 originCode === 'DBRK' && destCode === 'MONT'
                   ? 'bg-emerald-500 text-slate-950 font-bold border-emerald-400'
                   : 'bg-slate-900 border-slate-800 text-slate-200 hover:border-slate-700'
@@ -536,7 +537,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
           </div>
 
           {/* Station Selector Card */}
-          <div className="p-6 sm:p-7 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-md space-y-6">
+          <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-md space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-center">
               {/* Origin Station */}
               <div className="md:col-span-5 space-y-2">
@@ -554,7 +555,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
                     playKeyClick();
                     setOriginCode(e.target.value);
                   }}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-hidden focus:border-emerald-500 font-medium"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 sm:py-3 text-base sm:text-sm text-white focus:outline-hidden focus:border-emerald-500 font-medium"
                 >
                   {stations.map((s) => (
                     <option key={s.code} value={s.code}>
@@ -578,11 +579,12 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               </div>
 
               {/* Swap Button */}
-              <div className="md:col-span-1 flex justify-center py-2 md:py-0">
+              <div className="md:col-span-1 flex justify-center py-1 md:py-0">
                 <button
                   onClick={handleSwapStations}
-                  className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition-transform hover:rotate-180 duration-300 cursor-pointer text-sm shadow-md"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition-transform hover:rotate-180 duration-300 cursor-pointer text-sm shadow-md"
                   title="Swap Origin and Destination"
+                  aria-label="Swap Origin and Destination"
                 >
                   ⇄
                 </button>
@@ -604,7 +606,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
                     playKeyClick();
                     setDestCode(e.target.value);
                   }}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-hidden focus:border-cyan-500 font-medium"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 sm:py-3 text-base sm:text-sm text-white focus:outline-hidden focus:border-cyan-500 font-medium"
                 >
                   {stations.map((s) => (
                     <option key={s.code} value={s.code}>
@@ -689,7 +691,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
           )}
 
           {/* UPCOMING REAL-TIME TRAIN DEPARTURES FROM THE PERSPECTIVE OF ORIGIN STATION */}
-          <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-md space-y-4">
+          <div className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-md space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
               <div>
                 <div className="flex items-center gap-2">
@@ -721,15 +723,15 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             </div>
 
             {/* Filter Toggle: All Departures vs Direct toward Destination */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs font-mono">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs font-mono">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <span className="text-slate-400">Board Filter:</span>
                 <button
                   onClick={() => {
                     playKeyClick();
                     setDepartureFilter('all');
                   }}
-                  className={`px-3 py-1 rounded-lg transition-colors cursor-pointer ${
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg transition-colors cursor-pointer text-[11px] sm:text-xs ${
                     departureFilter === 'all'
                       ? 'bg-slate-200 text-slate-950 font-bold'
                       : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
@@ -742,7 +744,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
                     playKeyClick();
                     setDepartureFilter('direct');
                   }}
-                  className={`px-3 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 text-[11px] sm:text-xs ${
                     departureFilter === 'direct'
                       ? 'bg-emerald-400 text-slate-950 font-bold'
                       : 'bg-slate-950 text-emerald-400 hover:text-white border border-emerald-900/60'
@@ -755,7 +757,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
                 </button>
               </div>
 
-              <span className="text-[11px] text-emerald-400 font-semibold">
+              <span className="text-[11px] text-emerald-400 font-semibold self-start sm:self-auto">
                 ● OFFICIAL BART ETD PLATFORM FEED
               </span>
             </div>

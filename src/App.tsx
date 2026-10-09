@@ -60,6 +60,7 @@ export default function App() {
   const initial = getStateForPath(typeof window !== 'undefined' ? window.location.pathname : '/');
   const [activeTab, setActiveTab] = useState<Tab>(initial.tab);
   const [activeProject, setActiveProject] = useState<string | null>(initial.project);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   // Sync state with browser Back/Forward navigation
   useEffect(() => {
@@ -67,6 +68,7 @@ export default function App() {
       const state = getStateForPath(window.location.pathname);
       setActiveTab(state.tab);
       setActiveProject(state.project);
+      setMobileMenuOpen(false);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -77,6 +79,7 @@ export default function App() {
     playKeyClick();
     setActiveTab(tab);
     setActiveProject(project);
+    setMobileMenuOpen(false);
 
     const newPath = getPathForState(tab, project);
     if (window.location.pathname !== newPath) {
@@ -84,16 +87,246 @@ export default function App() {
     }
   };
 
+  const getActiveTitle = () => {
+    if (activeTab === 'projects') {
+      if (activeProject === 'bart') return 'BART Planner';
+      if (activeProject === 'roboinvestor') return 'RoboInvestor';
+      return 'My Projects';
+    }
+    if (activeTab === 'games') return 'My Games';
+    if (activeTab === 'changelog') return 'Version History';
+    if (activeTab === 'about') return 'About Me';
+    return 'Home';
+  };
+
   return (
     <div className="min-h-screen bg-[#04070b] text-slate-100 font-sans selection:bg-emerald-500 selection:text-white relative overflow-x-hidden flex flex-col justify-between">
       {/* Real Animated Rocketship in Deep Space Background */}
       <AnimatedRocketScene />
 
-      {/* Unified Single-Page Container */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-12 py-16 sm:py-28 w-full flex-1">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start">
-          {/* Left Column: Brand & Integrated Navigation */}
-          <div className="md:col-span-4 space-y-8">
+      {/* MOBILE-ONLY TOP NAVIGATION HEADER (Phone / Android Chrome touch optimized) */}
+      <div className="md:hidden sticky top-0 z-50 bg-[#04070b]/90 backdrop-blur-xl border-b border-slate-800/80 px-3.5 py-2.5">
+        <div className="flex items-center justify-between gap-2">
+          {/* Brand & Active Breadcrumb */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <button
+              onClick={() => navigateTo('home', null)}
+              className="cursor-pointer shrink-0 p-1 -ml-1 active:opacity-75 transition-opacity"
+              title="Home (huon.si)"
+              aria-label="Home"
+            >
+              <RocketLogo className="w-10 h-7" />
+            </button>
+            <div className="flex items-center gap-1.5 min-w-0 text-xs font-mono">
+              <span className="text-slate-400 font-bold shrink-0">huon.si</span>
+              {activeTab !== 'home' && (
+                <>
+                  <span className="text-slate-600">/</span>
+                  <span className="text-emerald-400 font-semibold truncate">
+                    {getActiveTitle()}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => {
+              playKeyClick();
+              setMobileMenuOpen((prev) => !prev);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-xs font-mono text-slate-200 active:bg-slate-800 transition-colors cursor-pointer shrink-0"
+            aria-expanded={mobileMenuOpen}
+            aria-label="Toggle Navigation Menu"
+          >
+            <span>{mobileMenuOpen ? '✕' : '☰'}</span>
+            <span className="text-[11px] font-bold">{mobileMenuOpen ? 'CLOSE' : 'MENU'}</span>
+          </button>
+        </div>
+
+        {/* Quick-Access Touch Horizontal Bar on Mobile */}
+        <div className="overflow-x-auto no-scrollbar flex items-center gap-1.5 pt-2 pb-0.5 text-xs font-mono">
+          <button
+            onClick={() => navigateTo('home', null)}
+            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
+              activeTab === 'home'
+                ? 'bg-emerald-500 text-slate-950 font-bold'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+            }`}
+          >
+            Home
+          </button>
+
+          <button
+            onClick={() => navigateTo('projects', null)}
+            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
+              activeTab === 'projects' && !activeProject
+                ? 'bg-emerald-500 text-slate-950 font-bold'
+                : activeTab === 'projects'
+                ? 'bg-slate-800 text-emerald-400 font-bold border border-emerald-800/80'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+            }`}
+          >
+            Projects
+          </button>
+
+          {activeTab === 'projects' && (
+            <>
+              <button
+                onClick={() => navigateTo('projects', 'bart')}
+                className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer flex items-center gap-1 ${
+                  activeProject === 'bart'
+                    ? 'bg-yellow-400 text-slate-950 font-bold'
+                    : 'bg-slate-900/80 text-yellow-400/80 hover:text-yellow-300 border border-yellow-900/50'
+                }`}
+              >
+                <span>🚆 BART</span>
+              </button>
+
+              <button
+                onClick={() => navigateTo('projects', 'roboinvestor')}
+                className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer flex items-center gap-1 ${
+                  activeProject === 'roboinvestor'
+                    ? 'bg-cyan-400 text-slate-950 font-bold'
+                    : 'bg-slate-900/80 text-cyan-400/80 hover:text-cyan-300 border border-cyan-900/50'
+                }`}
+              >
+                <span>🤖 RoboInvestor</span>
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={() => navigateTo('games', null)}
+            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
+              activeTab === 'games'
+                ? 'bg-emerald-500 text-slate-950 font-bold'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+            }`}
+          >
+            Games
+          </button>
+
+          <button
+            onClick={() => navigateTo('changelog', null)}
+            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
+              activeTab === 'changelog'
+                ? 'bg-emerald-500 text-slate-950 font-bold'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+            }`}
+          >
+            Log
+          </button>
+
+          <button
+            onClick={() => navigateTo('about', null)}
+            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
+              activeTab === 'about'
+                ? 'bg-emerald-500 text-slate-950 font-bold'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+            }`}
+          >
+            About
+          </button>
+        </div>
+
+        {/* Collapsible Full Mobile Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="mt-3 p-4 rounded-2xl bg-slate-950/95 border border-slate-800/90 shadow-2xl space-y-3 animate-fadeIn">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold pb-2 border-b border-slate-800/80">
+              Navigation Menu
+            </div>
+            <nav className="flex flex-col space-y-1 text-sm font-medium">
+              <button
+                onClick={() => navigateTo('home', null)}
+                className={`text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between ${
+                  activeTab === 'home' ? 'bg-slate-900 text-white font-bold' : 'text-slate-300 hover:bg-slate-900/50'
+                }`}
+              >
+                <span>🚀 Home</span>
+                {activeTab === 'home' && <span className="text-emerald-400 text-xs font-mono">&bull; Active</span>}
+              </button>
+
+              <div className="space-y-1">
+                <button
+                  onClick={() => navigateTo('projects', null)}
+                  className={`text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer w-full flex items-center justify-between ${
+                    activeTab === 'projects' && !activeProject
+                      ? 'bg-slate-900 text-white font-bold'
+                      : 'text-slate-300 hover:bg-slate-900/50'
+                  }`}
+                >
+                  <span>💼 My Projects</span>
+                  {activeTab === 'projects' && <span className="text-emerald-400 text-xs font-mono">&bull; Active</span>}
+                </button>
+
+                <div className="pl-6 space-y-1">
+                  <button
+                    onClick={() => navigateTo('projects', 'bart')}
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
+                      activeProject === 'bart'
+                        ? 'bg-yellow-950/70 border border-yellow-800 text-yellow-300 font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>&rarr; BART Planner (Live Router)</span>
+                    {activeProject === 'bart' && <span className="text-yellow-400 text-[10px]">CURRENT</span>}
+                  </button>
+
+                  <button
+                    onClick={() => navigateTo('projects', 'roboinvestor')}
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
+                      activeProject === 'roboinvestor'
+                        ? 'bg-cyan-950/70 border border-cyan-800 text-cyan-300 font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>&rarr; RoboInvestor (Robinhood Agent)</span>
+                    {activeProject === 'roboinvestor' && <span className="text-cyan-400 text-[10px]">CURRENT</span>}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigateTo('games', null)}
+                className={`text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between ${
+                  activeTab === 'games' ? 'bg-slate-900 text-white font-bold' : 'text-slate-300 hover:bg-slate-900/50'
+                }`}
+              >
+                <span>🎮 My Games (Cosmic Defender)</span>
+                {activeTab === 'games' && <span className="text-emerald-400 text-xs font-mono">&bull; Active</span>}
+              </button>
+
+              <button
+                onClick={() => navigateTo('changelog', null)}
+                className={`text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between ${
+                  activeTab === 'changelog' ? 'bg-slate-900 text-white font-bold' : 'text-slate-300 hover:bg-slate-900/50'
+                }`}
+              >
+                <span>📜 Version History &amp; Changelog</span>
+                {activeTab === 'changelog' && <span className="text-emerald-400 text-xs font-mono">&bull; Active</span>}
+              </button>
+
+              <button
+                onClick={() => navigateTo('about', null)}
+                className={`text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between ${
+                  activeTab === 'about' ? 'bg-slate-900 text-white font-bold' : 'text-slate-300 hover:bg-slate-900/50'
+                }`}
+              >
+                <span>👤 About Me</span>
+                {activeTab === 'about' && <span className="text-emerald-400 text-xs font-mono">&bull; Active</span>}
+              </button>
+            </nav>
+          </div>
+        )}
+      </div>
+
+      {/* Unified Responsive Container: Slightly wider on desktop, snug and edge-friendly on phones */}
+      <div className="relative z-10 max-w-5xl lg:max-w-7xl 2xl:max-w-[1536px] mx-auto px-3.5 sm:px-6 md:px-8 lg:px-12 py-4 sm:py-8 md:py-14 lg:py-16 w-full flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 lg:gap-12 items-start">
+          {/* DESKTOP-ONLY Left Column: Brand & Sticky Integrated Navigation */}
+          <div className="hidden md:block md:col-span-4 lg:col-span-3 xl:col-span-3 md:sticky md:top-8 lg:top-12 self-start space-y-8">
             {/* Static picture of the animated rocket acting as the home page link */}
             <button
               onClick={() => navigateTo('home', null)}
@@ -186,8 +419,8 @@ export default function App() {
             </nav>
           </div>
 
-          {/* Right Column: Content for Selected Tab */}
-          <div className="md:col-span-8 min-h-[360px]">
+          {/* Right Column: Main Content Area (Expands comfortably on Desktop, fills Phone cleanly) */}
+          <div className="col-span-1 md:col-span-8 lg:col-span-9 xl:col-span-9 min-h-[360px] w-full">
             {/* DEFAULT 'HOME' VIEW: Completely blank as requested */}
             {activeTab === 'home' && null}
 
@@ -327,8 +560,8 @@ export default function App() {
         </div>
       </div>
 
-      {/* Simple Minimal Footer */}
-      <footer className="relative z-10 max-w-5xl mx-auto px-6 sm:px-12 py-8 w-full text-xs text-slate-500 font-mono flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-slate-900/60">
+      {/* Simple Minimal Responsive Footer */}
+      <footer className="relative z-10 max-w-5xl lg:max-w-7xl 2xl:max-w-[1536px] mx-auto px-3.5 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 w-full text-xs text-slate-500 font-mono flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-900/60">
         <span>Huon.si</span>
         <span className="text-slate-400">
           Built with Google AI Studio &amp; Google Antigravity

@@ -134,11 +134,131 @@ const trackLines: Record<string, { name: string; color: string; stations: string
   },
 };
 
+// Route station sequences used to accurately identify and deduplicate physical train consists
+export const lineStationSequences: Record<string, string[]> = {
+  green: [
+    'BERY', 'MLPT', 'WARM', 'FRMT', 'UCTY', 'SHAY', 'HAYW', 'BAYF', 'SANL',
+    'COLS', 'FTVL', 'LAKE', 'WOAK', 'EMBR', 'MONT', 'POWL', 'CIVC', '16TH',
+    '24TH', 'GLEN', 'BALB', 'DALY',
+  ],
+  yellow: [
+    'ANTC', 'PCTR', 'PITT', 'NCON', 'CONC', 'PHIL', 'WCRK', 'LAFY', 'ORIN',
+    'ROCK', 'MCAR', '19TH', '12TH', 'WOAK', 'EMBR', 'MONT', 'POWL', 'CIVC',
+    '16TH', '24TH', 'GLEN', 'BALB', 'DALY', 'COLM', 'SSAN', 'SBRN', 'SFIA', 'MLBR',
+  ],
+  red: [
+    'RICH', 'DELN', 'PLZA', 'NBRK', 'DBRK', 'ASHB', 'MCAR', '19TH', '12TH',
+    'WOAK', 'EMBR', 'MONT', 'POWL', 'CIVC', '16TH', '24TH', 'GLEN', 'BALB',
+    'DALY', 'COLM', 'SSAN', 'SBRN', 'SFIA', 'MLBR',
+  ],
+  orange: [
+    'RICH', 'DELN', 'PLZA', 'NBRK', 'DBRK', 'ASHB', 'MCAR', '19TH', '12TH',
+    'LAKE', 'FTVL', 'COLS', 'SANL', 'BAYF', 'HAYW', 'SHAY', 'UCTY', 'FRMT',
+    'WARM', 'MLPT', 'BERY',
+  ],
+  blue: [
+    'DUBL', 'WDUB', 'CAST', 'BAYF', 'SANL', 'COLS', 'FTVL', 'LAKE', 'WOAK',
+    'EMBR', 'MONT', 'POWL', 'CIVC', '16TH', '24TH', 'GLEN', 'BALB', 'DALY',
+  ],
+};
+
+/**
+ * Geographically accurate and consistent BART direction normalizer.
+ * In the raw BART API, Route 6 (Green Line towards Berryessa/San José) contains a legacy 1970s quirk
+ * labeling Berryessa as 'North', while Route 4 (Orange Line to the exact same Berryessa station) is labeled 'South'.
+ * This function harmonizes and standardizes all BART lines according to real Bay Area geography.
+ */
+export function normalizeBartDirection(lineId: string, destAbbr: string, rawDir?: string): 'North' | 'South' {
+  const dest = (destAbbr || '').toUpperCase();
+  const line = (lineId || '').toLowerCase();
+
+  // Explicit Northern / Northeastern East Bay Terminals
+  if (['ANTC', 'PCTR', 'PITT', 'NCON', 'CONC', 'PHIL', 'RICH', 'DUBL'].includes(dest)) {
+    return 'North';
+  }
+
+  // Explicit Southern Peninsula / Airport Terminals
+  if (['SFIA', 'MLBR', 'COLM', 'SSAN', 'SBRN'].includes(dest)) {
+    return 'South';
+  }
+
+  // Berryessa / North San José is the southernmost terminal in the South Bay / Silicon Valley
+  // for both Green Line and Orange Line
+  if (dest === 'BERY' || dest.includes('BERY')) {
+    return 'South';
+  }
+
+  // Daly City Terminal:
+  // On the Green Line (Berryessa ↔ Daly City), heading to Daly City travels North from South Bay/East Bay through SF
+  // On the Blue Line (Dublin ↔ Daly City), heading to Daly City travels West/Southwest
+  if (dest === 'DALY') {
+    if (line === 'green') {
+      return 'North';
+    }
+    return 'South';
+  }
+
+  return (rawDir || '').toLowerCase().startsWith('n') ? 'North' : 'South';
+}
+
 // Initial reliable baseline of real physical train consists across all 5 lines
 const fallbackTrains: LiveTrain[] = [
-  // Green Line
+  // Green Line — Southbound Consists (Heading South to Berryessa / North San José)
   {
-    id: 'TR-MLPT-1',
+    id: 'TR-EMBR-G1',
+    stationCode: 'EMBR',
+    stationName: 'Embarcadero',
+    destination: 'Berryessa (San José)',
+    destAbbr: 'BERY',
+    lineId: 'green',
+    lineName: 'Green Line',
+    hexcolor: '#22c55e',
+    direction: 'South',
+    cars: '8',
+    minutes: 'Leaving',
+    platform: 'Platform 2',
+    delaySec: 0,
+    x: stationCoords.EMBR.x + 7,
+    y: stationCoords.EMBR.y,
+  },
+  {
+    id: 'TR-HAYW-G1',
+    stationCode: 'HAYW',
+    stationName: 'Hayward',
+    destination: 'Berryessa (San José)',
+    destAbbr: 'BERY',
+    lineId: 'green',
+    lineName: 'Green Line',
+    hexcolor: '#22c55e',
+    direction: 'South',
+    cars: '8',
+    minutes: '1',
+    platform: 'Platform 1',
+    delaySec: 0,
+    x: stationCoords.HAYW.x + 7,
+    y: stationCoords.HAYW.y,
+  },
+  {
+    id: 'TR-WARM-G1',
+    stationCode: 'WARM',
+    stationName: 'Warm Springs / South Fremont',
+    destination: 'Berryessa (San José)',
+    destAbbr: 'BERY',
+    lineId: 'green',
+    lineName: 'Green Line',
+    hexcolor: '#22c55e',
+    direction: 'South',
+    cars: '8',
+    minutes: 'Leaving',
+    platform: 'Platform 1',
+    delaySec: 0,
+    x: stationCoords.WARM.x + 7,
+    y: stationCoords.WARM.y,
+  },
+
+  // Green Line — Northbound Consists (Heading North to Daly City / SF)
+  {
+    id: 'TR-MLPT-G1',
     stationCode: 'MLPT',
     stationName: 'Milpitas',
     destination: 'Daly City',
@@ -146,7 +266,7 @@ const fallbackTrains: LiveTrain[] = [
     lineId: 'green',
     lineName: 'Green Line',
     hexcolor: '#22c55e',
-    direction: 'South',
+    direction: 'North',
     cars: '8',
     minutes: 'Leaving',
     platform: 'Platform 2',
@@ -155,24 +275,7 @@ const fallbackTrains: LiveTrain[] = [
     y: stationCoords.MLPT.y,
   },
   {
-    id: 'TR-BERY-1',
-    stationCode: 'BERY',
-    stationName: 'Berryessa (San José)',
-    destination: 'Daly City',
-    destAbbr: 'DALY',
-    lineId: 'green',
-    lineName: 'Green Line',
-    hexcolor: '#22c55e',
-    direction: 'North',
-    cars: '8',
-    minutes: 'Leaving',
-    platform: 'Platform 1',
-    delaySec: 0,
-    x: stationCoords.BERY.x + 7,
-    y: stationCoords.BERY.y,
-  },
-  {
-    id: 'TR-COLS-1',
+    id: 'TR-COLS-G1',
     stationCode: 'COLS',
     stationName: 'Coliseum',
     destination: 'Daly City',
@@ -180,7 +283,7 @@ const fallbackTrains: LiveTrain[] = [
     lineId: 'green',
     lineName: 'Green Line',
     hexcolor: '#22c55e',
-    direction: 'South',
+    direction: 'North',
     cars: '8',
     minutes: '1',
     platform: 'Platform 2',
@@ -189,21 +292,21 @@ const fallbackTrains: LiveTrain[] = [
     y: stationCoords.COLS.y,
   },
   {
-    id: 'TR-EMBR-1',
-    stationCode: 'EMBR',
-    stationName: 'Embarcadero',
-    destination: 'Berryessa',
-    destAbbr: 'BERY',
+    id: 'TR-16TH-G1',
+    stationCode: '16TH',
+    stationName: '16th St Mission',
+    destination: 'Daly City',
+    destAbbr: 'DALY',
     lineId: 'green',
     lineName: 'Green Line',
     hexcolor: '#22c55e',
     direction: 'North',
     cars: '8',
-    minutes: 'Leaving',
-    platform: 'Platform 2',
-    delaySec: 60,
-    x: stationCoords.EMBR.x + 7,
-    y: stationCoords.EMBR.y,
+    minutes: '2',
+    platform: 'Platform 1',
+    delaySec: 0,
+    x: stationCoords['16TH'].x - 7,
+    y: stationCoords['16TH'].y,
   },
 
   // Yellow Line
@@ -413,8 +516,21 @@ export const BartLiveMap: React.FC = () => {
         throw new Error('Unexpected BART API payload');
       }
 
-      const parsedTrains: LiveTrain[] = [];
-      const seenTrains = new Set<string>();
+      // Extract candidate arrival predictions for trains at platform or approaching within 5 mins
+      const allCandidates: Array<{
+        stationCode: string;
+        stationName: string;
+        destination: string;
+        destAbbr: string;
+        lineId: string;
+        direction: 'North' | 'South';
+        minutes: string;
+        mins: number;
+        cars: string;
+        platform: string;
+        delaySec: number;
+        hexcolor: string;
+      }> = [];
 
       stationsList.forEach((st: any) => {
         if (!st.etd) return;
@@ -424,54 +540,120 @@ export const BartLiveMap: React.FC = () => {
           const estimates = Array.isArray(item.estimate) ? item.estimate : [item.estimate];
 
           estimates.forEach((est: any) => {
+            const lineId = (est.color || 'yellow').toLowerCase();
             const mins = est.minutes === 'Leaving' ? 0 : parseInt(est.minutes, 10);
 
-            // Capture trains that are currently stopped at platform or arriving within 2 mins
-            if (mins <= 2) {
-              const trainKey = `${st.abbr}-${item.abbreviation}-${est.direction}`;
-              if (!seenTrains.has(trainKey)) {
-                seenTrains.add(trainKey);
+            // Track consists currently stopped at platform or approaching downstream stations within 5 mins
+            if (!isNaN(mins) && mins <= 5) {
+              const direction = normalizeBartDirection(lineId, item.abbreviation, est.direction);
+              const hexcolor =
+                est.hexcolor ||
+                (lineId === 'green'
+                  ? '#22c55e'
+                  : lineId === 'orange'
+                  ? '#f97316'
+                  : lineId === 'red'
+                  ? '#ef4444'
+                  : lineId === 'blue'
+                  ? '#3b82f6'
+                  : '#facc15');
 
-                const coords = stationCoords[st.abbr] || { x: 450, y: 125, name: st.name };
-                const lineId = (est.color || 'yellow').toLowerCase();
-
-                // Platform separation: Northbound trains slightly offset left/up, Southbound right/down
-                const isNorth = (est.direction || '').toLowerCase().startsWith('n');
-                const offsetX = isNorth ? -7 : 7;
-                const offsetY = 0;
-
-                parsedTrains.push({
-                  id: `TR-${st.abbr}-${parsedTrains.length + 101}`,
-                  stationCode: st.abbr,
-                  stationName: st.name,
-                  destination: item.destination,
-                  destAbbr: item.abbreviation,
-                  lineId,
-                  lineName: `${est.color || 'BART'} Line`,
-                  hexcolor:
-                    est.hexcolor ||
-                    (lineId === 'green'
-                      ? '#22c55e'
-                      : lineId === 'orange'
-                      ? '#f97316'
-                      : lineId === 'red'
-                      ? '#ef4444'
-                      : lineId === 'blue'
-                      ? '#3b82f6'
-                      : '#facc15'),
-                  direction: isNorth ? 'North' : 'South',
-                  cars: est.length || '8',
-                  minutes: est.minutes,
-                  platform: est.platform ? `Platform ${est.platform}` : 'Platform 1',
-                  delaySec: parseInt(est.delay || '0', 10),
-                  x: coords.x + offsetX,
-                  y: coords.y + offsetY,
-                });
-              }
+              allCandidates.push({
+                stationCode: st.abbr,
+                stationName: st.name,
+                destination: item.destination,
+                destAbbr: item.abbreviation,
+                lineId,
+                direction,
+                minutes: est.minutes,
+                mins,
+                cars: est.length || '8',
+                platform: est.platform ? `Platform ${est.platform}` : 'Platform 1',
+                delaySec: parseInt(est.delay || '0', 10),
+                hexcolor,
+              });
             }
           });
         });
       });
+
+      // Group candidates by line and normalized direction to identify distinct physical consists
+      const grouped: Record<string, typeof allCandidates> = {};
+      allCandidates.forEach((cand) => {
+        const key = `${cand.lineId}:${cand.direction}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(cand);
+      });
+
+      const parsedTrains: LiveTrain[] = [];
+      let trainCounter = 101;
+
+      for (const [key, candidates] of Object.entries(grouped)) {
+        const [lineId, direction] = key.split(':') as [string, 'North' | 'South'];
+        const seq = lineStationSequences[lineId] || [];
+
+        // Sort so the train closest to arriving/leaving is prioritized for each consist
+        candidates.sort((a, b) => a.mins - b.mins);
+
+        const assignedIndices = new Set<number>();
+        candidates.forEach((cand) => {
+          const idx = seq.indexOf(cand.stationCode);
+          if (idx === -1) {
+            const coords = stationCoords[cand.stationCode] || { x: 450, y: 125, name: cand.stationName };
+            const offsetX = direction === 'North' ? -7 : 7;
+            parsedTrains.push({
+              id: `TR-${cand.stationCode}-${trainCounter++}`,
+              stationCode: cand.stationCode,
+              stationName: cand.stationName,
+              destination: cand.destination,
+              destAbbr: cand.destAbbr,
+              lineId: cand.lineId,
+              lineName: `${cand.lineId.toUpperCase()} LINE`,
+              hexcolor: cand.hexcolor,
+              direction,
+              cars: cand.cars,
+              minutes: cand.minutes,
+              platform: cand.platform,
+              delaySec: cand.delaySec,
+              x: coords.x + offsetX,
+              y: coords.y,
+            });
+            return;
+          }
+
+          // Check if another arrival estimate is already within 2 stations along the route (same physical consist)
+          let hasNearbyConsist = false;
+          for (let hop = -2; hop <= 2; hop++) {
+            if (assignedIndices.has(idx + hop)) {
+              hasNearbyConsist = true;
+              break;
+            }
+          }
+
+          if (!hasNearbyConsist) {
+            assignedIndices.add(idx);
+            const coords = stationCoords[cand.stationCode] || { x: 450, y: 125, name: cand.stationName };
+            const offsetX = direction === 'North' ? -7 : 7;
+            parsedTrains.push({
+              id: `TR-${cand.stationCode}-${trainCounter++}`,
+              stationCode: cand.stationCode,
+              stationName: cand.stationName,
+              destination: cand.destination,
+              destAbbr: cand.destAbbr,
+              lineId: cand.lineId,
+              lineName: `${cand.lineId.toUpperCase()} LINE`,
+              hexcolor: cand.hexcolor,
+              direction,
+              cars: cand.cars,
+              minutes: cand.minutes,
+              platform: cand.platform,
+              delaySec: cand.delaySec,
+              x: coords.x + offsetX,
+              y: coords.y,
+            });
+          }
+        });
+      }
 
       if (parsedTrains.length > 0) {
         setTrains(parsedTrains);
@@ -596,7 +778,7 @@ export const BartLiveMap: React.FC = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Header & Multi-Line Toggle Bar */}
-      <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-5 backdrop-blur-md space-y-4">
+      <div className="border border-slate-800 bg-slate-900/60 rounded-2xl p-3.5 sm:p-5 backdrop-blur-md space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
           <div>
             <div className="flex items-center gap-2">
@@ -613,15 +795,15 @@ export const BartLiveMap: React.FC = () => {
             </h3>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
             {/* View Mode Toggle */}
-            <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center text-xs font-mono">
+            <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center text-xs font-mono w-full sm:w-auto justify-between sm:justify-start">
               <button
                 onClick={() => {
                   playKeyClick();
                   setViewMode('both');
                 }}
-                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                className={`flex-1 sm:flex-initial text-center px-2 sm:px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
                   viewMode === 'both' ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:text-white'
                 }`}
                 title="Show Map and Ledger"
@@ -633,7 +815,7 @@ export const BartLiveMap: React.FC = () => {
                   playKeyClick();
                   setViewMode('ledger');
                 }}
-                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                className={`flex-1 sm:flex-initial text-center px-2 sm:px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
                   viewMode === 'ledger' ? 'bg-emerald-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
                 }`}
                 title="Jump directly to Dispatch Ledger"
@@ -645,7 +827,7 @@ export const BartLiveMap: React.FC = () => {
                   playKeyClick();
                   setViewMode('map');
                 }}
-                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                className={`flex-1 sm:flex-initial text-center px-2 sm:px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
                   viewMode === 'map' ? 'bg-slate-800 text-white font-bold' : 'text-slate-400 hover:text-white'
                 }`}
                 title="Show Map Only"
@@ -661,7 +843,7 @@ export const BartLiveMap: React.FC = () => {
                 fetchLiveTrains();
               }}
               disabled={loading}
-              className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs text-slate-200 transition-colors cursor-pointer font-mono flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs text-slate-200 transition-colors cursor-pointer font-mono flex items-center gap-1.5 shrink-0"
             >
               <span>{loading ? '↻ Refreshing...' : '↻ Refresh'}</span>
               <span className="text-slate-500 text-[10px]">({lastUpdated})</span>
@@ -929,7 +1111,7 @@ export const BartLiveMap: React.FC = () => {
 
           <svg
             viewBox="0 0 860 520"
-            className="w-full h-auto min-h-[380px] max-h-[580px] select-none"
+            className="w-full h-auto min-h-[250px] sm:min-h-[340px] md:min-h-[420px] max-h-[640px] select-none"
           >
             <defs>
               <pattern id="bayWater2" width="10" height="10" patternUnits="userSpaceOnUse">
@@ -1172,7 +1354,7 @@ export const BartLiveMap: React.FC = () => {
       {(viewMode === 'both' || viewMode === 'ledger') && (
         <div
           id="dispatch-ledger"
-          className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/90 backdrop-blur-md space-y-4 animate-fadeIn scroll-mt-20"
+          className="p-4 sm:p-6 lg:p-7 rounded-2xl bg-slate-900/60 border border-slate-800/90 backdrop-blur-md space-y-4 animate-fadeIn scroll-mt-20"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
             <div>
@@ -1196,7 +1378,7 @@ export const BartLiveMap: React.FC = () => {
                     }). Click any row to highlight on map.`}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 self-start sm:self-auto">
               <span className="text-xs font-mono text-emerald-400">
                 {isLiveConnected ? 'REAL-TIME GTFS FEED' : 'STATION TELEMETRY'}
               </span>
@@ -1204,8 +1386,13 @@ export const BartLiveMap: React.FC = () => {
           </div>
 
           {filteredTrains.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="space-y-1.5">
+              <div className="sm:hidden flex items-center justify-between text-[10px] font-mono text-slate-500 pb-0.5 px-0.5">
+                <span>{filteredTrains.length} Consists Tracked</span>
+                <span>Swipe table &rarr;</span>
+              </div>
+              <div className="overflow-x-auto -mx-2 sm:mx-0 px-2 sm:px-0 scrollbar-thin">
+                <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-slate-800/80 text-slate-400 font-mono text-[11px] uppercase">
                     <th className="py-2.5 px-3">Line</th>
@@ -1315,6 +1502,7 @@ export const BartLiveMap: React.FC = () => {
                 </tbody>
               </table>
             </div>
+          </div>
           ) : (
             <div className="p-8 text-center text-slate-400 border border-dashed border-slate-800 rounded-xl text-xs space-y-2">
               <p>

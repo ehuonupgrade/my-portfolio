@@ -88,3 +88,12 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #00ff41;
 }
+
+/* Hide scrollbar utility for mobile touch strips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -7,6 +7,14 @@
     "tag": "Transit",
     "changes": [
       {
+        "type": "fix",
+        "description": "Resolved Southbound Green Line train tracking: normalized BART API legacy Route 6 direction discrepancy (Berryessa correctly designated Southbound and Daly City Northbound) and expanded consist tracking to continuously capture all active en-route trains in both directions."
+      },
+      {
+        "type": "design",
+        "description": "Implemented adaptive multi-device responsive layout: expanded desktop main content area (max-w-7xl) with sticky navigation, alongside touch-optimized mobile navigation header, quick tab strip, and swipeable tables for Android Chrome and mobile screens."
+      },
+      {
         "type": "feature",
         "description": "Added Northbound and Southbound direction filters to live system map and dispatch ledger, with consist counts and interactive toggles."
       },
