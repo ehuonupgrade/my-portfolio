@@ -17,6 +17,9 @@ export interface LiveTrain {
   delaySec: number;
   x: number;
   y: number;
+  expectedDepartureTime?: string;
+  expectedArrivalTime?: string;
+  remainingDurationMins?: number;
 }
 
 // All 5 primary BART lines
@@ -199,6 +202,54 @@ export function normalizeBartDirection(lineId: string, destAbbr: string, rawDir?
   }
 
   return (rawDir || '').toLowerCase().startsWith('n') ? 'North' : 'South';
+}
+
+/**
+ * Formats a Date object into a readable 12-hour time string: e.g. "11:24 AM"
+ */
+export function formatTime12(date: Date): string {
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const minsStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+  return `${hours}:${minsStr} ${ampm}`;
+}
+
+/**
+ * Computes estimated departure time and estimated destination arrival time for any live BART train.
+ */
+export function computeTrainScheduleTimes(
+  stationCode: string,
+  destAbbr: string,
+  lineId: string,
+  minutesStr: string,
+  baseDate: Date = new Date()
+): {
+  expectedDepartureTime: string;
+  expectedArrivalTime: string;
+  remainingDurationMins: number;
+} {
+  const mins = minutesStr === 'Leaving' ? 0 : parseInt(minutesStr, 10) || 0;
+  const departureDate = new Date(baseDate.getTime() + mins * 60000);
+  const expectedDepartureTime = formatTime12(departureDate);
+
+  const seq = lineStationSequences[lineId] || [];
+  const currIdx = seq.indexOf(stationCode);
+  const destIdx = seq.indexOf(destAbbr);
+  const hops = currIdx !== -1 && destIdx !== -1 ? Math.abs(destIdx - currIdx) : 8;
+  const transitMins = Math.max(2, Math.round(hops * 2.8));
+  const totalMins = mins + transitMins;
+
+  const arrivalDate = new Date(baseDate.getTime() + totalMins * 60000);
+  const expectedArrivalTime = formatTime12(arrivalDate);
+
+  return {
+    expectedDepartureTime,
+    expectedArrivalTime,
+    remainingDurationMins: totalMins,
+  };
 }
 
 // Initial reliable baseline of real physical train consists across all 5 lines
@@ -489,7 +540,17 @@ const fallbackTrains: LiveTrain[] = [
 ];
 
 export const BartLiveMap: React.FC = () => {
-  const [trains, setTrains] = useState<LiveTrain[]>(fallbackTrains);
+  const [trains, setTrains] = useState<LiveTrain[]>(() =>
+    fallbackTrains.map((t) => {
+      const sched = computeTrainScheduleTimes(t.stationCode, t.destAbbr, t.lineId, t.minutes);
+      return {
+        ...t,
+        expectedDepartureTime: sched.expectedDepartureTime,
+        expectedArrivalTime: sched.expectedArrivalTime,
+        remainingDurationMins: sched.remainingDurationMins,
+      };
+    })
+  );
   const [loading, setLoading] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>('Live Connected');
   const [selectedTrain, setSelectedTrain] = useState<LiveTrain | null>(null);
@@ -597,6 +658,13 @@ export const BartLiveMap: React.FC = () => {
 
         const assignedIndices = new Set<number>();
         candidates.forEach((cand) => {
+          const scheduleTimes = computeTrainScheduleTimes(
+            cand.stationCode,
+            cand.destAbbr,
+            cand.lineId,
+            cand.minutes
+          );
+
           const idx = seq.indexOf(cand.stationCode);
           if (idx === -1) {
             const coords = stationCoords[cand.stationCode] || { x: 450, y: 125, name: cand.stationName };
@@ -615,6 +683,9 @@ export const BartLiveMap: React.FC = () => {
               minutes: cand.minutes,
               platform: cand.platform,
               delaySec: cand.delaySec,
+              expectedDepartureTime: scheduleTimes.expectedDepartureTime,
+              expectedArrivalTime: scheduleTimes.expectedArrivalTime,
+              remainingDurationMins: scheduleTimes.remainingDurationMins,
               x: coords.x + offsetX,
               y: coords.y,
             });
@@ -648,6 +719,9 @@ export const BartLiveMap: React.FC = () => {
               minutes: cand.minutes,
               platform: cand.platform,
               delaySec: cand.delaySec,
+              expectedDepartureTime: scheduleTimes.expectedDepartureTime,
+              expectedArrivalTime: scheduleTimes.expectedArrivalTime,
+              remainingDurationMins: scheduleTimes.remainingDurationMins,
               x: coords.x + offsetX,
               y: coords.y,
             });
@@ -1227,6 +1301,10 @@ export const BartLiveMap: React.FC = () => {
                   )}
 
                   {/* Train Container Badge */}
+                  <title>{`${train.lineName} to ${train.destination}
+• Current: ${train.stationName} (${train.platform})
+• Expected Departure: ${train.expectedDepartureTime || 'Leaving'} (${train.minutes === 'Leaving' ? 'Boarding' : `in ${train.minutes}m`})
+• Expected Arrival: ${train.expectedArrivalTime || '--'} at ${train.destination}`}</title>
                   <rect
                     x="-12"
                     y="-12"
@@ -1282,38 +1360,75 @@ export const BartLiveMap: React.FC = () => {
 
           {/* Selected Train Telemetry Modal / Card */}
           {selectedTrain && (
-            <div className="mt-3 p-4 rounded-xl bg-slate-900/95 border border-slate-800 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
-              <div className="flex items-center gap-3">
+            <div className="mt-3 p-4 rounded-xl bg-slate-900/95 border border-slate-800 text-xs flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fadeIn">
+              <div className="flex items-start sm:items-center gap-3">
                 <span
-                  className="w-4 h-4 rounded-full shrink-0"
+                  className="w-4 h-4 rounded-full shrink-0 mt-0.5 sm:mt-0"
                   style={{ backgroundColor: selectedTrain.hexcolor }}
                 />
                 <div>
-                  <div className="text-white font-bold text-sm">
-                    {selectedTrain.lineName} &bull; Bound for {selectedTrain.destination}
-                  </div>
-                  <div className="text-slate-400">
-                    Station: <strong className="text-white">{selectedTrain.stationName}</strong> &bull;{' '}
-                    <span className="text-slate-300 font-mono font-semibold">
+                  <div className="text-white font-bold text-sm flex items-center gap-2 flex-wrap">
+                    <span>{selectedTrain.lineName}</span>
+                    <span className="text-slate-400">&bull;</span>
+                    <span>Bound for {selectedTrain.destination}</span>
+                    <span
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded ${
+                        selectedTrain.direction.toLowerCase().startsWith('n')
+                          ? 'bg-sky-950 text-sky-400 border border-sky-800 font-bold'
+                          : 'bg-amber-950 text-amber-400 border border-amber-800 font-bold'
+                      }`}
+                    >
                       {selectedTrain.direction.toLowerCase().startsWith('n') ? '↑ Northbound' : '↓ Southbound'}
-                    </span>{' '}
-                    &bull; {selectedTrain.cars} Cars &bull; {selectedTrain.platform}
+                    </span>
+                  </div>
+                  <div className="text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-mono">
+                    <span>
+                      Station: <strong className="text-white">{selectedTrain.stationName}</strong> ({selectedTrain.platform})
+                    </span>
+                    <span>&bull;</span>
+                    <span>{selectedTrain.cars} Cars</span>
+                    {selectedTrain.delaySec > 0 ? (
+                      <>
+                        <span>&bull;</span>
+                        <span className="text-amber-400 font-bold">
+                          +{Math.round(selectedTrain.delaySec / 60)}m Delay
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span>&bull;</span>
+                        <span className="text-emerald-400 font-bold">On Time</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 text-xs font-mono">
-                <div>
-                  <span className="text-slate-400">STATUS:</span>{' '}
-                  <span className="text-emerald-400 font-bold">
-                    {selectedTrain.minutes === 'Leaving'
-                      ? 'Boarding / Departing'
-                      : `Arriving in ${selectedTrain.minutes}m`}
+              {/* Real-Time Expected Times Telemetry Pill Box */}
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-xs font-mono shrink-0">
+                <div className="px-2 border-r border-slate-800">
+                  <span className="text-slate-400 text-[10px] block uppercase">Expected Departure</span>
+                  <div className="text-emerald-400 font-bold text-sm">
+                    {selectedTrain.expectedDepartureTime || 'Leaving'}
+                  </div>
+                  <span className="text-[10px] text-slate-400">
+                    {selectedTrain.minutes === 'Leaving' ? '● Boarding' : `in ${selectedTrain.minutes} min`}
                   </span>
                 </div>
+
+                <div className="px-2">
+                  <span className="text-slate-400 text-[10px] block uppercase">Expected Arrival</span>
+                  <div className="text-cyan-400 font-bold text-sm">
+                    {selectedTrain.expectedArrivalTime || '--'}
+                  </div>
+                  <span className="text-[10px] text-slate-400">
+                    at {selectedTrain.destAbbr} ({selectedTrain.remainingDurationMins ? `~${selectedTrain.remainingDurationMins}m` : 'ETA'})
+                  </span>
+                </div>
+
                 <button
                   onClick={() => setSelectedTrain(null)}
-                  className="text-slate-400 hover:text-white p-1 cursor-pointer"
+                  className="text-slate-400 hover:text-white p-1 ml-auto cursor-pointer self-start"
                   title="Close Selection"
                 >
                   &times;
@@ -1399,6 +1514,8 @@ export const BartLiveMap: React.FC = () => {
                     <th className="py-2.5 px-3">Direction</th>
                     <th className="py-2.5 px-3">Destination</th>
                     <th className="py-2.5 px-3">Current Station</th>
+                    <th className="py-2.5 px-3">Expected Departure</th>
+                    <th className="py-2.5 px-3">Expected Arrival</th>
                     <th className="py-2.5 px-3">Status / Platform</th>
                     <th className="py-2.5 px-3">Cars</th>
                     <th className="py-2.5 px-3">Delay</th>
@@ -1468,6 +1585,26 @@ export const BartLiveMap: React.FC = () => {
                         {/* Current Station */}
                         <td className="py-3 px-3 font-mono text-emerald-300 font-medium whitespace-nowrap">
                           {train.stationName}
+                        </td>
+
+                        {/* Expected Departure Time */}
+                        <td className="py-3 px-3 whitespace-nowrap font-mono">
+                          <div className="text-emerald-400 font-bold text-xs">
+                            {train.expectedDepartureTime || 'Leaving'}
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            {train.minutes === 'Leaving' ? '● Boarding' : `in ${train.minutes}m`}
+                          </div>
+                        </td>
+
+                        {/* Expected Destination Arrival Time */}
+                        <td className="py-3 px-3 whitespace-nowrap font-mono">
+                          <div className="text-cyan-400 font-bold text-xs">
+                            {train.expectedArrivalTime || '--'}
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            at {train.destAbbr} {train.remainingDurationMins ? `(~${train.remainingDurationMins}m)` : ''}
+                          </div>
                         </td>
 
                         {/* Status / Platform */}

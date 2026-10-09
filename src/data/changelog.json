@@ -7,6 +7,10 @@
     "tag": "Transit",
     "changes": [
       {
+        "type": "feature",
+        "description": "Added expected arrival time and expected departure times across the Trip Planner overview cards, origin departures board, and the Live Map dispatch ledger and consist telemetry cards."
+      },
+      {
         "type": "fix",
         "description": "Resolved Southbound Green Line train tracking: normalized BART API legacy Route 6 direction discrepancy (Berryessa correctly designated Southbound and Daly City Northbound) and expanded consist tracking to continuously capture all active en-route trains in both directions."
       },

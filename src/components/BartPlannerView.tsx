@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import bartData from '../data/bart_data.json';
-import { BartLiveMap, normalizeBartDirection } from './BartLiveMap';
+import { BartLiveMap, normalizeBartDirection, formatTime12, computeTrainScheduleTimes, ALL_LINES } from './BartLiveMap';
 import { BartAlertsFeed } from './BartAlertsFeed';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 
@@ -22,6 +22,9 @@ export interface OriginStationDeparture {
   delaySec: number;
   servesDestination: boolean;
   lineName: string;
+  expectedDepartureTime: string;
+  expectedArrivalTime?: string;
+  expectedTerminalArrivalTime?: string;
 }
 
 interface RealTripData {
@@ -32,6 +35,8 @@ interface RealTripData {
   transfersCount: number;
   transferStation: string | null;
   isLive: boolean;
+  expectedDepartureTime?: string;
+  expectedArrivalTime?: string;
 }
 
 export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
@@ -41,11 +46,34 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
   const [liveTripData, setLiveTripData] = useState<RealTripData | null>(null);
   const [loadingSchedule, setLoadingSchedule] = useState<boolean>(false);
 
+  // Multi-line selection: allows selecting multiple line colors simultaneously without restriction to one color
+  const [selectedLines, setSelectedLines] = useState<string[]>([...ALL_LINES]);
+
   // Real-time departures from the perspective of the selected origin station
   const [originDepartures, setOriginDepartures] = useState<OriginStationDeparture[]>([]);
   const [loadingDepartures, setLoadingDepartures] = useState<boolean>(false);
   const [departureFilter, setDepartureFilter] = useState<'all' | 'direct'>('all');
   const [lastUpdatedDepartures, setLastUpdatedDepartures] = useState<string>('Connecting...');
+
+  // Multi-line filter handler: toggle individual lines on/off, supporting multiple lines
+  const toggleLine = (lineId: string) => {
+    playKeyClick();
+    setSelectedLines((prev) => {
+      if (prev.length === ALL_LINES.length) {
+        return [lineId];
+      }
+      if (prev.includes(lineId)) {
+        const next = prev.filter((l) => l !== lineId);
+        return next.length === 0 ? [...ALL_LINES] : next;
+      }
+      return [...prev, lineId];
+    });
+  };
+
+  const selectAllLines = () => {
+    playKeyClick();
+    setSelectedLines([...ALL_LINES]);
+  };
 
   const { stations, lines, systemStatus } = bartData;
 
@@ -107,6 +135,25 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             const serves = checkServesDestination(colorStr, item.abbreviation, orig, targetDest);
             const normDir = normalizeBartDirection(colorStr.toLowerCase(), item.abbreviation, est.direction);
 
+            const departureDate = new Date(Date.now() + numericMins * 60000);
+            const expectedDepartureTime = formatTime12(departureDate);
+
+            // Terminal schedule arrival
+            const termSched = computeTrainScheduleTimes(orig, item.abbreviation, colorStr.toLowerCase(), mins);
+            const expectedTerminalArrivalTime = termSched.expectedArrivalTime;
+
+            // Destination arrival if it serves targetDest
+            let expectedArrivalTime: string | undefined = undefined;
+            if (serves) {
+              const lineObj = lines.find((l) => l.id === colorStr.toLowerCase());
+              const origI = lineObj ? lineObj.stations.indexOf(orig) : -1;
+              const destI = lineObj ? lineObj.stations.indexOf(targetDest) : -1;
+              const hops = origI !== -1 && destI !== -1 ? Math.abs(destI - origI) : 8;
+              const tripMins = Math.max(2, Math.round(hops * 2.8));
+              const arrivalDate = new Date(Date.now() + (numericMins + tripMins) * 60000);
+              expectedArrivalTime = formatTime12(arrivalDate);
+            }
+
             parsedList.push({
               id: `${orig}-${item.abbreviation}-${est.direction}-${idx}-${numericMins}`,
               destination: item.destination,
@@ -121,6 +168,9 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               delaySec: parseInt(est.delay || '0', 10),
               servesDestination: serves,
               lineName: `${colorStr} LINE`,
+              expectedDepartureTime,
+              expectedArrivalTime,
+              expectedTerminalArrivalTime,
             });
           });
         });
@@ -139,8 +189,14 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
         const activeLines = origStationObj?.lines || ['green', 'orange'];
 
         const fallbackList: OriginStationDeparture[] = [];
+        const baseNow = Date.now();
 
         if (activeLines.includes('green')) {
+          const dep0 = formatTime12(new Date(baseNow));
+          const arr0 = formatTime12(new Date(baseNow + 28 * 60000));
+          const dep1 = formatTime12(new Date(baseNow + 6 * 60000));
+          const arr1 = formatTime12(new Date(baseNow + (6 + 32) * 60000));
+
           fallbackList.push({
             id: `${orig}-DALY-0`,
             destination: 'Daly City',
@@ -155,6 +211,9 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             delaySec: 0,
             servesDestination: checkServesDestination('GREEN', 'DALY', orig, targetDest),
             lineName: 'GREEN LINE',
+            expectedDepartureTime: dep0,
+            expectedArrivalTime: arr0,
+            expectedTerminalArrivalTime: arr0,
           });
           fallbackList.push({
             id: `${orig}-BERY-1`,
@@ -170,10 +229,16 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             delaySec: 0,
             servesDestination: checkServesDestination('GREEN', 'BERY', orig, targetDest),
             lineName: 'GREEN LINE',
+            expectedDepartureTime: dep1,
+            expectedArrivalTime: arr1,
+            expectedTerminalArrivalTime: arr1,
           });
         }
 
         if (activeLines.includes('orange')) {
+          const depO = formatTime12(new Date(baseNow + 8 * 60000));
+          const arrO = formatTime12(new Date(baseNow + (8 + 35) * 60000));
+
           fallbackList.push({
             id: `${orig}-RICH-2`,
             destination: 'Richmond',
@@ -188,10 +253,18 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             delaySec: 60,
             servesDestination: checkServesDestination('ORANGE', 'RICH', orig, targetDest),
             lineName: 'ORANGE LINE',
+            expectedDepartureTime: depO,
+            expectedArrivalTime: arrO,
+            expectedTerminalArrivalTime: arrO,
           });
         }
 
         if (activeLines.includes('yellow')) {
+          const depY1 = formatTime12(new Date(baseNow + 4 * 60000));
+          const arrY1 = formatTime12(new Date(baseNow + (4 + 40) * 60000));
+          const depY2 = formatTime12(new Date(baseNow + 11 * 60000));
+          const arrY2 = formatTime12(new Date(baseNow + (11 + 30) * 60000));
+
           fallbackList.push({
             id: `${orig}-ANTC-3`,
             destination: 'Antioch',
@@ -206,6 +279,9 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             delaySec: 0,
             servesDestination: checkServesDestination('YELLOW', 'ANTC', orig, targetDest),
             lineName: 'YELLOW LINE',
+            expectedDepartureTime: depY1,
+            expectedArrivalTime: arrY1,
+            expectedTerminalArrivalTime: arrY1,
           });
           fallbackList.push({
             id: `${orig}-SFIA-4`,
@@ -221,6 +297,9 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             delaySec: 0,
             servesDestination: checkServesDestination('YELLOW', 'SFIA', orig, targetDest),
             lineName: 'YELLOW LINE',
+            expectedDepartureTime: depY2,
+            expectedArrivalTime: arrY2,
+            expectedTerminalArrivalTime: arrY2,
           });
         }
 
@@ -296,6 +375,8 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             transfersCount,
             transferStation,
             isLive: true,
+            expectedDepartureTime: trip['@origTimeMin'],
+            expectedArrivalTime: trip['@destTimeMin'],
           });
         }
       })
@@ -317,6 +398,10 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             fare = '$10.55';
           }
 
+          const now = new Date();
+          const expDep = formatTime12(new Date(now.getTime() + 4 * 60000));
+          const expArr = formatTime12(new Date(now.getTime() + (4 + dur) * 60000));
+
           setLiveTripData({
             durationMins: dur,
             fareClipper: fare,
@@ -325,6 +410,8 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             transfersCount: 0,
             transferStation: null,
             isLive: false,
+            expectedDepartureTime: expDep,
+            expectedArrivalTime: expArr,
           });
         }
       })
@@ -357,14 +444,23 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
     );
   }, [originStation.city, destStation.city]);
 
-  // Departures filtered according to user view toggle
+  // Departures filtered according to user view toggle AND multi-line selection
   const filteredOriginDepartures = useMemo(() => {
+    let list = originDepartures;
     if (departureFilter === 'direct') {
-      const directs = originDepartures.filter((d) => d.servesDestination);
-      return directs.length > 0 ? directs : originDepartures;
+      const directs = list.filter((d) => d.servesDestination);
+      list = directs.length > 0 ? directs : list;
     }
-    return originDepartures;
-  }, [originDepartures, departureFilter]);
+    if (selectedLines.length < ALL_LINES.length) {
+      list = list.filter((d) => selectedLines.includes(d.color.toLowerCase()));
+    }
+    return list;
+  }, [originDepartures, departureFilter, selectedLines]);
+
+  // Earliest direct train departure for calculating live schedule itinerary
+  const nextDirectDeparture = useMemo(() => {
+    return originDepartures.find((d) => d.servesDestination);
+  }, [originDepartures]);
 
   return (
     <div className="space-y-8 font-sans animate-fadeIn">
@@ -631,48 +727,50 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
             </div>
           </div>
 
-          {/* Trip Summary Card: Duration & Accurate Fares */}
+          {/* Trip Summary Card: Duration, Expected Times & Accurate Fares */}
           {originCode !== destCode && liveTripData && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {/* Expected Departure Time */}
+              <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800 space-y-1">
+                <span className="text-[11px] font-mono text-slate-400 uppercase">Expected Departure</span>
+                <div className="text-2xl font-bold text-emerald-400 font-mono">
+                  {nextDirectDeparture?.expectedDepartureTime || liveTripData.expectedDepartureTime || 'On Demand'}
+                </div>
+                <span className="text-[10px] text-slate-400 block truncate">
+                  from {originStation.name} &bull; {nextDirectDeparture ? (nextDirectDeparture.numericMins === 0 ? '● Boarding now' : `in ${nextDirectDeparture.minutes}m`) : 'Next scheduled'}
+                </span>
+              </div>
+
+              {/* Expected Arrival Time */}
+              <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800 space-y-1">
+                <span className="text-[11px] font-mono text-slate-400 uppercase">Expected Arrival</span>
+                <div className="text-2xl font-bold text-cyan-400 font-mono">
+                  {nextDirectDeparture?.expectedArrivalTime || liveTripData.expectedArrivalTime || '--'}
+                </div>
+                <span className="text-[10px] text-slate-400 block truncate">
+                  at {destStation.name} &bull; ~{liveTripData.durationMins}m journey
+                </span>
+              </div>
+
+              {/* Trip Duration & Route Details */}
               <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800 space-y-1">
                 <span className="text-[11px] font-mono text-slate-400 uppercase">Trip Duration</span>
                 <div className="text-2xl font-bold text-white font-mono">
                   {loadingSchedule ? '...' : `~${liveTripData.durationMins} min`}
                 </div>
-                <span className="text-[10px] text-slate-400">
-                  {liveTripData.durationMins >= 55
-                    ? 'Around 1 hour travel time'
-                    : 'Scheduled train travel time'}
+                <span className="text-[10px] text-slate-400 block truncate">
+                  {liveTripData.transfersCount === 0 ? 'Direct Train' : `${liveTripData.transfersCount} Transfer`} &bull; {isTransbay ? 'Transbay' : 'Corridor'}
                 </span>
               </div>
 
+              {/* Clipper Fare & Discounts */}
               <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800 space-y-1">
                 <span className="text-[11px] font-mono text-slate-400 uppercase">Clipper 1-Way Fare</span>
                 <div className="text-2xl font-bold text-emerald-400 font-mono">
                   {loadingSchedule ? '...' : liveTripData.fareClipper}
                 </div>
-                <span className="text-[10px] text-slate-400">Standard Adult Clipper</span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800 space-y-1">
-                <span className="text-[11px] font-mono text-slate-400 uppercase">Discounted Fares</span>
-                <div className="text-sm font-bold text-white pt-1">
-                  Youth: <span className="text-emerald-300 font-mono">{liveTripData.fareYouth}</span>
-                </div>
-                <div className="text-[11px] text-slate-400">
-                  Senior/RTC: <span className="text-cyan-300 font-mono">{liveTripData.fareSenior}</span>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800 space-y-1">
-                <span className="text-[11px] font-mono text-slate-400 uppercase">Route Details</span>
-                <div className="text-sm font-bold text-white pt-1">
-                  {liveTripData.transfersCount === 0
-                    ? 'Direct Train'
-                    : `${liveTripData.transfersCount} Transfer`}
-                </div>
-                <span className="text-[10px] text-slate-400">
-                  {isTransbay ? 'Crossing Transbay Tube' : 'Intra-Region Corridor'}
+                <span className="text-[10px] text-slate-400 block truncate">
+                  Youth: {liveTripData.fareYouth} &bull; Senior: {liveTripData.fareSenior}
                 </span>
               </div>
             </div>
@@ -722,8 +820,115 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               </div>
             </div>
 
+            {/* Multi-Line Color Filter Controls */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-mono">
+                <span className="text-slate-400 font-semibold uppercase tracking-wider">
+                  Filter by Transit Line Color (Multi-Select):
+                </span>
+                <span className="text-slate-400">
+                  {selectedLines.length === ALL_LINES.length
+                    ? 'All Line Colors Active'
+                    : `${selectedLines.length} Line Colors Selected`}
+                </span>
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <button
+                  onClick={selectAllLines}
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                    selectedLines.length === ALL_LINES.length
+                      ? 'bg-white text-slate-950 shadow-md ring-2 ring-white/30'
+                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                  }`}
+                  title="Select All Transit Lines"
+                >
+                  {selectedLines.length === ALL_LINES.length ? '✓ ALL LINES' : 'ALL LINES'}
+                </button>
+
+                {/* GREEN LINE */}
+                <button
+                  onClick={() => toggleLine('green')}
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    selectedLines.includes('green')
+                      ? 'bg-emerald-500 text-slate-950 shadow-md ring-2 ring-emerald-400/50'
+                      : 'bg-slate-950 text-emerald-400/60 hover:text-emerald-300 border border-emerald-950 hover:border-emerald-800 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>{selectedLines.includes('green') ? '✓ GREEN' : '+ GREEN'}</span>
+                  <span className="text-[10px] opacity-80">
+                    ({originDepartures.filter((d) => d.color.toLowerCase() === 'green').length})
+                  </span>
+                </button>
+
+                {/* YELLOW LINE */}
+                <button
+                  onClick={() => toggleLine('yellow')}
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    selectedLines.includes('yellow')
+                      ? 'bg-yellow-400 text-slate-950 shadow-md ring-2 ring-yellow-300/50'
+                      : 'bg-slate-950 text-yellow-400/60 hover:text-yellow-300 border border-yellow-950 hover:border-yellow-800 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-yellow-400" />
+                  <span>{selectedLines.includes('yellow') ? '✓ YELLOW' : '+ YELLOW'}</span>
+                  <span className="text-[10px] opacity-80">
+                    ({originDepartures.filter((d) => d.color.toLowerCase() === 'yellow').length})
+                  </span>
+                </button>
+
+                {/* RED LINE */}
+                <button
+                  onClick={() => toggleLine('red')}
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    selectedLines.includes('red')
+                      ? 'bg-red-500 text-white shadow-md ring-2 ring-red-400/50'
+                      : 'bg-slate-950 text-red-400/60 hover:text-red-300 border border-red-950 hover:border-red-800 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-red-400" />
+                  <span>{selectedLines.includes('red') ? '✓ RED' : '+ RED'}</span>
+                  <span className="text-[10px] opacity-80">
+                    ({originDepartures.filter((d) => d.color.toLowerCase() === 'red').length})
+                  </span>
+                </button>
+
+                {/* ORANGE LINE */}
+                <button
+                  onClick={() => toggleLine('orange')}
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    selectedLines.includes('orange')
+                      ? 'bg-orange-500 text-slate-950 shadow-md ring-2 ring-orange-400/50'
+                      : 'bg-slate-950 text-orange-400/60 hover:text-orange-300 border border-orange-950 hover:border-orange-800 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-orange-400" />
+                  <span>{selectedLines.includes('orange') ? '✓ ORANGE' : '+ ORANGE'}</span>
+                  <span className="text-[10px] opacity-80">
+                    ({originDepartures.filter((d) => d.color.toLowerCase() === 'orange').length})
+                  </span>
+                </button>
+
+                {/* BLUE LINE */}
+                <button
+                  onClick={() => toggleLine('blue')}
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    selectedLines.includes('blue')
+                      ? 'bg-blue-500 text-white shadow-md ring-2 ring-blue-400/50'
+                      : 'bg-slate-950 text-blue-400/60 hover:text-blue-300 border border-blue-950 hover:border-blue-800 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-blue-400" />
+                  <span>{selectedLines.includes('blue') ? '✓ BLUE' : '+ BLUE'}</span>
+                  <span className="text-[10px] opacity-80">
+                    ({originDepartures.filter((d) => d.color.toLowerCase() === 'blue').length})
+                  </span>
+                </button>
+              </div>
+            </div>
+
             {/* Filter Toggle: All Departures vs Direct toward Destination */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs font-mono">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-800/80 text-xs font-mono">
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <span className="text-slate-400">Board Filter:</span>
                 <button
@@ -770,26 +975,29 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
                     key={dep.id}
                     className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs group hover:bg-slate-800/20 px-2 rounded-xl transition-colors"
                   >
-                    <div className="flex items-center gap-4">
-                      {/* Departure Minute Indicator */}
-                      <div className="w-24 shrink-0 font-mono">
-                        {dep.minutes === 'Leaving' || dep.numericMins === 0 ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500 text-slate-950 font-bold text-xs uppercase tracking-tight animate-pulse">
-                            ● LEAVING
-                          </span>
-                        ) : (
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-lg font-bold text-white">in {dep.minutes}</span>
-                            <span className="text-slate-400 text-xs">min</span>
-                          </div>
-                        )}
+                    <div className="flex items-start sm:items-center gap-4">
+                      {/* Expected Departure Time & Minute Indicator */}
+                      <div className="w-32 sm:w-36 shrink-0 font-mono">
+                        <div className="text-emerald-400 font-bold text-sm">
+                          {dep.expectedDepartureTime}
+                        </div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">
+                          {dep.minutes === 'Leaving' || dep.numericMins === 0 ? (
+                            <span className="inline-flex items-center gap-1 text-emerald-400 font-bold">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                              ● LEAVING
+                            </span>
+                          ) : (
+                            <span>in {dep.minutes} min</span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Destination and Line Information */}
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span
-                            className="inline-block w-2.5 h-2.5 rounded-full"
+                            className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
                             style={{ backgroundColor: dep.hexcolor }}
                           />
                           <span className="text-sm font-bold text-white tracking-tight">
@@ -805,7 +1013,23 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
                           )}
                         </div>
 
-                        <div className="text-slate-400 text-[11px] flex items-center gap-3 font-mono">
+                        {/* Expected Destination Arrival Time */}
+                        {dep.servesDestination ? (
+                          <div className="text-cyan-300 font-mono text-[11px] font-semibold flex items-center gap-1.5 pt-0.5">
+                            <span className="text-cyan-400 font-bold">🏁 Expected Arrival at {destStation.name}:</span>
+                            <span className="text-white font-bold text-xs">{dep.expectedArrivalTime || '--'}</span>
+                            <span className="text-slate-400 font-normal">
+                              (~{liveTripData?.durationMins || 25}m trip)
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="text-slate-400 font-mono text-[11px] flex items-center gap-1.5 pt-0.5">
+                            <span>Terminal ETA at {dep.destination}:</span>
+                            <span className="text-slate-200 font-semibold">{dep.expectedTerminalArrivalTime}</span>
+                          </div>
+                        )}
+
+                        <div className="text-slate-400 text-[11px] flex flex-wrap items-center gap-x-3 gap-y-1 font-mono pt-0.5">
                           <span>
                             Departing: <strong className="text-slate-200">{originStation.name}</strong> ({dep.platform})
                           </span>
@@ -826,7 +1050,7 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
                     </div>
 
                     {/* Delay & Real-Time Status Badge */}
-                    <div className="flex items-center gap-2 self-start sm:self-auto font-mono text-[11px]">
+                    <div className="flex items-center gap-2 self-start sm:self-auto font-mono text-[11px] shrink-0">
                       {dep.delaySec > 0 ? (
                         <span className="px-2.5 py-1 rounded-md bg-amber-950/80 border border-amber-800 text-amber-300 font-semibold">
                           +{Math.round(dep.delaySec / 60)}m Delay
@@ -842,13 +1066,18 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
               </div>
             ) : (
               <div className="p-8 text-center text-slate-400 border border-dashed border-slate-800 rounded-xl text-xs space-y-2">
-                <p>No real-time departures found matching the current filter.</p>
-                <button
-                  onClick={() => setDepartureFilter('all')}
-                  className="text-emerald-400 underline font-mono cursor-pointer"
-                >
-                  View all departures from {originStation.name} &rarr;
-                </button>
+                <p>No real-time departures found matching the current filters.</p>
+                <div className="flex justify-center gap-3">
+                  <button
+                    onClick={() => {
+                      setDepartureFilter('all');
+                      selectAllLines();
+                    }}
+                    className="text-emerald-400 underline font-mono cursor-pointer"
+                  >
+                    Reset all filters &rarr;
+                  </button>
+                </div>
               </div>
             )}
           </div>
