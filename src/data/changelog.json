@@ -8,7 +8,7 @@
     "changes": [
       {
         "type": "feature",
-        "description": "Added expected arrival time and expected departure times across the Trip Planner overview cards, origin departures board, and the Live Map dispatch ledger and consist telemetry cards."
+        "description": "Configured Live Map Expected Arrival and Departure to explicitly represent the next upcoming station (when the train will arrive and when it will leave), alongside an interactive stop-by-stop upcoming station timetable for any stop along the run, while keeping Trip Planner focused on origin/destination trip endpoints."
       },
       {
         "type": "fix",

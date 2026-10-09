@@ -1,6 +1,30 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { playKeyClick, playBeep } from '../utils/audio';
 
+export interface UpcomingStop {
+  stationCode: string;
+  stationName: string;
+  expectedArrivalTime: string;
+  expectedDepartureTime: string;
+  minutesAway: number;
+  isNextStop: boolean;
+  isTerminal: boolean;
+}
+
+export interface TrainScheduleInfo {
+  upcomingStationCode: string;
+  upcomingStationName: string;
+  expectedArrivalTime: string; // Expected arrival at next upcoming station
+  expectedDepartureTime: string; // Expected departure from next upcoming station
+  arrivalMinutes: number;
+  departureMinutes: number;
+  isAtPlatform: boolean;
+  finalDestinationArrivalTime: string;
+  finalDurationMins: number;
+  upcomingStops: UpcomingStop[];
+  remainingDurationMins: number;
+}
+
 export interface LiveTrain {
   id: string;
   stationCode: string;
@@ -17,8 +41,17 @@ export interface LiveTrain {
   delaySec: number;
   x: number;
   y: number;
+  // Upcoming station arrival & departure times
+  upcomingStationCode?: string;
+  upcomingStationName?: string;
   expectedDepartureTime?: string;
   expectedArrivalTime?: string;
+  arrivalMinutes?: number;
+  departureMinutes?: number;
+  isAtPlatform?: boolean;
+  finalDestinationArrivalTime?: string;
+  finalDurationMins?: number;
+  upcomingStops?: UpcomingStop[];
   remainingDurationMins?: number;
 }
 
@@ -218,7 +251,8 @@ export function formatTime12(date: Date): string {
 }
 
 /**
- * Computes estimated departure time and estimated destination arrival time for any live BART train.
+ * Computes estimated arrival and departure times for the next upcoming station,
+ * plus a full stop-by-stop schedule for every upcoming station on the train's route.
  */
 export function computeTrainScheduleTimes(
   stationCode: string,
@@ -226,29 +260,99 @@ export function computeTrainScheduleTimes(
   lineId: string,
   minutesStr: string,
   baseDate: Date = new Date()
-): {
-  expectedDepartureTime: string;
-  expectedArrivalTime: string;
-  remainingDurationMins: number;
-} {
-  const mins = minutesStr === 'Leaving' ? 0 : parseInt(minutesStr, 10) || 0;
-  const departureDate = new Date(baseDate.getTime() + mins * 60000);
-  const expectedDepartureTime = formatTime12(departureDate);
-
+): TrainScheduleInfo {
+  const isAtPlatform =
+    minutesStr === 'Leaving' || minutesStr === '0' || parseInt(minutesStr, 10) === 0;
+  const minsToCurrentStation = isAtPlatform ? 0 : parseInt(minutesStr, 10) || 0;
   const seq = lineStationSequences[lineId] || [];
   const currIdx = seq.indexOf(stationCode);
   const destIdx = seq.indexOf(destAbbr);
-  const hops = currIdx !== -1 && destIdx !== -1 ? Math.abs(destIdx - currIdx) : 8;
-  const transitMins = Math.max(2, Math.round(hops * 2.8));
-  const totalMins = mins + transitMins;
 
-  const arrivalDate = new Date(baseDate.getTime() + totalMins * 60000);
-  const expectedArrivalTime = formatTime12(arrivalDate);
+  const step =
+    currIdx !== -1 && destIdx !== -1
+      ? destIdx > currIdx
+        ? 1
+        : destIdx < currIdx
+        ? -1
+        : 0
+      : 0;
+
+  const upcomingStops: UpcomingStop[] = [];
+  let cumulativeMins = minsToCurrentStation;
+
+  if (currIdx !== -1 && step !== 0) {
+    let idx = currIdx;
+    while (true) {
+      const code = seq[idx];
+      const name = stationCoords[code]?.name || code;
+      const isFirst = idx === currIdx;
+      const isTerminal = idx === destIdx;
+
+      let arrMins = cumulativeMins;
+      let depMins = cumulativeMins + 1;
+
+      if (isFirst && isAtPlatform) {
+        arrMins = 0;
+        depMins = 1;
+      }
+
+      const arrDate = new Date(baseDate.getTime() + arrMins * 60000);
+      const depDate = new Date(baseDate.getTime() + depMins * 60000);
+
+      upcomingStops.push({
+        stationCode: code,
+        stationName: name,
+        expectedArrivalTime: isFirst && isAtPlatform ? 'At Platform' : formatTime12(arrDate),
+        expectedDepartureTime: isFirst && isAtPlatform ? 'Leaving' : formatTime12(depDate),
+        minutesAway: arrMins,
+        isNextStop: isFirst,
+        isTerminal,
+      });
+
+      if (idx === destIdx) break;
+      idx += step;
+
+      // Inter-station transit calculation:
+      // Transbay underwater tube between Embarcadero and West Oakland takes ~7 mins.
+      // Standard BART stations take ~2.5 - 3 mins.
+      const isTransbayHop =
+        (code === 'EMBR' && seq[idx] === 'WOAK') || (code === 'WOAK' && seq[idx] === 'EMBR');
+      const hopTransit = isTransbayHop ? 7 : 3;
+      cumulativeMins += hopTransit;
+    }
+  }
+
+  // Fallback if stations are not in sequence or single station
+  if (upcomingStops.length === 0) {
+    const currentName = stationCoords[stationCode]?.name || stationCode;
+    const arrDate = new Date(baseDate.getTime() + minsToCurrentStation * 60000);
+    const depDate = new Date(baseDate.getTime() + (minsToCurrentStation + 1) * 60000);
+    upcomingStops.push({
+      stationCode,
+      stationName: currentName,
+      expectedArrivalTime: isAtPlatform ? 'At Platform' : formatTime12(arrDate),
+      expectedDepartureTime: isAtPlatform ? 'Leaving' : formatTime12(depDate),
+      minutesAway: minsToCurrentStation,
+      isNextStop: true,
+      isTerminal: true,
+    });
+  }
+
+  const nextStop = upcomingStops[0];
+  const finalStop = upcomingStops[upcomingStops.length - 1];
 
   return {
-    expectedDepartureTime,
-    expectedArrivalTime,
-    remainingDurationMins: totalMins,
+    upcomingStationCode: nextStop.stationCode,
+    upcomingStationName: nextStop.stationName,
+    expectedArrivalTime: nextStop.expectedArrivalTime,
+    expectedDepartureTime: nextStop.expectedDepartureTime,
+    arrivalMinutes: nextStop.minutesAway,
+    departureMinutes: nextStop.minutesAway + 1,
+    isAtPlatform,
+    finalDestinationArrivalTime: finalStop.expectedArrivalTime,
+    finalDurationMins: finalStop.minutesAway,
+    upcomingStops,
+    remainingDurationMins: finalStop.minutesAway,
   };
 }
 
@@ -545,8 +649,16 @@ export const BartLiveMap: React.FC = () => {
       const sched = computeTrainScheduleTimes(t.stationCode, t.destAbbr, t.lineId, t.minutes);
       return {
         ...t,
+        upcomingStationCode: sched.upcomingStationCode,
+        upcomingStationName: sched.upcomingStationName,
         expectedDepartureTime: sched.expectedDepartureTime,
         expectedArrivalTime: sched.expectedArrivalTime,
+        arrivalMinutes: sched.arrivalMinutes,
+        departureMinutes: sched.departureMinutes,
+        isAtPlatform: sched.isAtPlatform,
+        finalDestinationArrivalTime: sched.finalDestinationArrivalTime,
+        finalDurationMins: sched.finalDurationMins,
+        upcomingStops: sched.upcomingStops,
         remainingDurationMins: sched.remainingDurationMins,
       };
     })
@@ -554,6 +666,7 @@ export const BartLiveMap: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [lastUpdated, setLastUpdated] = useState<string>('Live Connected');
   const [selectedTrain, setSelectedTrain] = useState<LiveTrain | null>(null);
+  const [expandedTrainId, setExpandedTrainId] = useState<string | null>(null);
 
   // Multi-line selection: allows selecting multiple line colors simultaneously
   const [selectedLines, setSelectedLines] = useState<string[]>([...ALL_LINES]);
@@ -683,8 +796,16 @@ export const BartLiveMap: React.FC = () => {
               minutes: cand.minutes,
               platform: cand.platform,
               delaySec: cand.delaySec,
+              upcomingStationCode: scheduleTimes.upcomingStationCode,
+              upcomingStationName: scheduleTimes.upcomingStationName,
               expectedDepartureTime: scheduleTimes.expectedDepartureTime,
               expectedArrivalTime: scheduleTimes.expectedArrivalTime,
+              arrivalMinutes: scheduleTimes.arrivalMinutes,
+              departureMinutes: scheduleTimes.departureMinutes,
+              isAtPlatform: scheduleTimes.isAtPlatform,
+              finalDestinationArrivalTime: scheduleTimes.finalDestinationArrivalTime,
+              finalDurationMins: scheduleTimes.finalDurationMins,
+              upcomingStops: scheduleTimes.upcomingStops,
               remainingDurationMins: scheduleTimes.remainingDurationMins,
               x: coords.x + offsetX,
               y: coords.y,
@@ -719,8 +840,16 @@ export const BartLiveMap: React.FC = () => {
               minutes: cand.minutes,
               platform: cand.platform,
               delaySec: cand.delaySec,
+              upcomingStationCode: scheduleTimes.upcomingStationCode,
+              upcomingStationName: scheduleTimes.upcomingStationName,
               expectedDepartureTime: scheduleTimes.expectedDepartureTime,
               expectedArrivalTime: scheduleTimes.expectedArrivalTime,
+              arrivalMinutes: scheduleTimes.arrivalMinutes,
+              departureMinutes: scheduleTimes.departureMinutes,
+              isAtPlatform: scheduleTimes.isAtPlatform,
+              finalDestinationArrivalTime: scheduleTimes.finalDestinationArrivalTime,
+              finalDurationMins: scheduleTimes.finalDurationMins,
+              upcomingStops: scheduleTimes.upcomingStops,
               remainingDurationMins: scheduleTimes.remainingDurationMins,
               x: coords.x + offsetX,
               y: coords.y,
@@ -1302,9 +1431,10 @@ export const BartLiveMap: React.FC = () => {
 
                   {/* Train Container Badge */}
                   <title>{`${train.lineName} to ${train.destination}
-• Current: ${train.stationName} (${train.platform})
-• Expected Departure: ${train.expectedDepartureTime || 'Leaving'} (${train.minutes === 'Leaving' ? 'Boarding' : `in ${train.minutes}m`})
-• Expected Arrival: ${train.expectedArrivalTime || '--'} at ${train.destination}`}</title>
+• Next Upcoming Station: ${train.upcomingStationName || train.stationName} (${train.platform})
+• Expected Arrival (Upcoming Stop): ${train.expectedArrivalTime || '--'} (${train.isAtPlatform ? 'At Platform / Boarding' : `in ${train.arrivalMinutes ?? 0}m`})
+• Expected Departure (Upcoming Stop): ${train.expectedDepartureTime || 'Leaving'} (${train.isAtPlatform ? 'Leaving now' : `departs in ${train.departureMinutes ?? 1}m`})
+• Terminal Destination ETA: ${train.finalDestinationArrivalTime || train.expectedArrivalTime || '--'} at ${train.destAbbr}`}</title>
                   <rect
                     x="-12"
                     y="-12"
@@ -1360,70 +1490,49 @@ export const BartLiveMap: React.FC = () => {
 
           {/* Selected Train Telemetry Modal / Card */}
           {selectedTrain && (
-            <div className="mt-3 p-4 rounded-xl bg-slate-900/95 border border-slate-800 text-xs flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fadeIn">
-              <div className="flex items-start sm:items-center gap-3">
-                <span
-                  className="w-4 h-4 rounded-full shrink-0 mt-0.5 sm:mt-0"
-                  style={{ backgroundColor: selectedTrain.hexcolor }}
-                />
-                <div>
-                  <div className="text-white font-bold text-sm flex items-center gap-2 flex-wrap">
-                    <span>{selectedTrain.lineName}</span>
-                    <span className="text-slate-400">&bull;</span>
-                    <span>Bound for {selectedTrain.destination}</span>
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded ${
-                        selectedTrain.direction.toLowerCase().startsWith('n')
-                          ? 'bg-sky-950 text-sky-400 border border-sky-800 font-bold'
-                          : 'bg-amber-950 text-amber-400 border border-amber-800 font-bold'
-                      }`}
-                    >
-                      {selectedTrain.direction.toLowerCase().startsWith('n') ? '↑ Northbound' : '↓ Southbound'}
-                    </span>
+            <div className="mt-3 p-4 rounded-xl bg-slate-900/95 border border-slate-800 text-xs flex flex-col gap-4 animate-fadeIn">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-start sm:items-center gap-3">
+                  <span
+                    className="w-4 h-4 rounded-full shrink-0 mt-0.5 sm:mt-0"
+                    style={{ backgroundColor: selectedTrain.hexcolor }}
+                  />
+                  <div>
+                    <div className="text-white font-bold text-sm flex items-center gap-2 flex-wrap">
+                      <span>{selectedTrain.lineName}</span>
+                      <span className="text-slate-400">&bull;</span>
+                      <span>Bound for {selectedTrain.destination}</span>
+                      <span
+                        className={`text-[10px] font-mono px-2 py-0.5 rounded ${
+                          selectedTrain.direction.toLowerCase().startsWith('n')
+                            ? 'bg-sky-950 text-sky-400 border border-sky-800 font-bold'
+                            : 'bg-amber-950 text-amber-400 border border-amber-800 font-bold'
+                        }`}
+                      >
+                        {selectedTrain.direction.toLowerCase().startsWith('n') ? '↑ Northbound' : '↓ Southbound'}
+                      </span>
+                    </div>
+                    <div className="text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-mono">
+                      <span>
+                        Current Station: <strong className="text-white">{selectedTrain.stationName}</strong> ({selectedTrain.platform})
+                      </span>
+                      <span>&bull;</span>
+                      <span>{selectedTrain.cars} Cars</span>
+                      {selectedTrain.delaySec > 0 ? (
+                        <>
+                          <span>&bull;</span>
+                          <span className="text-amber-400 font-bold">
+                            +{Math.round(selectedTrain.delaySec / 60)}m Delay
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span>&bull;</span>
+                          <span className="text-emerald-400 font-bold">On Time</span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-slate-400 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] font-mono">
-                    <span>
-                      Station: <strong className="text-white">{selectedTrain.stationName}</strong> ({selectedTrain.platform})
-                    </span>
-                    <span>&bull;</span>
-                    <span>{selectedTrain.cars} Cars</span>
-                    {selectedTrain.delaySec > 0 ? (
-                      <>
-                        <span>&bull;</span>
-                        <span className="text-amber-400 font-bold">
-                          +{Math.round(selectedTrain.delaySec / 60)}m Delay
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span>&bull;</span>
-                        <span className="text-emerald-400 font-bold">On Time</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Real-Time Expected Times Telemetry Pill Box */}
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-xs font-mono shrink-0">
-                <div className="px-2 border-r border-slate-800">
-                  <span className="text-slate-400 text-[10px] block uppercase">Expected Departure</span>
-                  <div className="text-emerald-400 font-bold text-sm">
-                    {selectedTrain.expectedDepartureTime || 'Leaving'}
-                  </div>
-                  <span className="text-[10px] text-slate-400">
-                    {selectedTrain.minutes === 'Leaving' ? '● Boarding' : `in ${selectedTrain.minutes} min`}
-                  </span>
-                </div>
-
-                <div className="px-2">
-                  <span className="text-slate-400 text-[10px] block uppercase">Expected Arrival</span>
-                  <div className="text-cyan-400 font-bold text-sm">
-                    {selectedTrain.expectedArrivalTime || '--'}
-                  </div>
-                  <span className="text-[10px] text-slate-400">
-                    at {selectedTrain.destAbbr} ({selectedTrain.remainingDurationMins ? `~${selectedTrain.remainingDurationMins}m` : 'ETA'})
-                  </span>
                 </div>
 
                 <button
@@ -1434,6 +1543,125 @@ export const BartLiveMap: React.FC = () => {
                   &times;
                 </button>
               </div>
+
+              {/* Real-Time Expected Times Telemetry Pill Box */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-xs font-mono">
+                {/* 1. Next Upcoming Station */}
+                <div className="p-2 bg-slate-900/60 rounded-lg border border-slate-800/80 space-y-0.5">
+                  <span className="text-slate-400 text-[10px] block uppercase font-semibold">
+                    Next Upcoming Station
+                  </span>
+                  <div className="text-white font-bold text-sm truncate">
+                    {selectedTrain.upcomingStationName || selectedTrain.stationName}
+                  </div>
+                  <span className="text-[10px] text-slate-400 block truncate">
+                    {selectedTrain.isAtPlatform
+                      ? '● At Platform / Boarding'
+                      : `Approaching (${selectedTrain.platform})`}
+                  </span>
+                </div>
+
+                {/* 2. Expected Arrival at Upcoming Station */}
+                <div className="p-2 bg-slate-900/60 rounded-lg border border-slate-800/80 space-y-0.5">
+                  <span className="text-cyan-400 text-[10px] block uppercase font-semibold">
+                    Expected Arrival (Next Stop)
+                  </span>
+                  <div className="text-cyan-400 font-bold text-sm">
+                    {selectedTrain.expectedArrivalTime || '--'}
+                  </div>
+                  <span className="text-[10px] text-slate-400 block truncate">
+                    {selectedTrain.isAtPlatform
+                      ? '● Arrived / Boarding'
+                      : `in ${selectedTrain.arrivalMinutes ?? 0} min`}
+                  </span>
+                </div>
+
+                {/* 3. Expected Departure from Upcoming Station */}
+                <div className="p-2 bg-slate-900/60 rounded-lg border border-slate-800/80 space-y-0.5">
+                  <span className="text-emerald-400 text-[10px] block uppercase font-semibold">
+                    Expected Departure (Next Stop)
+                  </span>
+                  <div className="text-emerald-400 font-bold text-sm">
+                    {selectedTrain.expectedDepartureTime || 'Leaving'}
+                  </div>
+                  <span className="text-[10px] text-slate-400 block truncate">
+                    {selectedTrain.isAtPlatform
+                      ? '● Leaving now'
+                      : `departs in ${selectedTrain.departureMinutes ?? 1} min`}
+                  </span>
+                </div>
+
+                {/* 4. Final Destination ETA */}
+                <div className="p-2 bg-slate-900/60 rounded-lg border border-slate-800/80 space-y-0.5">
+                  <span className="text-slate-400 text-[10px] block uppercase font-semibold">
+                    Terminal Arrival
+                  </span>
+                  <div className="text-yellow-400 font-bold text-sm">
+                    {selectedTrain.finalDestinationArrivalTime || selectedTrain.expectedArrivalTime || '--'}
+                  </div>
+                  <span className="text-[10px] text-slate-400 block truncate">
+                    at {selectedTrain.destAbbr} (~{selectedTrain.finalDurationMins ?? selectedTrain.remainingDurationMins ?? 0}m total)
+                  </span>
+                </div>
+              </div>
+
+              {/* Complete Stop-by-Stop Schedule for ALL Upcoming Stations along this Train's Route */}
+              {selectedTrain.upcomingStops && selectedTrain.upcomingStops.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-slate-800/80">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-mono">
+                    <span className="text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <span>⏱</span>
+                      <span>Upcoming Stations Schedule ({selectedTrain.upcomingStops.length} Stops Ahead):</span>
+                    </span>
+                    <span className="text-slate-400">
+                      When this train will arrive and depart at any upcoming station
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto no-scrollbar pb-1">
+                    <div className="flex items-stretch gap-2 min-w-max">
+                      {selectedTrain.upcomingStops.map((stop, sIdx) => (
+                        <div
+                          key={`${stop.stationCode}-${sIdx}`}
+                          className={`p-2.5 rounded-xl border font-mono text-xs space-y-1 min-w-[155px] ${
+                            stop.isNextStop
+                              ? 'bg-emerald-950/40 border-emerald-700/80 ring-1 ring-emerald-500/30'
+                              : stop.isTerminal
+                              ? 'bg-cyan-950/40 border-cyan-800/80'
+                              : 'bg-slate-950 border-slate-800/80'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-bold text-white text-[11px] truncate" title={stop.stationName}>
+                              {stop.stationName}
+                            </span>
+                            <span
+                              className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
+                                stop.isNextStop
+                                  ? 'bg-emerald-500 text-slate-950'
+                                  : stop.isTerminal
+                                  ? 'bg-cyan-500 text-slate-950'
+                                  : 'bg-slate-800 text-slate-400'
+                              }`}
+                            >
+                              {stop.isNextStop ? 'NEXT' : stop.isTerminal ? 'TERM' : `+${stop.minutesAway}m`}
+                            </span>
+                          </div>
+                          <div className="text-[10px] space-y-0.5 pt-0.5 border-t border-slate-800/60">
+                            <div className="flex items-center justify-between">
+                              <span className="text-cyan-400">Arrives:</span>
+                              <span className="text-white font-bold">{stop.expectedArrivalTime}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-emerald-400">Departs:</span>
+                              <span className="text-white font-bold">{stop.expectedDepartureTime}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1513,9 +1741,10 @@ export const BartLiveMap: React.FC = () => {
                     <th className="py-2.5 px-3">Line</th>
                     <th className="py-2.5 px-3">Direction</th>
                     <th className="py-2.5 px-3">Destination</th>
-                    <th className="py-2.5 px-3">Current Station</th>
-                    <th className="py-2.5 px-3">Expected Departure</th>
-                    <th className="py-2.5 px-3">Expected Arrival</th>
+                    <th className="py-2.5 px-3">Upcoming Station</th>
+                    <th className="py-2.5 px-3">Expected Arrival (Next Stop)</th>
+                    <th className="py-2.5 px-3">Expected Departure (Next Stop)</th>
+                    <th className="py-2.5 px-3">Upcoming Stops</th>
                     <th className="py-2.5 px-3">Status / Platform</th>
                     <th className="py-2.5 px-3">Cars</th>
                     <th className="py-2.5 px-3">Delay</th>
@@ -1525,115 +1754,213 @@ export const BartLiveMap: React.FC = () => {
                   {filteredTrains.map((train) => {
                     const isSelected = selectedTrain?.id === train.id;
                     const isNorth = (train.direction || '').toLowerCase().startsWith('n');
+                    const isExpanded = expandedTrainId === train.id;
 
                     return (
-                      <tr
-                        key={train.id}
-                        onClick={() => {
-                          playBeep(720, 0.05);
-                          setSelectedTrain(train);
-                        }}
-                        className={`cursor-pointer transition-colors ${
-                          isSelected
-                            ? 'bg-slate-800/90 text-white font-medium ring-1 ring-emerald-500/50'
-                            : 'hover:bg-slate-800/40 text-slate-300'
-                        }`}
-                      >
-                        {/* Line Badge */}
-                        <td className="py-3 px-3 whitespace-nowrap">
-                          <span
-                            className="inline-block w-3 h-3 rounded-full mr-2 align-middle"
-                            style={{ backgroundColor: train.hexcolor }}
-                          />
-                          <span className="font-mono uppercase font-bold text-[11px]">
-                            {train.lineId} Line
-                          </span>
-                        </td>
+                      <React.Fragment key={train.id}>
+                        <tr
+                          onClick={() => {
+                            playBeep(720, 0.05);
+                            setSelectedTrain(train);
+                          }}
+                          className={`cursor-pointer transition-colors ${
+                            isSelected
+                              ? 'bg-slate-800/90 text-white font-medium ring-1 ring-emerald-500/50'
+                              : 'hover:bg-slate-800/40 text-slate-300'
+                          }`}
+                        >
+                          {/* Line Badge */}
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            <span
+                              className="inline-block w-3 h-3 rounded-full mr-2 align-middle"
+                              style={{ backgroundColor: train.hexcolor }}
+                            />
+                            <span className="font-mono uppercase font-bold text-[11px]">
+                              {train.lineId} Line
+                            </span>
+                          </td>
 
-                        {/* Dedicated Direction Column with quick toggle filter */}
-                        <td className="py-3 px-3 whitespace-nowrap">
-                          {isNorth ? (
+                          {/* Dedicated Direction Column with quick toggle filter */}
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            {isNorth ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleDirection('North');
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-sky-950/80 border border-sky-800 hover:border-sky-600 hover:bg-sky-900/60 text-sky-400 font-mono font-bold text-[11px] cursor-pointer transition-colors"
+                                title="Click to toggle Northbound filter"
+                              >
+                                <span className="text-xs">↑</span> Northbound
+                              </button>
+                            ) : (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleDirection('South');
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-950/80 border border-amber-800 hover:border-amber-600 hover:bg-amber-900/60 text-amber-400 font-mono font-bold text-[11px] cursor-pointer transition-colors"
+                                title="Click to toggle Southbound filter"
+                              >
+                                <span className="text-xs">↓</span> Southbound
+                              </button>
+                            )}
+                          </td>
+
+                          {/* Destination */}
+                          <td className="py-3 px-3 font-semibold text-white whitespace-nowrap font-sans">
+                            <div>{train.destination}</div>
+                            <div className="text-[10px] text-slate-400 font-mono font-normal">
+                              Terminal: {train.destAbbr} &bull; ETA {train.finalDestinationArrivalTime || train.expectedArrivalTime || '--'}
+                            </div>
+                          </td>
+
+                          {/* Upcoming Station */}
+                          <td className="py-3 px-3 font-mono whitespace-nowrap">
+                            <div className="text-emerald-300 font-bold text-xs">
+                              {train.upcomingStationName || train.stationName}
+                            </div>
+                            <div className="text-[10px] text-slate-400">
+                              {train.isAtPlatform ? '● At Platform / Boarding' : 'Approaching Next Station'}
+                            </div>
+                          </td>
+
+                          {/* Expected Arrival Time at Upcoming Station */}
+                          <td className="py-3 px-3 whitespace-nowrap font-mono">
+                            <div className="text-cyan-400 font-bold text-xs">
+                              {train.expectedArrivalTime || '--'}
+                            </div>
+                            <div className="text-[10px] text-slate-400">
+                              {train.isAtPlatform
+                                ? '● Arrived'
+                                : `in ${train.arrivalMinutes ?? 0}m at ${train.upcomingStationCode || train.stationCode}`}
+                            </div>
+                          </td>
+
+                          {/* Expected Departure Time from Upcoming Station */}
+                          <td className="py-3 px-3 whitespace-nowrap font-mono">
+                            <div className="text-emerald-400 font-bold text-xs">
+                              {train.expectedDepartureTime || 'Leaving'}
+                            </div>
+                            <div className="text-[10px] text-slate-400">
+                              {train.isAtPlatform
+                                ? '● Leaving now'
+                                : `departs in ${train.departureMinutes ?? 1}m`}
+                            </div>
+                          </td>
+
+                          {/* Upcoming Stops Schedule Button */}
+                          <td className="py-3 px-3 whitespace-nowrap font-mono">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleDirection('North');
+                                playKeyClick();
+                                setExpandedTrainId(isExpanded ? null : train.id);
                               }}
-                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-sky-950/80 border border-sky-800 hover:border-sky-600 hover:bg-sky-900/60 text-sky-400 font-mono font-bold text-[11px] cursor-pointer transition-colors"
-                              title="Click to toggle Northbound filter"
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono text-[11px] font-bold cursor-pointer transition-colors ${
+                                isExpanded
+                                  ? 'bg-emerald-500 text-slate-950 border-emerald-400'
+                                  : 'bg-slate-950 text-emerald-400 hover:text-white border-slate-800 hover:border-slate-700'
+                              }`}
+                              title="View expected arrival and departure times for all upcoming stations"
                             >
-                              <span className="text-xs">↑</span> Northbound
+                              <span>⏱ {train.upcomingStops?.length || 0} Stops Ahead</span>
+                              <span className="text-[9px]">{isExpanded ? '▲' : '▼'}</span>
                             </button>
-                          ) : (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleDirection('South');
-                              }}
-                              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-950/80 border border-amber-800 hover:border-amber-600 hover:bg-amber-900/60 text-amber-400 font-mono font-bold text-[11px] cursor-pointer transition-colors"
-                              title="Click to toggle Southbound filter"
-                            >
-                              <span className="text-xs">↓</span> Southbound
-                            </button>
-                          )}
-                        </td>
+                          </td>
 
-                        {/* Destination */}
-                        <td className="py-3 px-3 font-semibold text-white whitespace-nowrap">
-                          {train.destination}
-                        </td>
+                          {/* Status / Platform */}
+                          <td className="py-3 px-3 font-mono whitespace-nowrap">
+                            {train.minutes === 'Leaving' || train.isAtPlatform ? (
+                              <span className="text-emerald-400 font-bold">● Boarding / Departing</span>
+                            ) : (
+                              <span className="text-slate-300">
+                                Arriving in {train.minutes}m ({train.platform})
+                              </span>
+                            )}
+                          </td>
 
-                        {/* Current Station */}
-                        <td className="py-3 px-3 font-mono text-emerald-300 font-medium whitespace-nowrap">
-                          {train.stationName}
-                        </td>
+                          {/* Cars */}
+                          <td className="py-3 px-3 font-mono text-slate-300 whitespace-nowrap">
+                            {train.cars} cars
+                          </td>
 
-                        {/* Expected Departure Time */}
-                        <td className="py-3 px-3 whitespace-nowrap font-mono">
-                          <div className="text-emerald-400 font-bold text-xs">
-                            {train.expectedDepartureTime || 'Leaving'}
-                          </div>
-                          <div className="text-[10px] text-slate-400">
-                            {train.minutes === 'Leaving' ? '● Boarding' : `in ${train.minutes}m`}
-                          </div>
-                        </td>
+                          {/* Delay */}
+                          <td className="py-3 px-3 font-mono whitespace-nowrap">
+                            {train.delaySec > 0 ? (
+                              <span className="text-amber-400 font-bold">
+                                +{Math.round(train.delaySec / 60)}m
+                              </span>
+                            ) : (
+                              <span className="text-slate-400">On Time</span>
+                            )}
+                          </td>
+                        </tr>
 
-                        {/* Expected Destination Arrival Time */}
-                        <td className="py-3 px-3 whitespace-nowrap font-mono">
-                          <div className="text-cyan-400 font-bold text-xs">
-                            {train.expectedArrivalTime || '--'}
-                          </div>
-                          <div className="text-[10px] text-slate-400">
-                            at {train.destAbbr} {train.remainingDurationMins ? `(~${train.remainingDurationMins}m)` : ''}
-                          </div>
-                        </td>
-
-                        {/* Status / Platform */}
-                        <td className="py-3 px-3 font-mono whitespace-nowrap">
-                          {train.minutes === 'Leaving' ? (
-                            <span className="text-emerald-400 font-bold">● Boarding / Departing</span>
-                          ) : (
-                            <span className="text-slate-300">
-                              Arriving in {train.minutes}m ({train.platform})
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Cars */}
-                        <td className="py-3 px-3 font-mono text-slate-300 whitespace-nowrap">
-                          {train.cars} cars
-                        </td>
-
-                        {/* Delay */}
-                        <td className="py-3 px-3 font-mono whitespace-nowrap">
-                          {train.delaySec > 0 ? (
-                            <span className="text-amber-400 font-bold">
-                              +{Math.round(train.delaySec / 60)}m
-                            </span>
-                          ) : (
-                            <span className="text-slate-400">On Time</span>
-                          )}
-                        </td>
-                      </tr>
+                        {/* Inline Expandable Schedule for this Train */}
+                        {isExpanded && (
+                          <tr className="bg-slate-950/95 border-b border-slate-800 animate-fadeIn">
+                            <td colSpan={10} className="p-3 sm:p-4 font-mono">
+                              <div className="space-y-2">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px]">
+                                  <span className="text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                                    <span>⏱</span>
+                                    <span>
+                                      Upcoming Station Schedule ({train.upcomingStops?.length || 0} Stations to {train.destination}):
+                                    </span>
+                                  </span>
+                                  <span className="text-slate-400 text-[10px]">
+                                    Exact train arrival & departure times for any upcoming station along this run
+                                  </span>
+                                </div>
+                                <div className="overflow-x-auto no-scrollbar pb-1">
+                                  <div className="flex items-stretch gap-2 min-w-max">
+                                    {train.upcomingStops?.map((stop, sIdx) => (
+                                      <div
+                                        key={`${stop.stationCode}-${sIdx}`}
+                                        className={`p-2.5 rounded-xl border text-xs space-y-1 min-w-[155px] ${
+                                          stop.isNextStop
+                                            ? 'bg-emerald-950/50 border-emerald-700/80 ring-1 ring-emerald-500/30'
+                                            : stop.isTerminal
+                                            ? 'bg-cyan-950/50 border-cyan-800/80'
+                                            : 'bg-slate-900/90 border-slate-800'
+                                        }`}
+                                      >
+                                        <div className="flex items-center justify-between gap-1">
+                                          <span className="font-bold text-white text-[11px] truncate" title={stop.stationName}>
+                                            {stop.stationName}
+                                          </span>
+                                          <span
+                                            className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
+                                              stop.isNextStop
+                                                ? 'bg-emerald-500 text-slate-950'
+                                                : stop.isTerminal
+                                                ? 'bg-cyan-500 text-slate-950'
+                                                : 'bg-slate-800 text-slate-400'
+                                            }`}
+                                          >
+                                            {stop.isNextStop ? 'NEXT' : stop.isTerminal ? 'TERM' : `+${stop.minutesAway}m`}
+                                          </span>
+                                        </div>
+                                        <div className="text-[10px] space-y-0.5 pt-0.5 border-t border-slate-800/60">
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-cyan-400">Arrives:</span>
+                                            <span className="text-white font-bold">{stop.expectedArrivalTime}</span>
+                                          </div>
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-emerald-400">Departs:</span>
+                                            <span className="text-white font-bold">{stop.expectedDepartureTime}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     );
                   })}
                 </tbody>
