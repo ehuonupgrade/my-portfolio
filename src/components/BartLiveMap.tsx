@@ -58,68 +58,79 @@ export interface LiveTrain {
 // All 5 primary BART lines
 export const ALL_LINES = ['green', 'yellow', 'red', 'orange', 'blue'] as const;
 
-// Accurate schematic coordinates for all 49 BART stations across the Bay Area (viewBox 860 x 530)
-export const stationCoords: Record<string, { x: number; y: number; name: string }> = {
+export interface StationCoord {
+  x: number;
+  y: number;
+  name: string;
+  shortName?: string;
+  dx?: number;
+  dy?: number;
+  anchor?: 'start' | 'middle' | 'end';
+  isMajorHub?: boolean;
+}
+
+// Accurate schematic coordinates for all 49 BART stations across the Bay Area (viewBox 950 x 545)
+export const stationCoords: Record<string, StationCoord> = {
   // San Francisco Spine (Peninsula & Downtown)
-  MLBR: { x: 190, y: 450, name: 'Millbrae' },
-  SFIA: { x: 210, y: 420, name: 'SFO Airport' },
-  SBRN: { x: 225, y: 390, name: 'San Bruno' },
-  SSAN: { x: 238, y: 365, name: 'South San Francisco' },
-  COLM: { x: 250, y: 340, name: 'Colma' },
-  DALY: { x: 265, y: 315, name: 'Daly City' },
-  BALB: { x: 280, y: 290, name: 'Balboa Park' },
-  GLEN: { x: 295, y: 265, name: 'Glen Park' },
-  '24TH': { x: 310, y: 240, name: '24th St Mission' },
-  '16TH': { x: 325, y: 215, name: '16th St Mission' },
-  CIVC: { x: 340, y: 190, name: 'Civic Center' },
-  POWL: { x: 355, y: 168, name: 'Powell St' },
-  MONT: { x: 370, y: 148, name: 'Montgomery St' },
-  EMBR: { x: 385, y: 130, name: 'Embarcadero' },
+  MLBR: { x: 190, y: 450, name: 'Millbrae', shortName: 'Millbrae', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  SFIA: { x: 210, y: 420, name: 'SFO Airport', shortName: 'SFO Airport ✈', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  SBRN: { x: 225, y: 390, name: 'San Bruno', shortName: 'San Bruno', dx: -8, dy: 3, anchor: 'end' },
+  SSAN: { x: 238, y: 365, name: 'South San Francisco', shortName: 'South SF', dx: -8, dy: 3, anchor: 'end' },
+  COLM: { x: 250, y: 340, name: 'Colma', shortName: 'Colma', dx: -8, dy: 3, anchor: 'end' },
+  DALY: { x: 265, y: 315, name: 'Daly City', shortName: 'Daly City', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  BALB: { x: 280, y: 290, name: 'Balboa Park', shortName: 'Balboa Park', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  GLEN: { x: 295, y: 265, name: 'Glen Park', shortName: 'Glen Park', dx: -8, dy: 3, anchor: 'end' },
+  '24TH': { x: 310, y: 240, name: '24th St Mission', shortName: '24th St Mission', dx: -8, dy: 3, anchor: 'end' },
+  '16TH': { x: 325, y: 215, name: '16th St Mission', shortName: '16th St Mission', dx: -8, dy: 3, anchor: 'end' },
+  CIVC: { x: 340, y: 190, name: 'Civic Center', shortName: 'Civic Center', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  POWL: { x: 355, y: 168, name: 'Powell St', shortName: 'Powell St', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  MONT: { x: 370, y: 148, name: 'Montgomery St', shortName: 'Montgomery St', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  EMBR: { x: 385, y: 130, name: 'Embarcadero', shortName: 'Embarcadero', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
 
   // Oakland & Transbay Hub
-  WOAK: { x: 450, y: 125, name: 'West Oakland' },
-  '12TH': { x: 480, y: 120, name: '12th St Oakland' },
-  '19TH': { x: 490, y: 105, name: '19th St Oakland' },
-  MCAR: { x: 500, y: 90, name: 'MacArthur' },
-  LAKE: { x: 485, y: 150, name: 'Lake Merritt' },
-  FTVL: { x: 505, y: 180, name: 'Fruitvale' },
-  COLS: { x: 525, y: 210, name: 'Coliseum' },
-  SANL: { x: 545, y: 240, name: 'San Leandro' },
-  BAYF: { x: 565, y: 270, name: 'Bay Fair' },
+  WOAK: { x: 450, y: 125, name: 'West Oakland', shortName: 'West Oakland', dx: 0, dy: 14, anchor: 'middle', isMajorHub: true },
+  '12TH': { x: 480, y: 120, name: '12th St Oakland', shortName: '12th St Oakland', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
+  '19TH': { x: 490, y: 105, name: '19th St Oakland', shortName: '19th St Oakland', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
+  MCAR: { x: 500, y: 90, name: 'MacArthur', shortName: 'MacArthur', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
+  LAKE: { x: 485, y: 150, name: 'Lake Merritt', shortName: 'Lake Merritt', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  FTVL: { x: 505, y: 180, name: 'Fruitvale', shortName: 'Fruitvale', dx: 8, dy: 3, anchor: 'start' },
+  COLS: { x: 525, y: 210, name: 'Coliseum', shortName: 'Coliseum ✈', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
+  SANL: { x: 545, y: 240, name: 'San Leandro', shortName: 'San Leandro', dx: 8, dy: 3, anchor: 'start' },
+  BAYF: { x: 565, y: 270, name: 'Bay Fair', shortName: 'Bay Fair', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
 
   // Berkeley / Richmond (North East Bay)
-  ASHB: { x: 500, y: 72, name: 'Ashby' },
-  DBRK: { x: 500, y: 52, name: 'Downtown Berkeley' },
-  NBRK: { x: 500, y: 36, name: 'North Berkeley' },
-  PLZA: { x: 500, y: 22, name: 'El Cerrito Plaza' },
-  DELN: { x: 500, y: 10, name: 'El Cerrito del Norte' },
-  RICH: { x: 500, y: 0, name: 'Richmond' },
+  ASHB: { x: 500, y: 72, name: 'Ashby', shortName: 'Ashby', dx: -8, dy: 3, anchor: 'end' },
+  DBRK: { x: 500, y: 54, name: 'Downtown Berkeley', shortName: 'Downtown Berkeley', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  NBRK: { x: 500, y: 38, name: 'North Berkeley', shortName: 'North Berkeley', dx: -8, dy: 3, anchor: 'end' },
+  PLZA: { x: 500, y: 24, name: 'El Cerrito Plaza', shortName: 'El Cerrito Plaza', dx: -8, dy: 3, anchor: 'end' },
+  DELN: { x: 500, y: 12, name: 'El Cerrito del Norte', shortName: 'El Cerrito del Norte', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
+  RICH: { x: 500, y: 2, name: 'Richmond', shortName: 'Richmond', dx: -8, dy: 3, anchor: 'end', isMajorHub: true },
 
   // Antioch / Contra Costa (Northeast)
-  ROCK: { x: 525, y: 80, name: 'Rockridge' },
-  ORIN: { x: 555, y: 70, name: 'Orinda' },
-  LAFY: { x: 590, y: 60, name: 'Lafayette' },
-  WCRK: { x: 630, y: 55, name: 'Walnut Creek' },
-  PHIL: { x: 665, y: 50, name: 'Pleasant Hill' },
-  CONC: { x: 700, y: 45, name: 'Concord' },
-  NCON: { x: 730, y: 40, name: 'North Concord' },
-  PITT: { x: 760, y: 35, name: 'Pittsburg/Bay Point' },
-  PCTR: { x: 785, y: 30, name: 'Pittsburg Center' },
-  ANTC: { x: 810, y: 25, name: 'Antioch' },
+  ROCK: { x: 525, y: 78, name: 'Rockridge', shortName: 'Rockridge', dx: 8, dy: -4, anchor: 'start' },
+  ORIN: { x: 555, y: 68, name: 'Orinda', shortName: 'Orinda', dx: 0, dy: -9, anchor: 'middle' },
+  LAFY: { x: 590, y: 58, name: 'Lafayette', shortName: 'Lafayette', dx: 0, dy: -9, anchor: 'middle' },
+  WCRK: { x: 630, y: 52, name: 'Walnut Creek', shortName: 'Walnut Creek', dx: 0, dy: -9, anchor: 'middle', isMajorHub: true },
+  PHIL: { x: 665, y: 47, name: 'Pleasant Hill', shortName: 'Pleasant Hill', dx: 0, dy: -9, anchor: 'middle' },
+  CONC: { x: 700, y: 42, name: 'Concord', shortName: 'Concord', dx: 0, dy: -9, anchor: 'middle', isMajorHub: true },
+  NCON: { x: 730, y: 37, name: 'North Concord', shortName: 'North Concord', dx: 0, dy: -9, anchor: 'middle' },
+  PITT: { x: 760, y: 32, name: 'Pittsburg/Bay Point', shortName: 'Pittsburg/Bay Pt', dx: 0, dy: -9, anchor: 'middle', isMajorHub: true },
+  PCTR: { x: 785, y: 27, name: 'Pittsburg Center', shortName: 'Pittsburg Ctr', dx: 0, dy: -9, anchor: 'middle' },
+  ANTC: { x: 810, y: 22, name: 'Antioch', shortName: 'Antioch', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
 
   // Dublin / Pleasanton (East)
-  CAST: { x: 615, y: 270, name: 'Castro Valley' },
-  WDUB: { x: 675, y: 270, name: 'West Dublin' },
-  DUBL: { x: 735, y: 270, name: 'Dublin / Pleasanton' },
+  CAST: { x: 615, y: 270, name: 'Castro Valley', shortName: 'Castro Valley', dx: 0, dy: 14, anchor: 'middle' },
+  WDUB: { x: 675, y: 270, name: 'West Dublin', shortName: 'West Dublin', dx: 0, dy: 14, anchor: 'middle' },
+  DUBL: { x: 735, y: 270, name: 'Dublin / Pleasanton', shortName: 'Dublin / Pleasanton', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
 
   // South Bay / Fremont / Milpitas / Berryessa
-  HAYW: { x: 580, y: 300, name: 'Hayward' },
-  SHAY: { x: 595, y: 330, name: 'South Hayward' },
-  UCTY: { x: 610, y: 360, name: 'Union City' },
-  FRMT: { x: 625, y: 390, name: 'Fremont' },
-  WARM: { x: 645, y: 420, name: 'Warm Springs' },
-  MLPT: { x: 670, y: 455, name: 'Milpitas' },
-  BERY: { x: 695, y: 490, name: 'Berryessa (San José)' },
+  HAYW: { x: 580, y: 300, name: 'Hayward', shortName: 'Hayward', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
+  SHAY: { x: 595, y: 330, name: 'South Hayward', shortName: 'South Hayward', dx: 8, dy: 3, anchor: 'start' },
+  UCTY: { x: 610, y: 360, name: 'Union City', shortName: 'Union City', dx: 8, dy: 3, anchor: 'start' },
+  FRMT: { x: 625, y: 390, name: 'Fremont', shortName: 'Fremont', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
+  WARM: { x: 645, y: 420, name: 'Warm Springs', shortName: 'Warm Springs', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
+  MLPT: { x: 670, y: 455, name: 'Milpitas', shortName: 'Milpitas', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
+  BERY: { x: 695, y: 490, name: 'Berryessa (San José)', shortName: 'Berryessa (SJ)', dx: 8, dy: 3, anchor: 'start', isMajorHub: true },
 };
 
 // Line track polyline definitions
@@ -962,6 +973,17 @@ export const BartLiveMap: React.FC = () => {
     });
   }, [trains, selectedLines, selectedDirections]);
 
+  // Map of active trains currently at or approaching each station
+  const trainsAtStation = useMemo(() => {
+    const map: Record<string, LiveTrain[]> = {};
+    filteredTrains.forEach((t) => {
+      const code = t.upcomingStationCode || t.stationCode;
+      if (!map[code]) map[code] = [];
+      map[code].push(t);
+    });
+    return map;
+  }, [filteredTrains]);
+
   const isAllLinesSelected = selectedLines.length === ALL_LINES.length;
 
   // Smooth scroll to ledger
@@ -1305,16 +1327,20 @@ export const BartLiveMap: React.FC = () => {
                       : ''
                   }`}
             </div>
+            <div className="text-[10px] text-emerald-400 font-mono font-medium flex items-center gap-1.5 pt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>ALL 49 STATIONS LABELED • GREEN GLOW [🚆] INDICATES ACTIVE TRAINS AT STATION</span>
+            </div>
           </div>
 
           {/* Transbay Tube Marker */}
-          <div className="absolute top-[26%] left-[46%] pointer-events-none text-[10px] font-mono text-cyan-400/80 border border-cyan-800/40 bg-cyan-950/60 px-2 py-0.5 rounded z-10">
+          <div className="absolute top-[26%] left-[46%] pointer-events-none text-[10px] font-mono text-cyan-400/80 border border-cyan-800/40 bg-cyan-950/60 px-2 py-0.5 rounded z-10 hidden sm:block">
             TRANSBAY TUBE ≋
           </div>
 
           <svg
-            viewBox="0 0 860 520"
-            className="w-full h-auto min-h-[250px] sm:min-h-[340px] md:min-h-[420px] max-h-[640px] select-none"
+            viewBox="-35 -20 955 545"
+            className="w-full h-auto min-h-[280px] sm:min-h-[380px] md:min-h-[460px] max-h-[680px] select-none"
           >
             <defs>
               <pattern id="bayWater2" width="10" height="10" patternUnits="userSpaceOnUse">
@@ -1336,6 +1362,18 @@ export const BartLiveMap: React.FC = () => {
               strokeDasharray="5 3"
               opacity="0.7"
             />
+            <text
+              x={(stationCoords.EMBR.x + stationCoords.WOAK.x) / 2}
+              y={(stationCoords.EMBR.y + stationCoords.WOAK.y) / 2 - 8}
+              textAnchor="middle"
+              fontSize="8.5"
+              fontFamily="monospace"
+              fill="#00e5ff"
+              fontWeight="bold"
+              className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] pointer-events-none select-none"
+            >
+              TRANSBAY TUBE ≋
+            </text>
 
             {/* Line Track Rails */}
             {Object.entries(trackLines).map(([lId, config]) => {
@@ -1374,34 +1412,96 @@ export const BartLiveMap: React.FC = () => {
               );
             })}
 
-            {/* Station Dots */}
-            {Object.entries(stationCoords).map(([code, p]) => (
-              <g key={code} className="group">
-                <circle
-                  cx={p.x}
-                  cy={p.y}
-                  r="3"
-                  fill="#0a120c"
-                  stroke="#ffffff"
-                  strokeWidth="1.2"
-                />
-              </g>
-            ))}
+            {/* ALL 49 Station Dots, Active Train Presence Halos, and Station Names */}
+            {Object.entries(stationCoords).map(([code, p]) => {
+              const trainsAtThisStation = trainsAtStation[code] || [];
+              const hasActiveTrain = trainsAtThisStation.length > 0;
+              const isSelectedTrainHere =
+                selectedTrain &&
+                (selectedTrain.stationCode === code || selectedTrain.upcomingStationCode === code);
 
-            {/* Key Station Labels */}
-            <g fontSize="10" fontFamily="monospace" fill="#94a3b8">
-              <text x={stationCoords.EMBR.x - 10} y={stationCoords.EMBR.y} textAnchor="end" fill="#ffffff" fontWeight="bold">Embarcadero</text>
-              <text x={stationCoords.POWL.x - 10} y={stationCoords.POWL.y} textAnchor="end">Powell St</text>
-              <text x={stationCoords.SFIA.x - 10} y={stationCoords.SFIA.y} textAnchor="end" fill="#38bdf8">SFO Airport ✈</text>
-              <text x={stationCoords.WOAK.x + 10} y={stationCoords.WOAK.y} textAnchor="start" fill="#ffffff" fontWeight="bold">West Oakland</text>
-              <text x={stationCoords.MCAR.x + 10} y={stationCoords.MCAR.y} textAnchor="start">MacArthur</text>
-              <text x={stationCoords.DBRK.x + 10} y={stationCoords.DBRK.y} textAnchor="start">Berkeley</text>
-              <text x={stationCoords.RICH.x + 10} y={stationCoords.RICH.y} textAnchor="start">Richmond</text>
-              <text x={stationCoords.ANTC.x - 10} y={stationCoords.ANTC.y + 15} textAnchor="middle" fill="#facc15">Antioch</text>
-              <text x={stationCoords.DUBL.x + 10} y={stationCoords.DUBL.y + 4} textAnchor="start" fill="#60a5fa">Dublin</text>
-              <text x={stationCoords.MLPT.x + 10} y={stationCoords.MLPT.y + 4} textAnchor="start" fill="#4ade80" fontWeight="bold">Milpitas</text>
-              <text x={stationCoords.BERY.x + 10} y={stationCoords.BERY.y + 4} textAnchor="start" fill="#4ade80">Berryessa (SJ)</text>
-            </g>
+              const activeColor = trainsAtThisStation[0]?.hexcolor || '#10b981';
+
+              return (
+                <g
+                  key={code}
+                  className="cursor-pointer group select-none transition-all duration-200"
+                  onClick={() => {
+                    if (trainsAtThisStation.length > 0) {
+                      playBeep(720, 0.05);
+                      setSelectedTrain(trainsAtThisStation[0]);
+                    }
+                  }}
+                >
+                  <title>{`${p.name} (${code})
+${
+  trainsAtThisStation.length > 0
+    ? `• ${trainsAtThisStation.length} Active Train(s) Currently Here or Approaching`
+    : '• BART Station'
+}`}</title>
+
+                  {/* Pulsing halo ring when active train is currently at or approaching this station */}
+                  {hasActiveTrain && (
+                    <circle
+                      cx={p.x}
+                      cy={p.y}
+                      r="8"
+                      fill="none"
+                      stroke={activeColor}
+                      strokeWidth="1.5"
+                      opacity="0.85"
+                      className="animate-ping origin-center"
+                    />
+                  )}
+
+                  {/* Station Marker Dot */}
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={isSelectedTrainHere ? '4.8' : hasActiveTrain ? '4' : p.isMajorHub ? '3.2' : '2.4'}
+                    fill={hasActiveTrain ? activeColor : '#050a07'}
+                    stroke={
+                      isSelectedTrainHere
+                        ? '#ffffff'
+                        : hasActiveTrain
+                        ? '#ffffff'
+                        : p.isMajorHub
+                        ? '#cbd5e1'
+                        : '#64748b'
+                    }
+                    strokeWidth={isSelectedTrainHere ? '2' : p.isMajorHub ? '1.4' : '1'}
+                    className="group-hover:stroke-white group-hover:scale-125 transition-all origin-center"
+                  />
+
+                  {/* Station Name Label for ALL 49 Stations */}
+                  <text
+                    x={p.x + (p.dx ?? 8)}
+                    y={p.y + (p.dy ?? 3)}
+                    textAnchor={p.anchor ?? 'start'}
+                    fontSize={hasActiveTrain || isSelectedTrainHere ? '8.8' : p.isMajorHub ? '8' : '7.2'}
+                    fontFamily="monospace"
+                    fontWeight={hasActiveTrain || isSelectedTrainHere || p.isMajorHub ? 'bold' : '500'}
+                    fill={
+                      isSelectedTrainHere
+                        ? '#38bdf8'
+                        : hasActiveTrain
+                        ? '#4ade80'
+                        : p.isMajorHub
+                        ? '#ffffff'
+                        : '#cbd5e1'
+                    }
+                    className="pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] transition-colors select-none"
+                  >
+                    {p.shortName || p.name}
+                    {hasActiveTrain && (
+                      <tspan fill="#34d399" fontWeight="bold">
+                        {` [${trainsAtThisStation.length}🚆]`}
+                      </tspan>
+                    )}
+                  </text>
+                </g>
+              );
+            })}
 
             {/* REAL PHYSICAL TRAIN ICONS AT ACTUAL STATIONS */}
             {filteredTrains.map((train) => {

@@ -8,6 +8,10 @@
     "changes": [
       {
         "type": "feature",
+        "description": "Rendered all 49 BART station names directly on the Live Map SVG with calibrated non-overlapping coordinates, transfer hub typography, and pulsing train presence halos with [🚆] counts to clearly see where every active train is currently at across the Bay Area network."
+      },
+      {
+        "type": "feature",
         "description": "Configured Live Map Expected Arrival and Departure to explicitly represent the next upcoming station (when the train will arrive and when it will leave), alongside an interactive stop-by-stop upcoming station timetable for any stop along the run, while keeping Trip Planner focused on origin/destination trip endpoints."
       },
       {
