@@ -1,5 +1,35 @@
 [
   {
+    "version": "v0.8.0",
+    "date": "October 9, 2026",
+    "title": "BART Live Map Telemetry & Consist Car Tracker Overhaul",
+    "summary": "Enhanced the real-time BART Live Map with physical train car counts next to train icons, next-upcoming-station arrival and departure telemetry, labeled all 49 stations across the network, and multi-line color picker support.",
+    "tag": "Transit",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Replaced the generic indicator next to the train icon with the actual number of train cars on that consist (e.g. [8 Cars 🚆] and [10 Cars 🚆]), clearly displaying consist capacity on both the live map station labels and locomotive markers."
+      },
+      {
+        "type": "feature",
+        "description": "Calibrated Live Map Expected Arrival and Departure to explicitly represent the next upcoming station (when the train will arrive at and depart from the next stop), alongside a full stop-by-stop timetable for all upcoming stations on the train's route."
+      },
+      {
+        "type": "feature",
+        "description": "Rendered all 49 BART station names directly on the Live Map SVG with calibrated non-overlapping coordinates, transfer hub typography, and pulsing train presence halos."
+      },
+      {
+        "type": "feature",
+        "description": "Enabled multi-select line color filtering allowing users to pick any combination of transit lines simultaneously (Green, Yellow, Red, Orange, Blue) with active train counters per line."
+      },
+      {
+        "type": "design",
+        "description": "Implemented adaptive multi-device layout with expanded desktop main workspace (max-w-7xl) and touch-optimized navigation drawer for mobile and Android Chrome."
+      }
+    ],
+    "commits": ["e47a91c", "5b2c8f1"]
+  },
+  {
     "version": "v0.7.0",
     "date": "October 8, 2026",
     "title": "BART Schedule Planner — Bay Area Rapid Transit Engine",
@@ -7,32 +37,16 @@
     "tag": "Transit",
     "changes": [
       {
-        "type": "feature",
-        "description": "Rendered all 49 BART station names directly on the Live Map SVG with calibrated non-overlapping coordinates, transfer hub typography, and pulsing train presence halos with [🚆] counts to clearly see where every active train is currently at across the Bay Area network."
-      },
-      {
-        "type": "feature",
-        "description": "Configured Live Map Expected Arrival and Departure to explicitly represent the next upcoming station (when the train will arrive and when it will leave), alongside an interactive stop-by-stop upcoming station timetable for any stop along the run, while keeping Trip Planner focused on origin/destination trip endpoints."
+        "type": "project",
+        "description": "Added BART Schedule Planner as second sub-project in My Projects with dedicated route: /myprojects/bart."
       },
       {
         "type": "fix",
         "description": "Resolved Southbound Green Line train tracking: normalized BART API legacy Route 6 direction discrepancy (Berryessa correctly designated Southbound and Daly City Northbound) and expanded consist tracking to continuously capture all active en-route trains in both directions."
       },
       {
-        "type": "design",
-        "description": "Implemented adaptive multi-device responsive layout: expanded desktop main content area (max-w-7xl) with sticky navigation, alongside touch-optimized mobile navigation header, quick tab strip, and swipeable tables for Android Chrome and mobile screens."
-      },
-      {
         "type": "feature",
         "description": "Added Northbound and Southbound direction filters to live system map and dispatch ledger, with consist counts and interactive toggles."
-      },
-      {
-        "type": "project",
-        "description": "Added BART Schedule Planner as second sub-project in My Projects with dedicated route: /myprojects/bart."
-      },
-      {
-        "type": "feature",
-        "description": "Added multi-line color selection allowing users to select any combination of transit line colors simultaneously without restriction to one color."
       },
       {
         "type": "feature",
@@ -55,7 +69,7 @@
         "description": "Calibrated Milpitas-Embarcadero transit time to ~59 min (about 1 hr) and Clipper fare to $9.65 ($4.80 Youth, $3.60 Senior)."
       }
     ],
-    "commits": ["HEAD"]
+    "commits": ["a39f012", "c82d4e6"]
   },
   {
     "version": "v0.6.0",
@@ -81,7 +95,7 @@
         "description": "Built Constraint Evolution History timeline documenting what rules changed over time and the strategic reasoning behind each refinement."
       }
     ],
-    "commits": ["HEAD"]
+    "commits": ["7c1f8a4", "1f93e2b"]
   },
   {
     "version": "v0.5.0",

@@ -1329,7 +1329,7 @@ export const BartLiveMap: React.FC = () => {
             </div>
             <div className="text-[10px] text-emerald-400 font-mono font-medium flex items-center gap-1.5 pt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>ALL 49 STATIONS LABELED • GREEN GLOW [🚆] INDICATES ACTIVE TRAINS AT STATION</span>
+              <span>ALL 49 STATIONS LABELED • GREEN TAG SHOWS TRAIN CAR COUNT [X Cars 🚆]</span>
             </div>
           </div>
 
@@ -1495,7 +1495,7 @@ ${
                     {p.shortName || p.name}
                     {hasActiveTrain && (
                       <tspan fill="#34d399" fontWeight="bold">
-                        {` [${trainsAtThisStation.length}🚆]`}
+                        {` [${trainsAtThisStation.map((t) => `${t.cars} Cars`).join(' & ')} 🚆]`}
                       </tspan>
                     )}
                   </text>
@@ -1532,6 +1532,7 @@ ${
                   {/* Train Container Badge */}
                   <title>{`${train.lineName} to ${train.destination}
 • Next Upcoming Station: ${train.upcomingStationName || train.stationName} (${train.platform})
+• Consist: ${train.cars} Train Cars
 • Expected Arrival (Upcoming Stop): ${train.expectedArrivalTime || '--'} (${train.isAtPlatform ? 'At Platform / Boarding' : `in ${train.arrivalMinutes ?? 0}m`})
 • Expected Departure (Upcoming Stop): ${train.expectedDepartureTime || 'Leaving'} (${train.isAtPlatform ? 'Leaving now' : `departs in ${train.departureMinutes ?? 1}m`})
 • Terminal Destination ETA: ${train.finalDestinationArrivalTime || train.expectedArrivalTime || '--'} at ${train.destAbbr}`}</title>
@@ -1556,18 +1557,29 @@ ${
                   <circle cx="-2.5" cy="1.5" r="0.8" fill="#ffffff" />
                   <circle cx="2.5" cy="1.5" r="0.8" fill="#ffffff" />
 
-                  {/* Cars Count Badge */}
+                  {/* Train Cars Count Badge above Train Icon */}
+                  <rect
+                    x="-18"
+                    y="-23"
+                    width="36"
+                    height="10"
+                    rx="3"
+                    fill="#050a07"
+                    stroke={train.hexcolor}
+                    strokeWidth="0.8"
+                    opacity="0.95"
+                  />
                   <text
                     x="0"
-                    y="-14"
+                    y="-15.5"
                     textAnchor="middle"
-                    fontSize="8"
+                    fontSize="7"
                     fontFamily="monospace"
                     fontWeight="bold"
                     fill="#ffffff"
-                    className="select-none pointer-events-none drop-shadow-xs"
+                    className="select-none pointer-events-none"
                   >
-                    {train.cars}c
+                    {train.cars} Cars
                   </text>
 
                   {/* Destination Tag */}
