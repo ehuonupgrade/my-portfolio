@@ -1601,18 +1601,8 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     registrationPlatform: 'Sawyer',
     sourcePlatforms: ['Sawyer', 'Winnie', 'Google', 'Yelp'],
     phone: '(408) 780-8888',
-    badge: 'BOUTIQUE STORYBOOK BALLET ★',
+    badge: 'BOUTIQUE STORYBOOK BALLET',
     photos: ['https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 100,
-    isEnrolledStudio: false,
-    tutuSimilarityReasons: [
-      '★ Benchmark Storybook Ballet Studio (Milpitas)',
-      'Storybook Ballet Curriculum (Nutcracker & Swan Lake themes)',
-      'Whimsical Boutique Decor with Borrowed Tutus',
-      'Gentle, Non-Competitive & Low Student-Teacher Ratio (5:1)',
-      'Bravo! Bash Gentle Showcases without stressful recitals',
-    ],
   },
 
   // 12B. Tutu School - San Jose (Willow Glen - 7.6 mi from 95131)
@@ -1733,16 +1723,8 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     registrationPlatform: 'Sawyer',
     sourcePlatforms: ['Sawyer', 'Winnie', 'Google', 'Yelp'],
     phone: '(408) 508-3600',
-    badge: 'TUTU SCHOOL SISTER STUDIO',
+    badge: 'BOUTIQUE BALLET',
     photos: ['https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 100,
-    tutuSimilarityReasons: [
-      'Official Tutu School Location (Willow Glen)',
-      'Identical Storybook Fairytale Curriculum',
-      'Borrowed Tutus & Silk Scarf Fairy Tales',
-      'Gentle, Non-Competitive & 5:1 Low Ratio',
-    ],
   },
 
   // 13. Tutu School - Sunnyvale (11.2 mi from 95131)
@@ -1851,16 +1833,8 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     registrationPlatform: 'Sawyer',
     sourcePlatforms: ['Sawyer', 'Winnie', 'Google', 'Yelp'],
     phone: '(408) 508-3601',
-    badge: 'TUTU SCHOOL SISTER STUDIO',
+    badge: 'BOUTIQUE BALLET',
     photos: ['https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 100,
-    tutuSimilarityReasons: [
-      'Official Tutu School Location (Downtown Sunnyvale)',
-      'Identical Storybook Fairytale Curriculum',
-      'Borrowed Tutus & Nutcracker Themes',
-      'Gentle, Non-Competitive & 5:1 Low Ratio',
-    ],
   },
 
   // 13B. Tutu School - Saratoga (14.8 mi from 95131)
@@ -1920,7 +1894,7 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     studentTeacherRatio: '5:1',
     parentParticipation: 'Drop-off (Viewing Window)',
     whatToBring: ['Ballet slippers', 'Leotard & tutu (or comfortable play clothing)', 'Water bottle'],
-    description: 'Sister branch nestled in historic Saratoga Village sharing the identical storybook fairy tale curriculum, low ratios, and gentle non-competitive philosophy as Milpitas.',
+    description: 'Charming ballet studio nestled in historic Saratoga Village featuring storybook fairy tale themes, small class sizes, and gentle movement instruction for early learners.',
     learningHighlights: [
       'Classical storybook dramatization (Swan Lake & Nutcracker)',
       'First and second ballet positions and delicate sautés',
@@ -1957,16 +1931,8 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     registrationPlatform: 'Sawyer',
     sourcePlatforms: ['Sawyer', 'Google', 'Yelp', 'Winnie'],
     phone: '(408) 867-8888',
-    badge: 'TUTU SCHOOL SISTER STUDIO',
+    badge: 'BOUTIQUE BALLET',
     photos: ['https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 100,
-    tutuSimilarityReasons: [
-      'Official Tutu School Sister Location',
-      'Identical Storybook Curriculum & Music',
-      'Borrowed Tutus & Chandelier Boutique Setting',
-      'Low 5:1 Student-Teacher Ratio',
-    ],
   },
 
   // 13C. West Valley Dance Company - Tiny Toes & Tutu Tots (6.2 mi from 95131)
@@ -2065,14 +2031,6 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     phone: '(408) 217-8106',
     badge: 'TUTU TOTS SPECIALIST',
     photos: ['https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 92,
-    tutuSimilarityReasons: [
-      'Storybook Fairy Tale & Tutu Tots Curriculum',
-      'Prop-Based Dance with Magic Wands & Silk Ribbons',
-      'Gentle & Encouraging Preschool Environment',
-      'Low 6:1 Ratio with Dedicated Toddler Instructors',
-    ],
   },
 
   // 13D. Small Fry Dance Club - San Mateo / Peninsula (25.4 mi from 95131)
@@ -2170,14 +2128,6 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     phone: '(650) 393-5560',
     badge: 'TODDLER DANCE SPECIALIST',
     photos: ['https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 94,
-    tutuSimilarityReasons: [
-      'Exclusively Toddler-to-Preschool Focus (18mo – 5yr)',
-      'Whimsical Prop-Based Dance (Wands, Scarves, Ribbons)',
-      'Gentle Positive-Discipline & Non-Competitive',
-      'Low 6:1 Ratio with Early Childhood Dance Educators',
-    ],
   },
 
   // 14. San Jose Dance Theatre - Downtown SJ (5.1 mi from 95131)
@@ -2288,14 +2238,6 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     phone: '(408) 735-8841',
     badge: 'HISTORIC BALLET ACADEMY',
     photos: ['https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 85,
-    tutuSimilarityReasons: [
-      'First Steps Storybook Ballet & Nutcracker Heritage',
-      'Classical French Ballet Terminology & Poise',
-      'Gentle Early Introduction without High-Pressure Exams',
-      'Sprung Hardwood Floors & Warm Faculty',
-    ],
   },
 
   // 15. Dance Academy USA (DAU) - Cupertino (12.3 mi from 95131)
@@ -2406,14 +2348,6 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     phone: '(408) 257-3211',
     badge: 'BALLET & TAP COMBO',
     photos: ['https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 88,
-    tutuSimilarityReasons: [
-      'Twinkle Toes Preschool Ballet with Props & Wands',
-      'Dedicated Toddler-Only Wing within Academy',
-      'Storybook Dance Themes & Imaginative Roleplay',
-      '6:1 Student-Teacher Attention',
-    ],
   },
 
   // ==========================================
@@ -2518,14 +2452,6 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     phone: '(408) 251-6392',
     badge: 'SUPER LOCAL • 2.4 MILES',
     photos: ['https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 80,
-    tutuSimilarityReasons: [
-      'Silk Ribbon Sticks & Creative Fairy Movement',
-      'Only 2.4 miles from Zip Code 95131 (Berryessa)',
-      'Subsidized Municipal Pricing ($18/class)',
-      'Gentle Non-Competitive Preschool Focus',
-    ],
   },
 
   // 17. Eastlake Dance Center - Berryessa (2.9 mi from 95131)
@@ -2746,14 +2672,6 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     phone: '(408) 866-2104',
     badge: 'WORLD RENOWNED CURRICULUM',
     photos: ['https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 82,
-    tutuSimilarityReasons: [
-      'Sensory Silk Scarves, Ribbons & Musical Storytelling',
-      'Classical Musicality & Gentle Movement',
-      'Process-Focused Creative Expression for 2.5–3.5 Yrs',
-      'Parent-Bonding & Toddler Socialization',
-    ],
   },
 
   // ==========================================
@@ -3190,14 +3108,6 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     phone: '(650) 968-4455',
     badge: 'CLASSICAL FRENCH TECHNIQUE',
     photos: ['https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 78,
-    tutuSimilarityReasons: [
-      'Classical French Pre-Ballet with Storybook Themes',
-      'Animal Stories & Creative Dramatization of Classic Ballets',
-      '5:1 Low Ratio with Patient Mentors',
-      'Sprung Marley Floors & Poise Focus',
-    ],
   },
 
   // 23. Bayer Ballet Academy - Mountain View (16.1 mi from 95131)
@@ -3861,14 +3771,6 @@ export const TODDLER_ACTIVITIES: ActivityItem[] = [
     phone: '(408) 899-4404',
     badge: 'CLASSICAL STORYBOOK BALLET',
     photos: ['https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=600&q=80'],
-    isTutuSimilar: true,
-    tutuSimilarityScore: 98,
-    tutuSimilarityReasons: [
-      'Official Tutu School Primary Program (Pre-K Progression)',
-      'Classical Swan Lake & Coppélia Fairy Tales',
-      'Borrowed Tutus & Low-Stress Stage Confidence',
-      'Low 6:1 Ratio with Early Childhood Ballet Mentors',
-    ],
   },
   {
     id: 'act-swim-goldfish-glider',

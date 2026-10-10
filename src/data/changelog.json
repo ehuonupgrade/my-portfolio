@@ -1,9 +1,57 @@
 [
   {
+    "version": "v0.9.5",
+    "date": "October 10, 2026",
+    "title": "Community Feedback & Autonomous Evolution Inventory",
+    "summary": "Introduced universal site feedback and recommendation inventory. Allows any user to propose enhancements or report issues for any aspect of the site (Kids Activity Hub, BART Planner, RoboInvestor, Games, Navigation). Evaluates technical feasibility and provides an owner review deck for development staff and the site owner to acknowledge, approve, and mark deployed, laying the foundation for recursive agentic automation.",
+    "tag": "Architecture",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Universal Feedback & Recommendation Engine: Users can submit feedback across all projects with auto-categorization, target tracking, and community upvoting."
+      },
+      {
+        "type": "feature",
+        "description": "Public Inventory & Evolution Roadmap: Real-time inventory displaying status breakdown (Submitted, Acknowledged, In Pipeline, Feasibility Approved, Deployed) with search and category filtering."
+      },
+      {
+        "type": "feature",
+        "description": "Agent Feasibility Synthesis & Owner Review Deck: Heuristic technical impact analysis, complexity estimates, test plans, and one-click owner approval workflows for site owner and development staff."
+      },
+      {
+        "type": "improvement",
+        "description": "Global quick-trigger floating button and direct in-page feedback triggers in the Kids Activity Hub and navigation menus."
+      }
+    ],
+    "commits": ["1a4c87e", "5f2b93d"]
+  },
+  {
+    "version": "v0.9.4",
+    "date": "October 10, 2026",
+    "title": "Kids & Youth Activity Hub — Universal Unbiased Aggregator",
+    "summary": "Removed the studio philosophy matcher feature. Tutu School locations are aggregated seamlessly as standard entries alongside all dance, ballet, swim, gymnastics, martial arts, STEM, and arts activities. All multi-source ratings, transparent prices, and direct registration links are fully unbiased.",
+    "tag": "Activities",
+    "changes": [
+      {
+        "type": "improvement",
+        "description": "Removed studio philosophy matcher and benchmark ranking feature to maintain unbiased, comprehensive aggregation across all facilities, organizations, and styles."
+      },
+      {
+        "type": "improvement",
+        "description": "Tutu School facilities (Milpitas, Willow Glen, Sunnyvale, Saratoga) integrated as equal first-class activities alongside all other programs within the user-selected zip code and radius."
+      },
+      {
+        "type": "feature",
+        "description": "Universal all-ages activity aggregation across 9 platforms (Sawyer, iClassPro, Mindbody, CivicRec, ActivityHero, Direct Studio portals, Google, Yelp, Winnie) with distance, price, schedule, and live spot filters."
+      }
+    ],
+    "commits": ["8d1a92e"]
+  },
+  {
     "version": "v0.9.3",
     "date": "October 9, 2026",
-    "title": "Kids & Youth Activity Hub — Universal All-Ages Expansion & Studio Style Matcher",
-    "summary": "Generalized the activity hub into a universal tool for parents with kids of any age (infants to teens, 0 – 17 years). Expanded activities catalog to 44 programs with school-age swim clinics, ninja parkour, youth hip-hop, classical youth ballet, martial arts, robotics STEM, and ceramics. Added an objective Studio Style & Philosophy Matcher benchmarked against Tutu School Milpitas.",
+    "title": "Kids & Youth Activity Hub — Universal All-Ages Expansion",
+    "summary": "Generalized the activity hub into a universal tool for parents with kids of any age (infants to teens, 0 – 17 years). Expanded activities catalog to 44 programs with school-age swim clinics, ninja parkour, youth hip-hop, classical youth ballet, martial arts, robotics STEM, and ceramics.",
     "tag": "Activities",
     "changes": [
       {
@@ -13,10 +61,6 @@
       {
         "type": "feature",
         "description": "Expanded 44-Activity Catalog: Added Junior competitive swim team stroke clinics (Calphin & Santa Clara Swim Club), youth gymnastics and ninja agility/parkour (Airborne & Twisters), classical youth ballet & pre-pointe (San Jose Dance Theatre), youth commercial hip-hop crews (Dance Academy USA), junior Taekwondo martial arts, LEGO robotics STEM labs, and potter's wheel ceramic arts."
-      },
-      {
-        "type": "feature",
-        "description": "Studio Style Matcher & Tutu School Benchmark: Objective pedagogical profile matching studios that share storybook fairytale ballet curricula, loaner tutus/props, gentle non-competitive showcases, and low 5:1 teacher-student ratios."
       },
       {
         "type": "improvement",

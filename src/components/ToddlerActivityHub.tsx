@@ -14,6 +14,7 @@ import {
   POPULAR_NEARBY_ZIPS,
 } from '../utils/geoUtils';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
+import { FeedbackModal } from './FeedbackModal';
 
 interface ToddlerActivityHubProps {
   onBack?: () => void;
@@ -25,8 +26,7 @@ export type SortOption =
   | 'highest_rated'
   | 'price_low'
   | 'price_high'
-  | 'availability'
-  | 'tutu_match';
+  | 'availability';
 export type AgeFilterMode = 'target' | 'bracket' | 'range';
 export type AgeBracketKey = 'all' | 'baby' | 'toddler' | 'preschool' | 'elementary' | 'tween' | 'teen';
 
@@ -63,10 +63,6 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
   const [minAgeYears, setMinAgeYears] = useState<number>(0);
   const [maxAgeYears, setMaxAgeYears] = useState<number>(17);
 
-  // Studio Style Matcher Filter State (Tutu School benchmark)
-  const [onlyTutuSimilar, setOnlyTutuSimilar] = useState<boolean>(false);
-  const [showTutuGuideModal, setShowTutuGuideModal] = useState<boolean>(false);
-
   // Other Filters & State
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
   const [selectedDay, setSelectedDay] = useState<string>('all');
@@ -80,6 +76,7 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
   // Modals State
   const [showSourcesModal, setShowSourcesModal] = useState<boolean>(false);
   const [activeActivity, setActiveActivity] = useState<ActivityItem | null>(null);
+  const [isActivityFeedbackModalOpen, setIsActivityFeedbackModalOpen] = useState<boolean>(false);
 
   // Reservation Flow Modal State
   const [reservingActivity, setReservingActivity] = useState<ActivityItem | null>(null);
@@ -88,18 +85,13 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
   const [childAge, setChildAge] = useState<string>(
     targetAgeYears !== 'all' ? `${targetAgeYears} Years Old` : ''
   );
-  const [parentEmail, setParentEmail] = useState<string>('eric.huon@gmail.com');
+  const [parentEmail, setParentEmail] = useState<string>('parent@example.com');
   const [reservationConfirmed, setReservationConfirmed] = useState<boolean>(false);
 
   // Location info for active origin zip
   const originLocationInfo = useMemo(() => {
     return getZipLocationInfo(originZip);
   }, [originZip]);
-
-  // Count of Tutu-similar style facilities
-  const tutuSimilarCount = useMemo(() => {
-    return TODDLER_ACTIVITIES.filter((a) => a.isTutuSimilar).length;
-  }, []);
 
   // Handle Zip Code Submission
   const handleApplyZipCode = (newZipCandidate: string) => {
@@ -153,11 +145,6 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
   // Filtered & Distance-Calculated Activities
   const filteredActivities = useMemo(() => {
     return TODDLER_ACTIVITIES.filter((item) => {
-      // Tutu School style similarity filter
-      if (onlyTutuSimilar && !item.isTutuSimilar) {
-        return false;
-      }
-
       // Category match
       if (selectedCategory !== 'all' && item.category !== selectedCategory) {
         return false;
@@ -236,7 +223,7 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
         if (!hasOpenSpots) return false;
       }
 
-      // Search query match (smart keyword, facility, location, tutu reasons)
+      // Search query match (title, facility, city, category, description, address)
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesTitle = item.title.toLowerCase().includes(q);
@@ -244,12 +231,7 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
         const matchesCity = item.location.city.toLowerCase().includes(q);
         const matchesCategory = item.categoryLabel.toLowerCase().includes(q);
         const matchesAddress = item.location.address.toLowerCase().includes(q);
-        const matchesTutuReason = item.tutuSimilarityReasons?.some((r) =>
-          r.toLowerCase().includes(q)
-        );
-        const matchesTutuKeyword =
-          (q.includes('tutu') || q.includes('similar') || q.includes('storybook')) &&
-          item.isTutuSimilar;
+        const matchesDescription = item.description.toLowerCase().includes(q);
 
         if (
           !matchesTitle &&
@@ -257,8 +239,7 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
           !matchesCity &&
           !matchesCategory &&
           !matchesAddress &&
-          !matchesTutuReason &&
-          !matchesTutuKeyword
+          !matchesDescription
         ) {
           return false;
         }
@@ -266,9 +247,6 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
 
       return true;
     }).sort((a, b) => {
-      if (sortOption === 'tutu_match') {
-        return (b.tutuSimilarityScore || 0) - (a.tutuSimilarityScore || 0);
-      }
       if (sortOption === 'closest') {
         const distA = calculateDynamicDistance(originZip, a.location.zipCode, a.location.distanceMiles);
         const distB = calculateDynamicDistance(originZip, b.location.zipCode, b.location.distanceMiles);
@@ -291,7 +269,6 @@ export const ToddlerActivityHub: React.FC<ToddlerActivityHubProps> = ({ onBack }
       return 0;
     });
   }, [
-    onlyTutuSimilar,
     selectedCategory,
     selectedDay,
     sortOption,
@@ -395,11 +372,6 @@ END:VCALENDAR`;
               <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-pink-950/80 border border-pink-700/60 text-pink-300">
                 {activeAgeLabel}
               </span>
-              {onlyTutuSimilar && (
-                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-pink-500 text-slate-950 shadow-sm animate-pulse">
-                  ✨ Tutu Style Match Active
-                </span>
-              )}
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed max-w-3xl">
               Real-time activity aggregator pooling verified swimming, gymnastics, dance,
@@ -426,6 +398,20 @@ END:VCALENDAR`;
               </div>
             </button>
 
+            <button
+              onClick={() => {
+                playKeyClick();
+                setIsActivityFeedbackModalOpen(true);
+              }}
+              className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/40 text-emerald-300 hover:text-white transition-all cursor-pointer flex items-center gap-2 shadow-sm group"
+            >
+              <span className="text-base">💡</span>
+              <div className="text-left font-mono">
+                <div className="text-[10px] text-emerald-400 font-bold group-hover:underline">SUGGEST / FEEDBACK</div>
+                <div className="text-[11px] text-slate-300">Propose class or feature &rarr;</div>
+              </div>
+            </button>
+
             <div className="flex items-center gap-3 bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl text-xs font-mono">
               <div>
                 <div className="text-[10px] text-slate-400">ORIGIN ZIP</div>
@@ -444,69 +430,6 @@ END:VCALENDAR`;
                 <div className="text-emerald-400 font-bold text-sm">&le; {maxDistance} Mi</div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Studio Style & Philosophy Benchmark Spotlight Banner */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-pink-950/70 via-purple-950/50 to-slate-900 border border-pink-700/60 shadow-md relative overflow-hidden backdrop-blur-md">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-xl shrink-0">
-              🩰
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-white uppercase tracking-wider font-mono">
-                  Studio Philosophy Matcher:
-                </span>
-                <span className="text-xs font-bold text-pink-200 bg-pink-950 px-2.5 py-0.5 rounded-full border border-pink-600/70 font-mono flex items-center gap-1.5">
-                  <span>Tutu School Benchmark (Milpitas)</span>
-                  <span className="text-slate-400 font-normal">(2.4 mi &bull; 95035)</span>
-                </span>
-                <span className="text-[10px] text-pink-300 bg-pink-950/70 border border-pink-700/60 px-2 py-0.5 rounded-full font-mono font-medium">
-                  Storybook Early Childhood Ballet
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-3xl">
-                Looking for programs similar to Tutu School’s signature style? We match studios sharing this methodology: <strong>Storybook Ballet</strong> (fairy tale themes like Swan Lake &amp; Nutcracker), <strong>loaner tutus &amp; silk scarves</strong>, <strong>gentle non-competitive showcases (Bravo! Bash)</strong>, and <strong>low 5:1 student-teacher ratios</strong>.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            <button
-              onClick={() => {
-                playKeyClick();
-                setOnlyTutuSimilar(!onlyTutuSimilar);
-                if (!onlyTutuSimilar) {
-                  setSortOption('tutu_match');
-                }
-              }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
-                onlyTutuSimilar
-                  ? 'bg-pink-500 text-slate-950 ring-2 ring-pink-300 shadow-md'
-                  : 'bg-pink-900/60 hover:bg-pink-800 border border-pink-500/80 text-pink-200 hover:text-white'
-              }`}
-            >
-              <span>{onlyTutuSimilar ? '✓' : '✨'}</span>
-              <span>
-                {onlyTutuSimilar
-                  ? `Filtering: ${filteredActivities.length} Matching Studios`
-                  : `Filter Studios Like Tutu School (${tutuSimilarCount})`}
-              </span>
-            </button>
-
-            <button
-              onClick={() => {
-                playKeyClick();
-                setShowTutuGuideModal(true);
-              }}
-              className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-pink-900/80 text-pink-300 hover:text-white text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5"
-            >
-              <span>ℹ️</span>
-              <span>Why These Match</span>
-            </button>
           </div>
         </div>
       </div>
@@ -1014,7 +937,6 @@ END:VCALENDAR`;
               className="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 focus:outline-none focus:border-pink-500 text-xs cursor-pointer"
             >
               <option value="closest">📍 Closest Distance (from Zip {originZip})</option>
-              <option value="tutu_match">✨ Tutu School Similarity Match % (High to Low)</option>
               <option value="highest_rated">★ Highest Rated (Multi-Source Score)</option>
               <option value="price_low">💲 Price: Low to High</option>
               <option value="price_high">💎 Price: High to Low</option>
@@ -1072,26 +994,8 @@ END:VCALENDAR`;
           </div>
         </div>
 
-        {/* Quick Toggles: Tutu Similar, Open Spots & Free Trial */}
+        {/* Quick Toggles: Open Spots & Free Trial */}
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/60">
-          <button
-            onClick={() => {
-              playKeyClick();
-              setOnlyTutuSimilar(!onlyTutuSimilar);
-              if (!onlyTutuSimilar) {
-                setSortOption('tutu_match');
-              }
-            }}
-            className={`px-2.5 py-1 rounded-lg border text-[11px] transition-colors cursor-pointer flex items-center gap-1.5 ${
-              onlyTutuSimilar
-                ? 'bg-pink-600 border-pink-400 text-slate-950 font-bold shadow-sm'
-                : 'bg-slate-950 border-pink-900/60 text-pink-300 hover:text-white hover:border-pink-500'
-            }`}
-          >
-            <span>{onlyTutuSimilar ? '✓' : '✨'}</span>
-            <span>Similar to Tutu School ({tutuSimilarCount})</span>
-          </button>
-
           <button
             onClick={() => {
               playKeyClick();
@@ -1169,20 +1073,6 @@ END:VCALENDAR`;
                           </span>
                         )}
 
-                        {act.isTutuSimilar && (
-                          <button
-                            onClick={() => {
-                              playKeyClick();
-                              setShowTutuGuideModal(true);
-                            }}
-                            className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-pink-900/80 hover:bg-pink-800 border border-pink-400 text-pink-100 flex items-center gap-1 cursor-pointer transition-colors shadow-xs"
-                            title="Click to view why this studio is similar to Tutu School"
-                          >
-                            <span>✨</span>
-                            <span>{act.tutuSimilarityScore}% Tutu Style</span>
-                          </button>
-                        )}
-
                         <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-emerald-300 border border-slate-700 flex items-center gap-1">
                           <span>📍</span>
                           <span>{dynamicDist} mi from {originZip}</span>
@@ -1225,37 +1115,6 @@ END:VCALENDAR`;
                       </span>
                     ))}
                   </div>
-
-                  {/* Tutu Similarity Profile Box (if matching) */}
-                  {act.isTutuSimilar && act.tutuSimilarityReasons && (
-                    <div className="p-2.5 rounded-xl bg-pink-950/30 border border-pink-800/40 text-[11px] font-mono space-y-1">
-                      <div className="flex items-center justify-between text-pink-300 font-bold text-[10px]">
-                        <span className="flex items-center gap-1">
-                          <span>🌸</span>
-                          <span>TUTU SCHOOL SIMILARITY PROFILE:</span>
-                        </span>
-                        <button
-                          onClick={() => {
-                            playKeyClick();
-                            setShowTutuGuideModal(true);
-                          }}
-                          className="text-pink-400 hover:text-white underline text-[10px] cursor-pointer"
-                        >
-                          How it matches &rarr;
-                        </button>
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {act.tutuSimilarityReasons.map((reason, idx) => (
-                          <span
-                            key={idx}
-                            className="px-1.5 py-0.5 rounded bg-slate-950/70 border border-pink-900/40 text-pink-200 text-[10px]"
-                          >
-                            {reason}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
                   {/* Pooled Sources Platform Badges */}
                   <div className="flex items-center gap-1 pt-0.5 text-[10px] font-mono text-slate-400">
@@ -1374,13 +1233,12 @@ END:VCALENDAR`;
           <h3 className="text-lg font-bold text-white">No activities match your current filter criteria</h3>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
             Try expanding your search radius (currently {maxDistance} miles from Zip {originZip}), adjusting child age bracket (currently {activeAgeLabel}),
-            or turning off the specific &quot;Similar to Tutu School&quot; filter.
+            or clearing your search keyword.
           </p>
           <div className="flex items-center justify-center gap-3 pt-2">
             <button
               onClick={() => {
                 playKeyClick();
-                setOnlyTutuSimilar(false);
                 setMaxDistance(30);
                 setSelectedCategory('all');
                 setSelectedDay('all');
@@ -1395,168 +1253,6 @@ END:VCALENDAR`;
             >
               Reset All Filters (All Ages &bull; 95131 &bull; 30mi)
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* TUTU SCHOOL SIMILARITY GUIDE MODAL */}
-      {showTutuGuideModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-pink-700/80 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl relative">
-            <button
-              onClick={() => setShowTutuGuideModal(false)}
-              className="absolute right-4 top-4 text-slate-400 hover:text-white text-xl cursor-pointer p-1"
-            >
-              &times;
-            </button>
-
-            <div className="space-y-1">
-              <span className="text-xs font-mono text-pink-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
-                <span>🩰</span>
-                <span>TUTU SCHOOL BENCHMARK &bull; STUDIO SIMILARITY &amp; REPUTATION INTELLIGENCE</span>
-              </span>
-              <h3 className="text-2xl font-bold text-white">
-                How We Identify Facilities Similar to Tutu School
-              </h3>
-              <p className="text-xs text-slate-300 leading-relaxed font-mono">
-                <a
-                  href="https://tutuschool.com/milpitas/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-pink-400 underline font-bold"
-                >
-                  Tutu School Milpitas
-                </a>{' '}
-                (1794 N Milpitas Blvd &bull; ~2.4 mi from 95131) represents a distinct boutique early-childhood movement philosophy. Below is the comparative profile we use to curate and rank kindred studios in the Bay Area.
-              </p>
-            </div>
-
-            {/* The 5 Pillars of Tutu School's Methodology */}
-            <div className="space-y-3 font-mono">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-1.5">
-                The 5 Defining Criteria of the &quot;Tutu School Model&quot;:
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-xl bg-slate-950 border border-pink-900/50 space-y-1">
-                  <div className="font-bold text-pink-300 flex items-center gap-1.5">
-                    <span>1.</span>
-                    <span>Storybook &amp; Fairytale Curriculum</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Classes are structured around classical ballets (Swan Lake, Sleeping Beauty, Coppélia, Cinderella). Children learn musical phrasing, dramatic mime, and arabesques through stories rather than mechanical drills.
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-950 border border-pink-900/50 space-y-1">
-                  <div className="font-bold text-pink-300 flex items-center gap-1.5">
-                    <span>2.</span>
-                    <span>Boutique Early Childhood Setting</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Intimate chandelier decor, child-safe hardwood, and loaner dress-up tutus and silk scarves. Designed specifically for early childhood (18mo–5yr), not an afterthought in a massive multi-genre dance facility.
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-950 border border-pink-900/50 space-y-1">
-                  <div className="font-bold text-pink-300 flex items-center gap-1.5">
-                    <span>3.</span>
-                    <span>Gentle &amp; Non-Competitive</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Purely process-over-product. Confidence, body joy, and social ease. End-of-term &quot;Bravo! Bash&quot; studio celebrations with zero expensive mandatory costumes or stage anxiety.
-                  </p>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-950 border border-pink-900/50 space-y-1">
-                  <div className="font-bold text-pink-300 flex items-center gap-1.5">
-                    <span>4.</span>
-                    <span>Low Student-Teacher Ratio (5:1)</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Strict caps of 5–8 children per class ensure personal attention, soothing of toddler separation anxiety, and playful encouragement throughout the 45-minute lesson.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Clusters of Similar Studios Available in Search */}
-            <div className="space-y-3 font-mono text-xs">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-1.5">
-                Kindred Facilities in Your {maxDistance}-Mile Radius ({originZip}):
-              </h4>
-              <div className="space-y-2.5">
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-3">
-                  <span className="text-xl">🌸</span>
-                  <div className="space-y-0.5">
-                    <div className="font-bold text-white">
-                      Official Tutu School Locations (100% Match)
-                    </div>
-                    <p className="text-[11px] text-slate-300">
-                      <strong>Tutu School Milpitas</strong> (2.4 mi), <strong>Tutu School Willow Glen</strong> (7.6 mi), <strong>Tutu School Sunnyvale</strong> (11.2 mi), and <strong>Tutu School Saratoga</strong> (14.8 mi). Identical curriculum, membership reciprocity, and loaner tutus.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-3">
-                  <span className="text-xl">🎀</span>
-                  <div className="space-y-0.5">
-                    <div className="font-bold text-white">
-                      Dedicated Early Childhood Dance Academies (92% &ndash; 94% Match)
-                    </div>
-                    <p className="text-[11px] text-slate-300">
-                      <strong>Small Fry Dance Club</strong> (Peninsula &bull; dedicated toddler &amp; preschool dance club) &amp; <strong>West Valley Dance Co &quot;Tiny Toes &amp; Tutu Tots&quot;</strong> (San Jose &bull; fairy wands, ribbons, and low-stress showcases).
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-3">
-                  <span className="text-xl">🩰</span>
-                  <div className="space-y-0.5">
-                    <div className="font-bold text-white">
-                      Classical Pre-Ballet Traditions with Gentle Tracks (85% &ndash; 88% Match)
-                    </div>
-                    <p className="text-[11px] text-slate-300">
-                      <strong>Dance Academy USA &quot;Twinkle Toes&quot;</strong> (Cupertino &bull; dedicated preschool wing with wand props) &amp; <strong>San Jose Dance Theatre &quot;First Steps&quot;</strong> (Downtown SJ &bull; Nutcracker heritage with gentle storybook movement).
-                    </p>
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex items-start gap-3">
-                  <span className="text-xl">🎵</span>
-                  <div className="space-y-0.5">
-                    <div className="font-bold text-white">
-                      Sensory, Scarf &amp; Ribbon Movement Complements (80% &ndash; 82% Match)
-                    </div>
-                    <p className="text-[11px] text-slate-300">
-                      <strong>Kindermusik at Campbell CC</strong> (silk scarves, bells &amp; classical storytelling) &amp; <strong>Berryessa Community Center &quot;Tiny Dancers&quot;</strong> (2.4 mi away &bull; subsidized municipal ribbon dancing).
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono">
-              <button
-                onClick={() => {
-                  playKeyClick();
-                  setOnlyTutuSimilar(true);
-                  setSortOption('tutu_match');
-                  setShowTutuGuideModal(false);
-                }}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-slate-950 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-md"
-              >
-                <span>✨</span>
-                <span>Apply Filter: Show All 12 Matched Studios</span>
-              </button>
-
-              <button
-                onClick={() => setShowTutuGuideModal(false)}
-                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition-colors cursor-pointer text-center"
-              >
-                Close Guide
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -1650,11 +1346,6 @@ END:VCALENDAR`;
                     {activeActivity.badge}
                   </span>
                 )}
-                {activeActivity.isTutuSimilar && (
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-pink-900 border border-pink-500 text-pink-200">
-                    ✨ {activeActivity.tutuSimilarityScore}% Tutu Style
-                  </span>
-                )}
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-emerald-300 border border-slate-700">
                   📍 {calculateDynamicDistance(originZip, activeActivity.location.zipCode, activeActivity.location.distanceMiles)} mi from {originZip}
                 </span>
@@ -1666,32 +1357,6 @@ END:VCALENDAR`;
                 {activeActivity.facility} &bull; {activeActivity.location.address}
               </div>
             </div>
-
-            {/* Tutu Similarity Profile Callout in Modal if Applicable */}
-            {activeActivity.isTutuSimilar && activeActivity.tutuSimilarityReasons && (
-              <div className="p-4 rounded-xl bg-pink-950/40 border border-pink-700/60 font-mono space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-xs font-bold text-pink-200 flex items-center gap-1.5 uppercase">
-                    <span>🌸</span>
-                    <span>Tutu School Philosophy Breakdown ({activeActivity.tutuSimilarityScore}% Match)</span>
-                  </div>
-                  <button
-                    onClick={() => setShowTutuGuideModal(true)}
-                    className="text-[10px] text-pink-400 hover:underline cursor-pointer"
-                  >
-                    View Guide &rarr;
-                  </button>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  {activeActivity.tutuSimilarityReasons.map((reason, idx) => (
-                    <div key={idx} className="flex items-center gap-1.5 text-pink-100">
-                      <span className="text-pink-400 font-bold">&bull;</span>
-                      <span>{reason}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Comprehensive Reviews Breakdown from Various Sources */}
             <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 font-mono">
@@ -2033,6 +1698,14 @@ END:VCALENDAR`;
           </div>
         </div>
       )}
+
+      {/* Suggest Activity or Feature Feedback Modal */}
+      <FeedbackModal
+        isOpen={isActivityFeedbackModalOpen}
+        onClose={() => setIsActivityFeedbackModalOpen(false)}
+        defaultCategory="toddler-activities"
+        defaultTarget="Kids Activity Hub (/myprojects/toddler-activities)"
+      />
     </div>
   );
 };

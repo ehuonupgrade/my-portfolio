@@ -10,10 +10,12 @@ import { ChangelogView } from './components/ChangelogView';
 import { InvestmentAgentView } from './components/InvestmentAgentView';
 import { BartPlannerView } from './components/BartPlannerView';
 import { ToddlerActivityHub } from './components/ToddlerActivityHub';
+import { FeedbackInventoryView } from './components/FeedbackInventoryView';
+import { FeedbackModal } from './components/FeedbackModal';
 import { RocketLogo } from './components/RocketLogo';
 import { playKeyClick } from './utils/audio';
 
-type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'about';
+type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'feedback' | 'about';
 
 interface RouteState {
   tab: Tab;
@@ -29,6 +31,7 @@ const getPathForState = (tab: Tab, project: string | null): string => {
   }
   if (tab === 'games') return '/mygames';
   if (tab === 'changelog') return '/version-history';
+  if (tab === 'feedback') return '/feedback';
   if (tab === 'about') return '/aboutme';
   return '/';
 };
@@ -59,6 +62,9 @@ const getStateForPath = (pathname: string): RouteState => {
   if (clean === '/version-history' || clean === '/changelog') {
     return { tab: 'changelog', project: null };
   }
+  if (clean === '/feedback' || clean === '/recommendations' || clean === '/roadmap') {
+    return { tab: 'feedback', project: null };
+  }
   if (clean === '/aboutme' || clean === '/about') {
     return { tab: 'about', project: null };
   }
@@ -71,6 +77,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(initial.tab);
   const [activeProject, setActiveProject] = useState<string | null>(initial.project);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [globalFeedbackModalOpen, setGlobalFeedbackModalOpen] = useState<boolean>(false);
 
   // Sync state with browser Back/Forward navigation
   useEffect(() => {
@@ -101,10 +108,12 @@ export default function App() {
     if (activeTab === 'projects') {
       if (activeProject === 'bart') return 'BART Planner';
       if (activeProject === 'roboinvestor') return 'RoboInvestor';
+      if (activeProject === 'toddler-activities' || activeProject === 'activities') return 'Activity Hub';
       return 'My Projects';
     }
     if (activeTab === 'games') return 'My Games';
     if (activeTab === 'changelog') return 'Version History';
+    if (activeTab === 'feedback') return 'Feedback & Roadmap';
     if (activeTab === 'about') return 'About Me';
     return 'Home';
   };
@@ -152,92 +161,6 @@ export default function App() {
           >
             <span>{mobileMenuOpen ? '✕' : '☰'}</span>
             <span className="text-[11px] font-bold">{mobileMenuOpen ? 'CLOSE' : 'MENU'}</span>
-          </button>
-        </div>
-
-        {/* Quick-Access Touch Horizontal Bar on Mobile */}
-        <div className="overflow-x-auto no-scrollbar flex items-center gap-1.5 pt-2 pb-0.5 text-xs font-mono">
-          <button
-            onClick={() => navigateTo('home', null)}
-            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
-              activeTab === 'home'
-                ? 'bg-emerald-500 text-slate-950 font-bold'
-                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            Home
-          </button>
-
-          <button
-            onClick={() => navigateTo('projects', null)}
-            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
-              activeTab === 'projects' && !activeProject
-                ? 'bg-emerald-500 text-slate-950 font-bold'
-                : activeTab === 'projects'
-                ? 'bg-slate-800 text-emerald-400 font-bold border border-emerald-800/80'
-                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            Projects
-          </button>
-
-          {activeTab === 'projects' && (
-            <>
-              <button
-                onClick={() => navigateTo('projects', 'bart')}
-                className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer flex items-center gap-1 ${
-                  activeProject === 'bart'
-                    ? 'bg-yellow-400 text-slate-950 font-bold'
-                    : 'bg-slate-900/80 text-yellow-400/80 hover:text-yellow-300 border border-yellow-900/50'
-                }`}
-              >
-                <span>🚆 BART</span>
-              </button>
-
-              <button
-                onClick={() => navigateTo('projects', 'roboinvestor')}
-                className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer flex items-center gap-1 ${
-                  activeProject === 'roboinvestor'
-                    ? 'bg-cyan-400 text-slate-950 font-bold'
-                    : 'bg-slate-900/80 text-cyan-400/80 hover:text-cyan-300 border border-cyan-900/50'
-                }`}
-              >
-                <span>🤖 RoboInvestor</span>
-              </button>
-            </>
-          )}
-
-          <button
-            onClick={() => navigateTo('games', null)}
-            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
-              activeTab === 'games'
-                ? 'bg-emerald-500 text-slate-950 font-bold'
-                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            Games
-          </button>
-
-          <button
-            onClick={() => navigateTo('changelog', null)}
-            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
-              activeTab === 'changelog'
-                ? 'bg-emerald-500 text-slate-950 font-bold'
-                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            Log
-          </button>
-
-          <button
-            onClick={() => navigateTo('about', null)}
-            className={`px-2.5 py-1 rounded-lg shrink-0 transition-colors cursor-pointer ${
-              activeTab === 'about'
-                ? 'bg-emerald-500 text-slate-950 font-bold'
-                : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
-            }`}
-          >
-            About
           </button>
         </div>
 
@@ -304,7 +227,7 @@ export default function App() {
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    <span>&rarr; Little Explorer (Toddler Classes)</span>
+                    <span>&rarr; Kids Activity Hub (Ages 0–17)</span>
                     {activeProject === 'toddler-activities' && <span className="text-pink-400 text-[10px]">CURRENT</span>}
                   </button>
                 </div>
@@ -328,6 +251,16 @@ export default function App() {
               >
                 <span>📜 Version History &amp; Changelog</span>
                 {activeTab === 'changelog' && <span className="text-emerald-400 text-xs font-mono">&bull; Active</span>}
+              </button>
+
+              <button
+                onClick={() => navigateTo('feedback', null)}
+                className={`text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between ${
+                  activeTab === 'feedback' ? 'bg-slate-900 text-white font-bold' : 'text-slate-300 hover:bg-slate-900/50'
+                }`}
+              >
+                <span>💡 Feedback &amp; Evolution Hub</span>
+                {activeTab === 'feedback' && <span className="text-emerald-400 text-xs font-mono">&bull; Active</span>}
               </button>
 
               <button
@@ -435,6 +368,18 @@ export default function App() {
               >
                 {activeTab === 'changelog' && <span className="text-emerald-400 mr-2">&bull;</span>}
                 Version History
+              </button>
+
+              <button
+                onClick={() => navigateTo('feedback', null)}
+                className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer ${
+                  activeTab === 'feedback'
+                    ? 'text-white font-bold translate-x-1.5'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {activeTab === 'feedback' && <span className="text-emerald-400 mr-2">&bull;</span>}
+                Feedback &amp; Evolution
               </button>
 
               <button
@@ -607,6 +552,9 @@ export default function App() {
             {/* TAB: VERSION HISTORY / CHANGELOG */}
             {activeTab === 'changelog' && <ChangelogView />}
 
+            {/* TAB: FEEDBACK & EVOLUTION ROADMAP */}
+            {activeTab === 'feedback' && <FeedbackInventoryView onBack={() => navigateTo('projects', null)} />}
+
             {/* TAB: ABOUT ME (No content for now) */}
             {activeTab === 'about' && (
               <div className="space-y-6 animate-fadeIn">
@@ -618,6 +566,33 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {/* Floating Action Button for Quick Feedback Submission across all pages */}
+      <div className="fixed bottom-5 right-5 z-40">
+        <button
+          onClick={() => {
+            playKeyClick();
+            setGlobalFeedbackModalOpen(true);
+          }}
+          className="group flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-slate-900/95 hover:bg-slate-800 border border-emerald-500/60 hover:border-emerald-400 text-xs font-mono text-emerald-300 hover:text-white shadow-2xl backdrop-blur-md transition-all cursor-pointer active:scale-95"
+          title="Provide feedback, suggest a feature, or report an issue on any aspect of this website"
+        >
+          <span className="text-base group-hover:rotate-12 transition-transform">💡</span>
+          <span className="font-bold hidden sm:inline">Feedback / Suggestion</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        </button>
+      </div>
+
+      {/* Global Feedback Submission Modal */}
+      <FeedbackModal
+        isOpen={globalFeedbackModalOpen}
+        onClose={() => setGlobalFeedbackModalOpen(false)}
+        defaultTarget={
+          activeTab === 'projects' && activeProject
+            ? `Project: ${activeProject}`
+            : `Page: ${activeTab}`
+        }
+      />
 
       {/* Simple Minimal Responsive Footer */}
       <footer className="relative z-10 max-w-5xl lg:max-w-7xl 2xl:max-w-[1536px] mx-auto px-3.5 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-8 w-full text-xs text-slate-500 font-mono flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-900/60">
