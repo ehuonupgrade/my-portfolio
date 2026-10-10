@@ -31,7 +31,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) {
       playBeep();
@@ -53,7 +53,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
         'performance': 'Performance & Architecture',
       };
 
-      submitNewFeedback({
+      await submitNewFeedback({
         title: title.trim(),
         description: description.trim(),
         category,

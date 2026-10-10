@@ -12,8 +12,10 @@ import { BartPlannerView } from './components/BartPlannerView';
 import { ToddlerActivityHub } from './components/ToddlerActivityHub';
 import { FeedbackInventoryView } from './components/FeedbackInventoryView';
 import { FeedbackModal } from './components/FeedbackModal';
+import { TrafficAnalyticsCard } from './components/TrafficAnalyticsCard';
 import { RocketLogo } from './components/RocketLogo';
 import { playKeyClick } from './utils/audio';
+import { recordPageView, recordDwellTime } from './utils/trafficTracker';
 
 type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'feedback' | 'about';
 
@@ -91,6 +93,28 @@ export default function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  // Lightweight, Anonymized Traffic & Attention Tracker
+  useEffect(() => {
+    const route = getPathForState(activeTab, activeProject);
+    const trackedProjectId =
+      activeTab === 'projects'
+        ? activeProject
+        : activeTab === 'games'
+        ? 'cosmic-game'
+        : null;
+
+    recordPageView(route, trackedProjectId);
+
+    // Track dwell duration on project if applicable
+    const startTime = Date.now();
+    return () => {
+      if (trackedProjectId) {
+        const dwellSeconds = (Date.now() - startTime) / 1000;
+        recordDwellTime(trackedProjectId, dwellSeconds);
+      }
+    };
+  }, [activeTab, activeProject]);
 
   const navigateTo = (tab: Tab, project: string | null = null) => {
     playKeyClick();
@@ -533,6 +557,11 @@ export default function App() {
                           </span>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Anonymized Project Traffic & Attention Insights */}
+                    <div className="pt-2">
+                      <TrafficAnalyticsCard />
                     </div>
                   </div>
                 )}

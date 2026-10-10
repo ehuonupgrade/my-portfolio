@@ -1,46 +1,23 @@
 import { FeedbackItem, FeedbackStatus } from '../types/feedback';
-import { INITIAL_FEEDBACK_ITEMS } from '../data/initialFeedback';
 
-const STORAGE_KEY = 'site_feedback_production_inventory_v2';
 const VOTED_KEY = 'site_feedback_production_voted_ids';
 
-export function getFeedbackInventory(): FeedbackItem[] {
-  if (typeof window === 'undefined') return INITIAL_FEEDBACK_ITEMS;
+export async function getFeedbackInventory(): Promise<FeedbackItem[]> {
   try {
-    // If old mock v1 storage exists, clean it up
-    if (localStorage.getItem('huon_feedback_inventory_v1')) {
-      localStorage.removeItem('huon_feedback_inventory_v1');
+    const res = await fetch('/api/feedback');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) return data;
     }
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_FEEDBACK_ITEMS));
-      return INITIAL_FEEDBACK_ITEMS;
-    }
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_FEEDBACK_ITEMS));
-      return INITIAL_FEEDBACK_ITEMS;
-    }
-    return parsed;
   } catch (err) {
-    console.error('Failed to parse feedback inventory from localStorage', err);
-    return INITIAL_FEEDBACK_ITEMS;
+    console.error('Failed to fetch feedback from server', err);
   }
+  return [];
 }
 
-export function saveFeedbackInventory(items: FeedbackItem[]): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    window.dispatchEvent(new Event('huon_feedback_updated'));
-  } catch (err) {
-    console.error('Failed to save feedback inventory', err);
-  }
-}
-
-export function submitNewFeedback(item: Omit<FeedbackItem, 'id' | 'submittedAt' | 'upvotes' | 'status' | 'agentAnalysis'>): FeedbackItem {
-  const current = getFeedbackInventory();
-
+export async function submitNewFeedback(
+  item: Omit<FeedbackItem, 'id' | 'submittedAt' | 'upvotes' | 'status' | 'agentAnalysis'>
+): Promise<FeedbackItem | null> {
   // Basic initial agent analysis heuristics based on title/description
   const text = `${item.title} ${item.description}`.toLowerCase();
   let feasibilityScore = 80;
@@ -61,14 +38,10 @@ export function submitNewFeedback(item: Omit<FeedbackItem, 'id' | 'submittedAt' 
     technicalImpact = 'medium';
   }
 
-  const newItem: FeedbackItem = {
+  const payload: Partial<FeedbackItem> = {
     ...item,
-    id: `fb-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
-    submittedAt: new Date().toISOString(),
-    upvotes: 1,
-    status: 'submitted',
     feasibility: feasibilityScore >= 85 ? 'high' : feasibilityScore >= 65 ? 'medium' : 'low',
-    feasibilityRationale: `Automated assessment: ${estimatedComplexity} complexity with ${technicalImpact} system impact. Ready for owner triage.`,
+    feasibilityRationale: `Automated assessment: ${estimatedComplexity} complexity with ${technicalImpact} system impact. Ready for site owner & development staff triage.`,
     agentAnalysis: {
       feasibilityScore,
       technicalImpact,
@@ -80,39 +53,48 @@ export function submitNewFeedback(item: Omit<FeedbackItem, 'id' | 'submittedAt' 
     },
   };
 
-  const updated = [newItem, ...current];
-  saveFeedbackInventory(updated);
-  return newItem;
+  try {
+    const res = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      window.dispatchEvent(new Event('huon_feedback_updated'));
+      return data.item;
+    }
+  } catch (err) {
+    console.error('Failed to submit feedback to server', err);
+  }
+  return null;
 }
 
-export function upvoteFeedbackItem(id: string): { success: boolean; newCount?: number } {
+export async function upvoteFeedbackItem(id: string): Promise<{ success: boolean; newCount?: number }> {
   if (typeof window === 'undefined') return { success: false };
   try {
     const votedRaw = localStorage.getItem(VOTED_KEY);
     const votedList: string[] = votedRaw ? JSON.parse(votedRaw) : [];
 
     if (votedList.includes(id)) {
-      return { success: false }; // Already voted
+      return { success: false };
     }
 
-    const current = getFeedbackInventory();
-    let newCount = 0;
-    const updated = current.map((item) => {
-      if (item.id === id) {
-        newCount = item.upvotes + 1;
-        return { ...item, upvotes: newCount };
-      }
-      return item;
+    const res = await fetch(`/api/feedback/${id}/upvote`, {
+      method: 'POST',
     });
 
-    saveFeedbackInventory(updated);
-    votedList.push(id);
-    localStorage.setItem(VOTED_KEY, JSON.stringify(votedList));
-    return { success: true, newCount };
+    if (res.ok) {
+      const data = await res.json();
+      votedList.push(id);
+      localStorage.setItem(VOTED_KEY, JSON.stringify(votedList));
+      window.dispatchEvent(new Event('huon_feedback_updated'));
+      return { success: true, newCount: data.newCount };
+    }
   } catch (err) {
     console.error('Error upvoting feedback item', err);
-    return { success: false };
   }
+  return { success: false };
 }
 
 export function hasUserVoted(id: string): boolean {
@@ -126,43 +108,25 @@ export function hasUserVoted(id: string): boolean {
   }
 }
 
-export function updateFeedbackStatusByOwner(
+export async function updateFeedbackStatusByOwner(
   id: string,
   status: FeedbackStatus,
   ownerNotes?: string,
   deployedCommit?: string
-): FeedbackItem | null {
-  const current = getFeedbackInventory();
-  let updatedItem: FeedbackItem | null = null;
-
-  const updated = current.map((item) => {
-    if (item.id === id) {
-      const isDeploying = status === 'deployed';
-      updatedItem = {
-        ...item,
-        status,
-        deployedAt: isDeploying ? item.deployedAt || new Date().toISOString() : item.deployedAt,
-        agentAnalysis: {
-          ...item.agentAnalysis,
-          reviewedByOwner: true,
-          ownerNotes: ownerNotes !== undefined ? ownerNotes : item.agentAnalysis.ownerNotes,
-          deployedCommit: deployedCommit !== undefined ? deployedCommit : item.agentAnalysis.deployedCommit,
-        },
-      };
-      return updatedItem;
+): Promise<FeedbackItem | null> {
+  try {
+    const res = await fetch(`/api/feedback/${id}/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, ownerNotes, deployedCommit }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      window.dispatchEvent(new Event('huon_feedback_updated'));
+      return data.item;
     }
-    return item;
-  });
-
-  if (updatedItem) {
-    saveFeedbackInventory(updated);
+  } catch (err) {
+    console.error('Error updating feedback status', err);
   }
-  return updatedItem;
-}
-
-export function resetFeedbackToDefault(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_FEEDBACK_ITEMS));
-  localStorage.removeItem(VOTED_KEY);
-  window.dispatchEvent(new Event('huon_feedback_updated'));
+  return null;
 }

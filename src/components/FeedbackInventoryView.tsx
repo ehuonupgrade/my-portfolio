@@ -5,10 +5,10 @@ import {
   upvoteFeedbackItem,
   hasUserVoted,
   updateFeedbackStatusByOwner,
-  resetFeedbackToDefault,
 } from '../utils/feedbackStore';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 import { FeedbackModal } from './FeedbackModal';
+import { TrafficAnalyticsCard } from './TrafficAnalyticsCard';
 
 interface FeedbackInventoryViewProps {
   onBack?: () => void;
@@ -28,15 +28,22 @@ export const FeedbackInventoryView: React.FC<FeedbackInventoryViewProps> = ({ on
   const [commitDraft, setCommitDraft] = useState<string>('');
   const [adminFeedbackNotice, setAdminFeedbackNotice] = useState<string | null>(null);
 
-  const loadData = () => {
-    setItems(getFeedbackInventory());
+  const loadData = async () => {
+    const data = await getFeedbackInventory();
+    setItems(data);
   };
 
   useEffect(() => {
     loadData();
-    const handleUpdate = () => loadData();
+    const handleUpdate = () => {
+      loadData();
+    };
     window.addEventListener('huon_feedback_updated', handleUpdate);
-    return () => window.removeEventListener('huon_feedback_updated', handleUpdate);
+    const interval = setInterval(loadData, 12000); // Poll every 12s for new global community submissions
+    return () => {
+      window.removeEventListener('huon_feedback_updated', handleUpdate);
+      clearInterval(interval);
+    };
   }, []);
 
   // Filtered & Sorted items
@@ -71,22 +78,22 @@ export const FeedbackInventoryView: React.FC<FeedbackInventoryViewProps> = ({ on
     return { total, deployed, inPipeline, acknowledged, totalVotes };
   }, [items]);
 
-  const handleUpvote = (id: string, e: React.MouseEvent) => {
+  const handleUpvote = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (hasUserVoted(id)) {
       playBeep();
       return;
     }
     playKeyClick();
-    const res = upvoteFeedbackItem(id);
+    const res = await upvoteFeedbackItem(id);
     if (res.success) {
       loadData();
     }
   };
 
-  const handleStatusChange = (id: string, newStatus: FeedbackStatus) => {
+  const handleStatusChange = async (id: string, newStatus: FeedbackStatus) => {
     playKeyClick();
-    const updated = updateFeedbackStatusByOwner(
+    const updated = await updateFeedbackStatusByOwner(
       id,
       newStatus,
       reviewNotesDraft.trim() || undefined,
@@ -251,6 +258,9 @@ export const FeedbackInventoryView: React.FC<FeedbackInventoryViewProps> = ({ on
           </p>
         </div>
       )}
+
+      {/* Lightweight Anonymized Traffic & Attention Analytics Card */}
+      <TrafficAnalyticsCard />
 
       {/* Filter and Search Bar */}
       <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 text-xs font-mono space-y-3">

@@ -1,5 +1,23 @@
 [
   {
+    "version": "v0.9.6",
+    "date": "October 10, 2026",
+    "title": "Lightweight Anonymized Project Traffic & Attention Tracker",
+    "summary": "Implemented a privacy-first, zero-cookie telemetry tracker for development staff and the site owner to observe real-time project popularity, dwell time, and device distribution across all site tools.",
+    "tag": "Analytics",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Anonymized Traffic & Attention Tracker: Records project views, active dwell time, session counts, and mobile vs. desktop distribution with zero personal data collection."
+      },
+      {
+        "type": "feature",
+        "description": "Integrated Analytics Card: Real-time visual popularity breakdown ranking projects by engagement in the Feedback & Evolution Hub and Projects Directory."
+      }
+    ],
+    "commits": ["3d8b12a"]
+  },
+  {
     "version": "v0.9.5",
     "date": "October 10, 2026",
     "title": "Community Feedback & Autonomous Evolution Inventory",
