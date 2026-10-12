@@ -293,6 +293,7 @@ export const FeedbackInventoryView: React.FC<FeedbackInventoryViewProps> = ({ on
               className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer text-xs"
             >
               <option value="all">All Project Categories ({items.length})</option>
+              <option value="linepulse">🏈 LinePulse Sports Betting</option>
               <option value="toddler-activities">🧸 Kids Activity Hub</option>
               <option value="bart-planner">🚆 BART Schedule Planner</option>
               <option value="roboinvestor">🤖 RoboInvestor Agent</option>

@@ -3,6 +3,7 @@ export type FeedbackCategory =
   | 'toddler-activities'
   | 'bart-planner'
   | 'roboinvestor'
+  | 'sports-betting'
   | 'cosmic-game'
   | 'ui-design'
   | 'performance';

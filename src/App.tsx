@@ -10,6 +10,7 @@ import { ChangelogView } from './components/ChangelogView';
 import { InvestmentAgentView } from './components/InvestmentAgentView';
 import { BartPlannerView } from './components/BartPlannerView';
 import { ToddlerActivityHub } from './components/ToddlerActivityHub';
+import { SportsBettingEdgeHub } from './components/SportsBettingEdgeHub';
 import { FeedbackInventoryView } from './components/FeedbackInventoryView';
 import { FeedbackModal } from './components/FeedbackModal';
 import { TrafficAnalyticsCard } from './components/TrafficAnalyticsCard';
@@ -29,6 +30,7 @@ const getPathForState = (tab: Tab, project: string | null): string => {
     if (project === 'roboinvestor') return '/myprojects/roboinvestor';
     if (project === 'bart') return '/myprojects/bart';
     if (project === 'toddler-activities' || project === 'activities') return '/myprojects/toddler-activities';
+    if (project === 'linepulse' || project === 'sports-betting' || project === 'betting') return '/myprojects/linepulse';
     return '/myprojects';
   }
   if (tab === 'games') return '/mygames';
@@ -41,6 +43,16 @@ const getPathForState = (tab: Tab, project: string | null): string => {
 const getStateForPath = (pathname: string): RouteState => {
   const clean = pathname.toLowerCase().replace(/\/+$/, '') || '/';
 
+  if (
+    clean === '/myprojects/linepulse' ||
+    clean === '/projects/linepulse' ||
+    clean === '/myprojects/sports-betting' ||
+    clean === '/projects/sports-betting' ||
+    clean === '/myprojects/betting' ||
+    clean === '/projects/betting'
+  ) {
+    return { tab: 'projects', project: 'linepulse' };
+  }
   if (
     clean === '/myprojects/toddler-activities' ||
     clean === '/projects/toddler-activities' ||
@@ -133,6 +145,7 @@ export default function App() {
       if (activeProject === 'bart') return 'BART Planner';
       if (activeProject === 'roboinvestor') return 'RoboInvestor';
       if (activeProject === 'toddler-activities' || activeProject === 'activities') return 'Activity Hub';
+      if (activeProject === 'linepulse') return 'LinePulse Sports Odds';
       return 'My Projects';
     }
     if (activeTab === 'games') return 'My Games';
@@ -254,6 +267,18 @@ export default function App() {
                     <span>&rarr; Kids Activity Hub (Ages 0–17)</span>
                     {activeProject === 'toddler-activities' && <span className="text-pink-400 text-[10px]">CURRENT</span>}
                   </button>
+
+                  <button
+                    onClick={() => navigateTo('projects', 'linepulse')}
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
+                      activeProject === 'linepulse'
+                        ? 'bg-indigo-950/70 border border-cyan-800 text-cyan-300 font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>&rarr; LinePulse (Sports Betting Lines &amp; 1-Game Strategy)</span>
+                    {activeProject === 'linepulse' && <span className="text-cyan-400 text-[10px]">CURRENT</span>}
+                  </button>
                 </div>
               </div>
 
@@ -366,6 +391,16 @@ export default function App() {
                     >
                       &rarr; Kids Activity Hub (Ages 0–17)
                     </button>
+                    <button
+                      onClick={() => navigateTo('projects', 'linepulse')}
+                      className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
+                        activeProject === 'linepulse'
+                          ? 'text-cyan-400 font-semibold'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      &rarr; LinePulse (Sports Betting)
+                    </button>
                   </div>
                 )}
               </div>
@@ -441,6 +476,11 @@ export default function App() {
                 {/* Sub-Project 3: Little Explorer (Toddler Activity Aggregator) */}
                 {activeProject === 'toddler-activities' && (
                   <ToddlerActivityHub onBack={() => navigateTo('projects', null)} />
+                )}
+
+                {/* Sub-Project 4: LinePulse Sports Betting Lines & 1-Game Strategy */}
+                {activeProject === 'linepulse' && (
+                  <SportsBettingEdgeHub onBack={() => navigateTo('projects', null)} />
                 )}
 
                 {/* Parent Projects Directory */}
@@ -553,6 +593,40 @@ export default function App() {
                           </span>
                           <span className="text-pink-400 font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                             <span>Explore Kids Classes</span>
+                            <span>&rarr;</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Project 4: LinePulse Sports Betting Aggregator */}
+                      <div
+                        onClick={() => navigateTo('projects', 'linepulse')}
+                        className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-cyan-500/60 transition-all duration-200 cursor-pointer backdrop-blur-md space-y-4 group"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-3">
+                          <div>
+                            <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold">
+                              US Sports Market Intelligence &bull; NFL Primary Focus
+                            </span>
+                            <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
+                              LinePulse: Sports Betting Lines &amp; 1-Game Strategy
+                            </h3>
+                          </div>
+                          <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 self-start sm:self-auto font-medium">
+                            LIVE AGGREGATOR &bull; 8 BOOKS
+                          </span>
+                        </div>
+
+                        <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                          Aggregates publicly available sports betting lines across 8 top books (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Compares odds, tracks total bets placed vs. total dollars wagered to detect sharp money divergence, logs line movement history, and isolates <strong>1 Game with 1 Multi-Leg Strategy</strong> where market pricing creates positive expected value (+EV).
+                        </p>
+
+                        <div className="flex items-center justify-between pt-2 text-xs font-mono">
+                          <span className="text-slate-400">
+                            DraftKings &bull; FanDuel &bull; Circa &bull; Pinnacle &bull; BetMGM &bull; Caesars
+                          </span>
+                          <span className="text-cyan-400 font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                            <span>Analyze Sharp Lines</span>
                             <span>&rarr;</span>
                           </span>
                         </div>

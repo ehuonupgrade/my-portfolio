@@ -48,6 +48,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
         'toddler-activities': 'Kids Activity Hub',
         'bart-planner': 'BART Planner',
         'roboinvestor': 'RoboInvestor Agent',
+        'sports-betting': 'LinePulse Sports Betting',
         'cosmic-game': 'Cosmic Defender Game',
         'ui-design': 'UI / Visual System',
         'performance': 'Performance & Architecture',
@@ -139,6 +140,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
                 >
                   <option value="general">🌐 General Website</option>
+                  <option value="linepulse">🏈 LinePulse Sports Betting</option>
                   <option value="toddler-activities">🧸 Kids Activity Hub</option>
                   <option value="bart-planner">🚆 BART Schedule Planner</option>
                   <option value="roboinvestor">🤖 RoboInvestor Agent</option>

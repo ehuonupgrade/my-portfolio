@@ -64,6 +64,17 @@ const DEFAULT_PROJECTS = {
     mobileViews: 0,
     desktopViews: 0,
   },
+  linepulse: {
+    id: 'linepulse',
+    name: 'LinePulse (Sports Betting Sharp Lines & Strategy)',
+    category: 'Sports Analytics & Probability',
+    path: '/myprojects/linepulse',
+    viewCount: 0,
+    totalDwellSeconds: 0,
+    lastVisitedAt: null,
+    mobileViews: 0,
+    desktopViews: 0,
+  },
 };
 
 function readTraffic(): any {
