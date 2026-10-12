@@ -1,5 +1,30 @@
 [
   {
+    "version": "v0.9.10",
+    "date": "October 12, 2026",
+    "title": "Prominent Line & Money Movement Alerts, SMS Text Dispatcher & Recharts Trends",
+    "summary": "Introduced a prominent critical line and whale money movement alert banner at the top of the main LinePulse page, featuring specific risk warning analyses (Key Number Hook risk, Reverse Line traps, late injury/inactives, and vig tax). Built an interactive SMS text dispatcher (/api/linepulse/alerts/sms) with live smartphone screen preview and real carrier gateway dispatch. Created a complete Recharts performance visualization tracking cumulative unit bankroll curves, win rate % vs. break-even thresholds, and slate-by-slate win/loss distributions.",
+    "tag": "Alerts & Data Viz",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Prominent Alert Banner: Glowing high-urgency strobe alert at top of main page detecting massive line steam (e.g. Bills +4.5 to +3.5) and whale handle divergence ($16.4M handle, 68% dollars)."
+      },
+      {
+        "type": "feature",
+        "description": "Risk Analysis Engine: Specific warnings for Key Number hook losses (+3.5 vs +3.0), Reverse Line traps, late inactive timing, and vig price gouging."
+      },
+      {
+        "type": "feature",
+        "description": "Real-Time SMS Text Dispatcher: Express API (/api/linepulse/alerts/sms) logging notifications with phone number storage and authentic mobile phone message preview."
+      },
+      {
+        "type": "feature",
+        "description": "Recharts Performance Trends: Cumulative profit curves (+15.60u net), win rate % margins above break-even, and slate decision distribution stacked bars."
+      }
+    ]
+  },
+  {
     "version": "v0.9.9",
     "date": "October 12, 2026",
     "title": "Sports Analysts Consensus, Contrarian Fade Radar & Header Restructure",

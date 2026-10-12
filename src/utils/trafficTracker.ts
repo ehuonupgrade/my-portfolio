@@ -28,17 +28,7 @@ export interface SiteTrafficSummary {
 const SESSION_FLAG_KEY = 'global_traffic_session_recorded';
 
 export async function fetchGlobalTrafficSummary(): Promise<SiteTrafficSummary> {
-  try {
-    const res = await fetch('/api/traffic');
-    if (res.ok) {
-      const data = await res.json();
-      return data;
-    }
-  } catch (err) {
-    console.error('Failed to fetch global traffic data from server', err);
-  }
-
-  return {
+  const fallback: SiteTrafficSummary = {
     totalPageViews: 0,
     totalSessions: 0,
     firstTrackedAt: new Date().toISOString(),
@@ -46,6 +36,20 @@ export async function fetchGlobalTrafficSummary(): Promise<SiteTrafficSummary> {
     projects: {},
     pageViewsByRoute: {},
   };
+
+  if (typeof window === 'undefined') return fallback;
+
+  try {
+    const res = await fetch('/api/traffic').catch(() => null);
+    if (res && res.ok) {
+      const data = await res.json();
+      return data;
+    }
+  } catch {
+    // Graceful offline fallback
+  }
+
+  return fallback;
 }
 
 export async function recordPageView(route: string, projectId: string | null = null): Promise<void> {
@@ -58,7 +62,7 @@ export async function recordPageView(route: string, projectId: string | null = n
       sessionStorage.setItem(SESSION_FLAG_KEY, 'true');
     }
 
-    await fetch('/api/traffic/record', {
+    const res = await fetch('/api/traffic/record', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -67,11 +71,13 @@ export async function recordPageView(route: string, projectId: string | null = n
         isMobile,
         isNewSession,
       }),
-    });
+    }).catch(() => null);
 
-    window.dispatchEvent(new Event('site_traffic_updated'));
-  } catch (err) {
-    console.error('Failed to record global page view', err);
+    if (res && res.ok) {
+      window.dispatchEvent(new Event('site_traffic_updated'));
+    }
+  } catch {
+    // Non-blocking telemetry
   }
 }
 
@@ -79,27 +85,29 @@ export async function recordDwellTime(projectId: string, seconds: number): Promi
   if (typeof window === 'undefined' || seconds <= 1) return;
 
   try {
-    await fetch('/api/traffic/record', {
+    const res = await fetch('/api/traffic/record', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         projectId,
         dwellSeconds: Math.round(seconds),
       }),
-    });
+    }).catch(() => null);
 
-    window.dispatchEvent(new Event('site_traffic_updated'));
-  } catch (err) {
-    console.error('Failed to record dwell time', err);
+    if (res && res.ok) {
+      window.dispatchEvent(new Event('site_traffic_updated'));
+    }
+  } catch {
+    // Non-blocking telemetry
   }
 }
 
 export async function resetTrafficData(): Promise<void> {
   try {
-    await fetch('/api/traffic/reset', { method: 'POST' });
+    await fetch('/api/traffic/reset', { method: 'POST' }).catch(() => null);
     sessionStorage.removeItem(SESSION_FLAG_KEY);
     window.dispatchEvent(new Event('site_traffic_updated'));
-  } catch (err) {
-    console.error('Failed to reset global traffic data', err);
+  } catch {
+    // Non-blocking telemetry
   }
 }

@@ -4,6 +4,9 @@ import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS } from '
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BetTrackerAndPatternView } from './BetTrackerAndPatternView';
 import { AnalystConsensusTracker } from './AnalystConsensusTracker';
+import { BettingPerformanceCharts } from './BettingPerformanceCharts';
+import { LineMovementAlertBanner } from './LineMovementAlertBanner';
+import { AlertHistoryLogViewer } from './AlertHistoryLogViewer';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 
 interface SportsBettingEdgeHubProps {
@@ -11,7 +14,7 @@ interface SportsBettingEdgeHubProps {
 }
 
 export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBack }) => {
-  const [hubViewMode, setHubViewMode] = useState<'board' | 'analysts' | 'tracker'>('board');
+  const [hubViewMode, setHubViewMode] = useState<'board' | 'analysts' | 'tracker' | 'trends' | 'logs'>('board');
   const [selectedLeague, setSelectedLeague] = useState<SportsLeague | 'ALL'>('NFL');
   const [activeGameId, setActiveGameId] = useState<string>('nfl-lar-buf-today');
   const [viewTab, setViewTab] = useState<'strategy' | 'splits' | 'books' | 'movement'>('strategy');
@@ -72,6 +75,23 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
 
   return (
     <div className="space-y-6 animate-fadeIn font-sans pb-12">
+      {/* PROMINENT REAL-TIME LINE & MONEY MOVEMENT ALERT BANNER */}
+      <LineMovementAlertBanner
+        onSelectGame={(gameId) => {
+          setActiveGameId(gameId);
+          setViewTab('movement');
+          setHubViewMode('board');
+        }}
+        onOpenStrategy={() => {
+          setActiveGameId(primeGame.id);
+          setViewTab('strategy');
+          setHubViewMode('board');
+        }}
+        onOpenAlertLogs={() => {
+          setHubViewMode('logs');
+        }}
+      />
+
       {/* Top Header & Breadcrumb */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 shadow-xl space-y-5 relative overflow-hidden backdrop-blur-md">
         <div className="space-y-2.5">
@@ -140,16 +160,46 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
             <button
               onClick={() => {
                 playKeyClick();
+                setHubViewMode('trends');
+              }}
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
+                hubViewMode === 'trends'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-extrabold shadow-emerald-500/30'
+                  : 'bg-emerald-950/60 border border-emerald-700/80 text-emerald-200 hover:text-white hover:border-emerald-500'
+              }`}
+            >
+              <span>📈</span>
+              <span>Performance Trends (Recharts)</span>
+            </button>
+
+            <button
+              onClick={() => {
+                playKeyClick();
                 setHubViewMode('tracker');
               }}
               className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
                 hubViewMode === 'tracker'
-                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 font-extrabold shadow-cyan-500/20'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white font-extrabold shadow-purple-500/20'
                   : 'bg-purple-950/70 border border-purple-700/80 text-purple-200 hover:text-white hover:border-purple-500'
               }`}
             >
               <span>🧠</span>
               <span>Bet Tracker &amp; AI (Day 1)</span>
+            </button>
+
+            <button
+              onClick={() => {
+                playKeyClick();
+                setHubViewMode('logs');
+              }}
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
+                hubViewMode === 'logs'
+                  ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white font-extrabold shadow-rose-600/30'
+                  : 'bg-rose-950/70 border border-rose-700/80 text-rose-200 hover:text-white hover:border-rose-500'
+              }`}
+            >
+              <span>📋</span>
+              <span>Historical Alert Logs</span>
             </button>
 
             <button
@@ -208,7 +258,11 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
       </div>
 
       {/* VIEW MODES */}
-      {hubViewMode === 'analysts' ? (
+      {hubViewMode === 'trends' ? (
+        <BettingPerformanceCharts onBackToBoard={() => setHubViewMode('board')} />
+      ) : hubViewMode === 'logs' ? (
+        <AlertHistoryLogViewer onBackToBoard={() => setHubViewMode('board')} />
+      ) : hubViewMode === 'analysts' ? (
         <AnalystConsensusTracker
           onSelectGame={(gameId) => {
             setActiveGameId(gameId);

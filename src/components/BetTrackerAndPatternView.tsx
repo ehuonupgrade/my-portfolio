@@ -16,6 +16,7 @@ import {
   calculatePerformanceSummary,
   calculateLearnedPatternSignals,
 } from '../utils/bettingPatternEngine';
+import { BettingPerformanceCharts } from './BettingPerformanceCharts';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 
 interface BetTrackerAndPatternViewProps {
@@ -26,7 +27,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
   onBackToBoard,
 }) => {
   const [bets, setBets] = useState<TrackedBetRecommendation[]>(() => getTrackedBets());
-  const [activeTab, setActiveTab] = useState<'ledger' | 'patterns' | 'teasers'>('ledger');
+  const [activeTab, setActiveTab] = useState<'ledger' | 'patterns' | 'teasers' | 'trends'>('ledger');
   const [filterStatus, setFilterStatus] = useState<BetOutcome | 'ALL'>('ALL');
   const [filterTier, setFilterTier] = useState<TrackedBetTier | 'ALL'>('ALL');
   const [editingBetId, setEditingBetId] = useState<string | null>(null);
@@ -267,6 +268,21 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
         >
           <span>🗓️</span>
           <span>7-Day Teaser Window Matrix</span>
+        </button>
+
+        <button
+          onClick={() => {
+            playKeyClick();
+            setActiveTab('trends');
+          }}
+          className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${
+            activeTab === 'trends'
+              ? 'bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 shadow-lg font-extrabold'
+              : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+          }`}
+        >
+          <span>📈</span>
+          <span>Performance Trends (Recharts)</span>
         </button>
       </div>
 
@@ -816,6 +832,13 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
             </div>
           </div>
         </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* TAB 4: RECHARTS PERFORMANCE VISUALIZATION            */}
+      {/* ==================================================== */}
+      {activeTab === 'trends' && (
+        <BettingPerformanceCharts onBackToBoard={onBackToBoard} />
       )}
     </div>
   );
