@@ -3,16 +3,16 @@
     "version": "v0.9.8",
     "date": "October 12, 2026",
     "title": "Bet Recommendations Tracker, Pattern AI Learning Engine & 7-Day Teaser Window",
-    "summary": "Introduced complete win/loss ledger tracking for all betting recommendations across the 4 daily tiers (1 Single Game, 1 Parlay, 1 3-team +10 tease, 1 4-team +13 tease) and Prime 1-Game blueprints. Features an adaptive pattern machine learning feedback engine that dynamically tunes strategy weights based on historical win rates and ROI (whale divergence, high-wind unders, key number threshold crossings). Expanded teaser rules to allow pairings spanning any 2 days across the upcoming 7-day schedule period.",
+    "summary": "Introduced complete win/loss ledger tracking for all betting recommendations across the 4 daily tiers (1 Single Game, 1 Parlay, 1 3-team +10 tease, 1 4-team +13 tease) and Prime 1-Game blueprints. Performance resets to 0-0 with live tracking starting as of today (October 12, 2026). Features an adaptive pattern machine learning feedback engine that dynamically tunes strategy weights based on real incoming game outcomes (whale divergence, high-wind unders, key number threshold crossings). Expanded teaser rules to allow pairings spanning any 2 days across the upcoming 7-day schedule period.",
     "tag": "Sports & Markets",
     "changes": [
       {
         "type": "feature",
-        "description": "Recommendations Ledger & Settlement: Historical and live tracking of all recommended bets with unit returns, win rate (73.7%), ROI (+22.4%), streak indicators, and interactive grading."
+        "description": "Recommendations Ledger & Settlement: Clean live tracking starting as of today with 0 settled bets, 0.00 Units, and 0 win streak across 5 active pending recommendations for tonight's slate."
       },
       {
         "type": "feature",
-        "description": "Adaptive Pattern Learning Engine: Evaluates 8 structural market signals against settled outcomes and calculates dynamic model weights (e.g., 1.28x for Whale Inflow, 1.35x for High-Wind Unders, 1.30x for Key Number Teasers)."
+        "description": "Adaptive Pattern Learning Engine: Evaluates 8 structural market signals against settled outcomes and calculates dynamic model weights (e.g., Whale Inflow, High-Wind Unders, Key Number Teasers) as games conclude."
       },
       {
         "type": "feature",

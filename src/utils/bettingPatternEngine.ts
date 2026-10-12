@@ -84,7 +84,7 @@ export function calculatePerformanceSummary(
   const roi = settledStaked > 0 ? (netUnitsWon / settledStaked) * 100 : 0;
 
   // Streak calculation (from most recent settled bet backward)
-  let currentStreak = '0';
+  let currentStreak = '0 (Day 1 Started)';
   let bestStreakNum = 0;
   let tempStreakNum = 0;
 
@@ -105,6 +105,8 @@ export function calculatePerformanceSummary(
       else break;
     }
     currentStreak = last.status === 'WON' ? `W${streakCount} 🔥` : last.status === 'LOST' ? `L${streakCount}` : 'PUSH';
+  } else {
+    currentStreak = '0 (Day 1 Started)';
   }
 
   // Tier breakdowns
@@ -204,7 +206,7 @@ export function calculateLearnedPatternSignals(
 
     if (totalBets === 0) {
       learnedWeight = 1.0;
-      strategyImpactNote = 'Baseline weight: Awaiting initial sample size to tune parameter.';
+      strategyImpactNote = "Day 1 Baseline (1.00x): Awaiting first settled game outcome from today's active slate to begin statistical adaptation.";
     } else if (winRate >= 75 && netUnits > 0) {
       learnedWeight = parseFloat((1.0 + Math.min(0.35, (winRate - 50) / 100 * 0.8)).toFixed(2));
       weightStatus = 'BOOSTED';

@@ -114,7 +114,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
               }`}
             >
               <span>🧠</span>
-              <span>Bet Tracker &amp; AI (+16.85u)</span>
+              <span>Bet Tracker &amp; AI (Day 1)</span>
             </button>
 
             <button
@@ -197,7 +197,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
           }`}
         >
           <span>🧠</span>
-          <span>Bet Recommendations Tracker &amp; Pattern AI (+16.85u | 73.7% Win Rate)</span>
+          <span>Bet Recommendations Tracker &amp; Pattern AI (Tracking Live · 0 Settled)</span>
         </button>
       </div>
 

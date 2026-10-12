@@ -31,20 +31,20 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
     { title: string; desc: string }
   > = {
     single: {
-      title: 'Whale Steam & Home Dog Hook (+28% Weight Boost)',
-      desc: 'Learned from 10 past tracked recommendations (8-2 record, 80% win rate). Model prioritized Buffalo +3.5.',
+      title: 'Active Formula: Whale Steam & Home Dog Hook (+3.5)',
+      desc: 'Tracking live starting today: Buffalo +3.5 selected on +26% money advantage over tickets against public Rams chalk.',
     },
     parlay: {
-      title: 'High-Wind Under & Correlated Game Script (+25% Weight Boost)',
-      desc: 'Learned from past slates: High-wind (>12mph) unders hold a 100% (5-0) track record.',
+      title: 'Active Formula: Correlated Cold-Wind Game Script + World Series',
+      desc: 'Tracking live starting today: Pairs Buffalo ground possession with Under 49.0 in 15mph wind and Dodgers WS home leverage.',
     },
     teaser10: {
-      title: '7-Day Span & Key Number 3 & 7 Crossings (+30% Weight Boost)',
-      desc: 'Spanning any 2 days in upcoming 7-day slate (Tonight Oct 12 & Sunday Oct 18). 88.9% historical hit rate.',
+      title: 'Active Formula: 7-Day Window Key Threshold Crossings',
+      desc: 'Spanning any 2 days in upcoming 7-day slate (Tonight Oct 12 & Sunday Oct 18), crossing critical numbers 3, 7, and 10.',
     },
     teaser13: {
-      title: 'Maximum +13 Safety Cushion Across 7-Day Window (+32% Weight Boost)',
-      desc: 'Moving lines past two full scores across any 2 days in the 7-day period holds an 87.5% win rate in ledger.',
+      title: 'Active Formula: Maximum +13 Cushion Across 7-Day Window',
+      desc: 'Spanning any 2 days in 7-day slate (Tonight & Sunday), moving spreads past two converted scores (+16.5 and +10.5).',
     },
   };
 

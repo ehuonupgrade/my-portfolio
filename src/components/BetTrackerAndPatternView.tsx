@@ -207,6 +207,21 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
         </div>
       </div>
 
+      {/* Day 1 Zero-Performance Tracking Status Banner */}
+      {summary.settledCount === 0 && (
+        <div className="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-800/60 flex items-start gap-3 text-cyan-200 font-sans text-xs">
+          <span className="text-xl shrink-0">🎯</span>
+          <div className="space-y-1">
+            <strong className="font-mono text-cyan-300 uppercase block text-[11px]">
+              Live Tracking Started As Of Today (October 12, 2026) &bull; Clean Performance Baseline
+            </strong>
+            <p className="text-slate-300 leading-relaxed">
+              Performance metrics reset to <strong>0 Settled (0.00 Units Won/Lost)</strong> with a <strong>0 Win Streak</strong>. We have logged 5 live algorithmic recommendations for today's slate (Buffalo Bills +3.5, 3-Leg Value Parlay, 3-Team +10 Teaser, 4-Team +13 Teaser, and 1-Game Strategy). As tonight&apos;s games conclude, settle results manually or click &quot;Simulate Tonight &amp; Learn&quot; to test the pattern learning engine!
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Main Tab Navigation */}
       <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
         <button
