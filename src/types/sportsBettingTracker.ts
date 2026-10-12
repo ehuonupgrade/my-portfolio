@@ -26,10 +26,12 @@ export interface TrackedBetLeg {
 export type PatternSignalType =
   | 'WHALE_DIVERGENCE_20PLUS'   // Money % - Ticket % >= 20%
   | 'HOME_UNDERDOG'             // Underdog playing at home
+  | 'ROAD_UNDERDOG'             // Underdog playing on the road catching key hook
   | 'HIGH_WIND_UNDER'           // Outdoor stadium with wind >= 12mph
   | 'KEY_NUMBER_CROSS_3_7'      // Teaser crossed through both 3 & 7
   | 'REVERSE_LINE_MOVEMENT'     // Line moved opposite to majority tickets
   | 'PUBLIC_ROAD_FAVORITE_FADE' // Public heavily betting road favorite (>65% tickets)
+  | 'PUBLIC_HOME_FAVORITE_FADE' // Public laying heavy home chalk (>55% tickets)
   | 'SAME_GAME_CORRELATED'      // Legs correlated on game script (e.g. dog spread + under)
   | 'CROSS_SPORT_PARLAY';       // Parlay combining multiple different leagues
 

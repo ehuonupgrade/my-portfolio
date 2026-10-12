@@ -1,5 +1,26 @@
 [
   {
+    "version": "v0.9.9",
+    "date": "October 12, 2026",
+    "title": "Sports Analysts Consensus, Contrarian Fade Radar & Header Restructure",
+    "summary": "Brought in sports media analyst predictions across major networks (ESPN, CBS Sports, FOX, PFF, Sharp Football) to compare against public ticket counts and sharp whale dollars. Integrated Contrarian Gambling Theory to automatically detect extreme consensus traps (80%+ pundit chalk) and trigger opposing high-value fade recommendations. Re-aligned the hub header to position navigation and action buttons neatly below the summary description text.",
+    "tag": "Sports & Markets",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Header Redesign: Brought navigation and action buttons directly below the project summary text, eliminating awkward horizontal stretching."
+      },
+      {
+        "type": "feature",
+        "description": "Sports Analysts Consensus & Contrarian Radar: Side-by-side comparison of 10 media analysts vs. public tickets vs. sharp syndicate dollars with Echo Chamber Scores (0-100) and automated fade triggers."
+      },
+      {
+        "type": "improvement",
+        "description": "Venue & Matchup Accuracy: Corrected Buffalo Bills @ Los Angeles Rams designation at SoFi Stadium, correctly treating Buffalo as a Road Underdog catching the key +3.5 field goal hook against public home Rams chalk."
+      }
+    ]
+  },
+  {
     "version": "v0.9.8",
     "date": "October 12, 2026",
     "title": "Bet Recommendations Tracker, Pattern AI Learning Engine & 7-Day Teaser Window",

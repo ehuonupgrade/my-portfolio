@@ -10,10 +10,12 @@ import {
 export const BASELINE_STRATEGY_WEIGHTS: Record<PatternSignalType, number> = {
   WHALE_DIVERGENCE_20PLUS: 1.0,
   HOME_UNDERDOG: 1.0,
+  ROAD_UNDERDOG: 1.0,
   HIGH_WIND_UNDER: 1.0,
   KEY_NUMBER_CROSS_3_7: 1.0,
   REVERSE_LINE_MOVEMENT: 1.0,
   PUBLIC_ROAD_FAVORITE_FADE: 1.0,
+  PUBLIC_HOME_FAVORITE_FADE: 1.0,
   SAME_GAME_CORRELATED: 1.0,
   CROSS_SPORT_PARLAY: 1.0,
 };
@@ -31,6 +33,11 @@ export const PATTERN_SIGNAL_METADATA: Record<
     label: 'Home Underdog with Points',
     icon: '🏟️',
     description: 'Home team getting spread points (+3.5 or higher), benefiting from home field noise and game script control.',
+  },
+  ROAD_UNDERDOG: {
+    label: 'Road Underdog Key Hook (+3.5)',
+    icon: '✈️',
+    description: 'Visiting road underdog getting key field goal hook (+3.5) with sharp money against public home chalk.',
   },
   HIGH_WIND_UNDER: {
     label: 'High Wind Outdoor Under (>= 12mph)',
@@ -51,6 +58,11 @@ export const PATTERN_SIGNAL_METADATA: Record<
     label: 'Public Road Favorite Fade (>65% Tickets)',
     icon: '🎯',
     description: 'Fading recreational bettors laying heavy road chalk on public darlings.',
+  },
+  PUBLIC_HOME_FAVORITE_FADE: {
+    label: 'Public Home Favorite Fade (>55% Tickets)',
+    icon: '🛡️',
+    description: 'Fading recreational public betting the home favorite when sharp syndicates back the road dog.',
   },
   SAME_GAME_CORRELATED: {
     label: 'Correlated Same-Game Script',

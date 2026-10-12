@@ -31,12 +31,12 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
     { title: string; desc: string }
   > = {
     single: {
-      title: 'Active Formula: Whale Steam & Home Dog Hook (+3.5)',
-      desc: 'Tracking live starting today: Buffalo +3.5 selected on +26% money advantage over tickets against public Rams chalk.',
+      title: 'Active Formula: Whale Steam & Road Dog Hook (+3.5)',
+      desc: 'Tracking live starting today: Buffalo +3.5 road dog selected on +26% money advantage over tickets against public Rams home chalk.',
     },
     parlay: {
-      title: 'Active Formula: Correlated Cold-Wind Game Script + World Series',
-      desc: 'Tracking live starting today: Pairs Buffalo ground possession with Under 49.0 in 15mph wind and Dodgers WS home leverage.',
+      title: 'Active Formula: Correlated SoFi Game Script + World Series',
+      desc: 'Tracking live starting today: Pairs Buffalo ground possession with Under 49.0 in climate-controlled SoFi and Dodgers WS home leverage.',
     },
     teaser10: {
       title: 'Active Formula: 7-Day Window Key Threshold Crossings',

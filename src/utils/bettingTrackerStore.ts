@@ -1,11 +1,12 @@
 import { TrackedBetRecommendation, BetOutcome } from '../types/sportsBettingTracker';
 
-const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v4_clean';
+const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v5_road_dog';
 
 /**
  * Production Recommendations Ledger
  * Starts at 0 settled bets as of today (October 12, 2026).
  * All 5 initial recommendations are PENDING.
+ * Game: Buffalo Bills (3-1, Visitor/Road Dog) @ Los Angeles Rams (2-2, Home Favorite) at SoFi Stadium.
  */
 export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
   // ==========================================
@@ -18,9 +19,9 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     slateTitle: 'Week 6 Monday Night Football Slate',
     tier: 'SINGLE_GAME',
     title: '1 Single Game Straight Bet: Buffalo Bills +3.5',
-    subtitle: 'Sharp Whale Inflow (+26% Handle Divergence) on Home Dog Hook',
+    subtitle: 'Sharp Whale Inflow (+26% Handle Divergence) on Road Dog Hook at SoFi Stadium',
     badge: '1 SINGLE GAME',
-    targetMatchup: 'Rams @ Bills (NFL)',
+    targetMatchup: 'Bills @ Rams (NFL)',
     payoutOdds: '-110 (FanDuel / DraftKings)',
     unitsStaked: 1.0,
     unitsWonLost: 0,
@@ -28,7 +29,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     legs: [
       {
         id: 'leg-today-single-1',
-        gameMatchup: 'Los Angeles Rams @ Buffalo Bills',
+        gameMatchup: 'Buffalo Bills @ Los Angeles Rams',
         league: 'NFL',
         gameDate: 'Tonight · 8:15 PM EDT',
         betType: 'SPREAD',
@@ -37,21 +38,26 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-110',
         bestSportsbook: 'FanDuel',
         status: 'PENDING',
-        rationale: 'Whale money accounts for 68% of dollar volume on only 42% of public slips. Home dog at Highmark Stadium with key +3.5 hook.',
+        rationale: 'Whale money accounts for 68% of dollar volume on only 42% of public slips. Visiting road dog catching key +3.5 hook at SoFi Stadium against public Rams home chalk.',
       },
     ],
-    signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'HOME_UNDERDOG', 'PUBLIC_ROAD_FAVORITE_FADE'],
-    preBetRationale: 'Massive sharp divergence (+26% money advantage) grabbing the crucial +3.5 hook on Buffalo at home against public Rams chalk.',
+    signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'ROAD_UNDERDOG', 'PUBLIC_HOME_FAVORITE_FADE'],
+    preBetRationale: 'Massive sharp divergence (+26% money advantage) grabbing the crucial +3.5 hook on Buffalo as a road dog at SoFi Stadium against host Rams.',
     appliedWeights: [
       {
         signal: 'WHALE_DIVERGENCE_20PLUS',
         weightMultiplier: 1.0,
-        description: 'Model entry signal: Sharp whale handle divergence (+26% money advantage) on home dog.',
+        description: 'Model entry signal: Sharp whale handle divergence (+26% money advantage) on visiting road dog.',
       },
       {
-        signal: 'HOME_UNDERDOG',
+        signal: 'ROAD_UNDERDOG',
         weightMultiplier: 1.0,
-        description: 'Model entry signal: Buffalo catching key +3.5 field goal hook at Highmark Stadium.',
+        description: 'Model entry signal: Buffalo catching key +3.5 field goal hook as road dog at SoFi Stadium.',
+      },
+      {
+        signal: 'PUBLIC_HOME_FAVORITE_FADE',
+        weightMultiplier: 1.0,
+        description: 'Model entry signal: Fading public recreational slips backing home favorite Rams (58% tickets).',
       },
     ],
   },
@@ -61,10 +67,10 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     dateLabel: 'Oct 12, 2026',
     slateTitle: 'Week 6 Monday Night Multi-Sport Parlay',
     tier: 'PARLAY_3LEG',
-    title: '1 3-Leg Value Parlay: Highmark Correlated Script + World Series',
-    subtitle: 'Correlating Buffalo Ground Control with Dodgers Bullpen Dominance',
+    title: '1 3-Leg Value Parlay: SoFi Correlated Script + World Series',
+    subtitle: 'Correlating Buffalo Road Ground Control with Dodgers Bullpen Dominance',
     badge: '3-LEG +EV PARLAY',
-    targetMatchup: 'Rams @ Bills + Yankees @ Dodgers',
+    targetMatchup: 'Bills @ Rams + Yankees @ Dodgers',
     payoutOdds: '+540 (DraftKings)',
     unitsStaked: 0.75,
     unitsWonLost: 0,
@@ -72,7 +78,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     legs: [
       {
         id: 'leg-today-parlay-1',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight · 8:15 PM EDT',
         betType: 'SPREAD',
@@ -81,11 +87,11 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-110',
         bestSportsbook: 'DraftKings',
         status: 'PENDING',
-        rationale: 'Whale syndicate line defense holding the +3.5 hook.',
+        rationale: 'Whale syndicate defense holding the +3.5 road hook.',
       },
       {
         id: 'leg-today-parlay-2',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight · 8:15 PM EDT',
         betType: 'TOTAL',
@@ -94,7 +100,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-110',
         bestSportsbook: 'DraftKings',
         status: 'PENDING',
-        rationale: 'Reverse line movement triggered by 15-18mph wind gusts dropping total from 51.0.',
+        rationale: 'Reverse Line Movement: 70% public tickets on Over, yet sharp limit bets drove total down from 51.0 with both teams controlling clock on the ground at SoFi Stadium.',
       },
       {
         id: 'leg-today-parlay-3',
@@ -110,18 +116,23 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         rationale: 'Chavez Ravine home field advantage backed by 74% sharp handle.',
       },
     ],
-    signalsTagged: ['SAME_GAME_CORRELATED', 'HIGH_WIND_UNDER', 'REVERSE_LINE_MOVEMENT'],
-    preBetRationale: 'Combines the Bills +3.5 and Under 49.0 correlated game script with Dodgers home championship leverage.',
+    signalsTagged: ['SAME_GAME_CORRELATED', 'REVERSE_LINE_MOVEMENT', 'ROAD_UNDERDOG'],
+    preBetRationale: 'Combines the Bills +3.5 and Under 49.0 correlated game script at SoFi Stadium with Dodgers home championship leverage.',
     appliedWeights: [
       {
-        signal: 'HIGH_WIND_UNDER',
+        signal: 'REVERSE_LINE_MOVEMENT',
         weightMultiplier: 1.0,
-        description: 'Model entry signal: Highmark Stadium 15-18mph wind gusts reduce deep ball accuracy.',
+        description: 'Model entry signal: Sharp limit bets moving total down despite public Over tickets.',
       },
       {
         signal: 'SAME_GAME_CORRELATED',
         weightMultiplier: 1.0,
-        description: 'Model entry signal: Correlated ground game possession script.',
+        description: 'Model entry signal: Correlated ground game possession script at SoFi Stadium.',
+      },
+      {
+        signal: 'ROAD_UNDERDOG',
+        weightMultiplier: 1.0,
+        description: 'Model entry signal: Road dog spread correlation with conservative ball possession.',
       },
     ],
   },
@@ -132,9 +143,9 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     slateTitle: 'Upcoming 7-Day Window: 2 Selected Days Teaser',
     tier: 'TEASER_3TEAM_10',
     title: '1 3-Team +10 Super Teaser (Spans 2 Days in 7-Day Window)',
-    subtitle: 'Day 1: Tonight (Oct 12) & Day 2: Sunday Showcase (Oct 18)',
+    subtitle: 'Day 1: Tonight (Oct 12 at SoFi Stadium) & Day 2: Sunday Showcase (Oct 18 at Ford Field)',
     badge: '3-TEAM +10 TEASER',
-    targetMatchup: 'Rams @ Bills (Tonight) & Chiefs @ Lions (Sunday)',
+    targetMatchup: 'Bills @ Rams (Tonight) & Chiefs @ Lions (Sunday)',
     payoutOdds: '-120 (Circa Sports / DraftKings)',
     unitsStaked: 1.5,
     unitsWonLost: 0,
@@ -142,7 +153,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     legs: [
       {
         id: 'leg-today-t10-1',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight (Day 1 of 2)',
         betType: 'SPREAD',
@@ -152,11 +163,11 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-120',
         bestSportsbook: 'Circa Sports',
         status: 'PENDING',
-        rationale: 'Crosses key numbers 4, 7, 10, 13. Buffalo has not lost a home game by 14+ in 34 straight games.',
+        rationale: 'Crosses key numbers 4, 7, 10, 13. Buffalo (3-1) getting +13.5 road points at SoFi Stadium.',
       },
       {
         id: 'leg-today-t10-2',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight (Day 1 of 2)',
         betType: 'TOTAL',
@@ -166,7 +177,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-120',
         bestSportsbook: 'DraftKings',
         status: 'PENDING',
-        rationale: 'Elevates total past 58 in 15mph wind. Extreme cushion requiring 60+ points to fail.',
+        rationale: 'Elevates total past 58 in clock-controlled matchup. Extreme cushion requiring 60+ points to fail.',
       },
       {
         id: 'leg-today-t10-3',
@@ -180,16 +191,21 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-120',
         bestSportsbook: 'DraftKings',
         status: 'PENDING',
-        rationale: 'Passes through 0, 3, 6, and lands on +7.5 key touchdown margin inside Ford Field dome.',
+        rationale: 'Passes through 0, 3, 6, and lands on +7.5 key touchdown margin inside Ford Field dome for home Detroit.',
       },
     ],
-    signalsTagged: ['KEY_NUMBER_CROSS_3_7', 'HIGH_WIND_UNDER', 'HOME_UNDERDOG'],
-    preBetRationale: 'Spans 2 days across the upcoming 7-day period (Tonight Oct 12 and Sunday Oct 18). Crosses crucial NFL touchdown and field goal margins.',
+    signalsTagged: ['KEY_NUMBER_CROSS_3_7', 'ROAD_UNDERDOG', 'HOME_UNDERDOG'],
+    preBetRationale: 'Spans 2 days across the upcoming 7-day period (Tonight Oct 12 at SoFi Stadium and Sunday Oct 18 at Ford Field). Crosses crucial NFL touchdown and field goal margins.',
     appliedWeights: [
       {
         signal: 'KEY_NUMBER_CROSS_3_7',
         weightMultiplier: 1.0,
         description: 'Model entry signal: Crosses key NFL victory margins 3, 7, and 10 across 2 selected days in 7-day period.',
+      },
+      {
+        signal: 'ROAD_UNDERDOG',
+        weightMultiplier: 1.0,
+        description: 'Model entry signal: Moving road dog spread past two scores (+13.5).',
       },
     ],
   },
@@ -200,9 +216,9 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     slateTitle: 'Upcoming 7-Day Window: 2 Selected Days Monster Teaser',
     tier: 'TEASER_4TEAM_13',
     title: '1 4-Team +13 Monster Teaser (Spans 2 Days in 7-Day Window)',
-    subtitle: 'Day 1: Tonight (Oct 12) & Day 2: Sunday Showcase (Oct 18)',
+    subtitle: 'Day 1: Tonight (Oct 12 at SoFi Stadium) & Day 2: Sunday Showcase (Oct 18 at Ford Field)',
     badge: '4-TEAM +13 MONSTER TEASER',
-    targetMatchup: 'Rams @ Bills (Tonight) & Chiefs @ Lions (Sunday)',
+    targetMatchup: 'Bills @ Rams (Tonight) & Chiefs @ Lions (Sunday)',
     payoutOdds: '-135 (Circa Sports / Caesars)',
     unitsStaked: 1.35,
     unitsWonLost: 0,
@@ -210,7 +226,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     legs: [
       {
         id: 'leg-today-t13-1',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight (Day 1 of 2)',
         betType: 'SPREAD',
@@ -220,11 +236,11 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-135',
         bestSportsbook: 'Circa Sports',
         status: 'PENDING',
-        rationale: 'Massive two-touchdown head start (+16.5) at Highmark Stadium.',
+        rationale: 'Massive two-touchdown head start (+16.5) for Buffalo as a road dog at SoFi Stadium.',
       },
       {
         id: 'leg-today-t13-2',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight (Day 1 of 2)',
         betType: 'TOTAL',
@@ -234,7 +250,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-135',
         bestSportsbook: 'Caesars',
         status: 'PENDING',
-        rationale: 'Elevates total over 60 points in windy cold weather. Historical breach rate under 3%.',
+        rationale: 'Elevates total over 61 points in run-first game plan. Historical breach rate under 3%.',
       },
       {
         id: 'leg-today-t13-3',
@@ -265,13 +281,18 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         rationale: 'Creates an astronomical 64.5 point ceiling between two top tier defenses.',
       },
     ],
-    signalsTagged: ['KEY_NUMBER_CROSS_3_7', 'HIGH_WIND_UNDER', 'HOME_UNDERDOG'],
+    signalsTagged: ['KEY_NUMBER_CROSS_3_7', 'ROAD_UNDERDOG', 'HOME_UNDERDOG'],
     preBetRationale: 'Maximized safety net spanning 2 days across the upcoming 7-day slate (Tonight and Sunday Oct 18). Moving lines past two full scores.',
     appliedWeights: [
       {
         signal: 'KEY_NUMBER_CROSS_3_7',
         weightMultiplier: 1.0,
         description: 'Model entry signal: Maximum two-touchdown (+13) cushion spanning 2 days across 7-day slate.',
+      },
+      {
+        signal: 'ROAD_UNDERDOG',
+        weightMultiplier: 1.0,
+        description: 'Model entry signal: Massive +16.5 road underdog cushion at SoFi Stadium.',
       },
     ],
   },
@@ -281,10 +302,10 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     dateLabel: 'Oct 12, 2026',
     slateTitle: 'Prime 1-Game Opportunity of the Slate',
     tier: 'PRIME_1GAME',
-    title: '1 Game Strategy: Rams @ Bills Sharp Dog & Ground Script',
+    title: '1 Game Strategy: Bills @ Rams Sharp Road Dog & Ground Script',
     subtitle: 'Correlated 3-Part Game Execution (Bills +3.5, Under 49.0, Cook Over Carries)',
     badge: '1 PRIME GAME STRATEGY',
-    targetMatchup: 'Rams @ Bills (NFL)',
+    targetMatchup: 'Bills @ Rams (NFL)',
     payoutOdds: '+260 Same Game Parlay / Straight Split',
     unitsStaked: 1.25,
     unitsWonLost: 0,
@@ -292,7 +313,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     legs: [
       {
         id: 'leg-today-p-1',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight',
         betType: 'SPREAD',
@@ -301,11 +322,11 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-110',
         bestSportsbook: 'FanDuel',
         status: 'PENDING',
-        rationale: 'Whale money divergence on home dog hook.',
+        rationale: 'Whale money divergence on road dog +3.5 hook at SoFi Stadium.',
       },
       {
         id: 'leg-today-p-2',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight',
         betType: 'TOTAL',
@@ -314,11 +335,11 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-110',
         bestSportsbook: 'BetMGM',
         status: 'PENDING',
-        rationale: 'Reverse Line Movement with 15mph wind gusts.',
+        rationale: 'Reverse Line Movement: sharp total limit bets driving line down from 51.0.',
       },
       {
         id: 'leg-today-p-3',
-        gameMatchup: 'Rams @ Bills',
+        gameMatchup: 'Bills @ Rams',
         league: 'NFL',
         gameDate: 'Tonight',
         betType: 'PLAYER_PROP',
@@ -327,16 +348,21 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestOdds: '-115',
         bestSportsbook: 'DraftKings',
         status: 'PENDING',
-        rationale: 'Bills rely heavily on interior power run scheme in wind.',
+        rationale: 'Bills rely heavily on interior power run scheme with James Cook to control possession on the road.',
       },
     ],
-    signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'HOME_UNDERDOG', 'HIGH_WIND_UNDER', 'SAME_GAME_CORRELATED'],
-    preBetRationale: 'Single highest conviction matchup of the slate with triple convergence of sharp indicators.',
+    signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'ROAD_UNDERDOG', 'REVERSE_LINE_MOVEMENT', 'SAME_GAME_CORRELATED'],
+    preBetRationale: 'Single highest conviction matchup of the slate with triple convergence of sharp indicators backing the visiting road underdog at SoFi Stadium.',
     appliedWeights: [
       {
         signal: 'WHALE_DIVERGENCE_20PLUS',
         weightMultiplier: 1.0,
-        description: 'Model entry signal: Triple convergence of sharp whale divergence, weather, and game script.',
+        description: 'Model entry signal: Triple convergence of sharp whale divergence, line movement, and ground script.',
+      },
+      {
+        signal: 'ROAD_UNDERDOG',
+        weightMultiplier: 1.0,
+        description: 'Model entry signal: Visiting road underdog getting key field goal hook (+3.5).',
       },
     ],
   },
@@ -354,6 +380,8 @@ export function getTrackedBets(): TrackedBetRecommendation[] {
     localStorage.removeItem('linepulse_tracked_bet_recommendations_v1');
     localStorage.removeItem('linepulse_tracked_bet_recommendations_v2');
     localStorage.removeItem('linepulse_tracked_bet_recommendations_v3');
+    localStorage.removeItem('linepulse_tracked_bet_recommendations_v4_reset');
+    localStorage.removeItem('linepulse_tracked_bet_recommendations_v4_clean');
 
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
@@ -430,7 +458,7 @@ export function updateBetStatus(
 }
 
 /**
- * Simulates tonight's Rams @ Bills game outcome (Bills win 24-20, Under 44 total, James Cook 18 carries),
+ * Simulates tonight's Bills @ Rams game outcome (Bills win 24-20, Under 44 total, James Cook 18 carries),
  * automatically settling today's 5 pending recommendations and triggering the learning engine!
  */
 export function simulateTonightOutcome(): TrackedBetRecommendation[] {
@@ -446,8 +474,8 @@ export function simulateTonightOutcome(): TrackedBetRecommendation[] {
         status: 'WON' as BetOutcome,
         unitsWonLost: 0.91,
         settledAt: new Date().toISOString(),
-        postGameAnalysis: 'Buffalo won outright 24-20 at Highmark Stadium. Covering +3.5 hook by 7.5 points.',
-        learnedTakeaway: 'Whale handle divergence on home dogs (+26% money advantage) delivered another winning ATS cover. Reinforced Home Dog + Whale Divergence weight to 1.32x.',
+        postGameAnalysis: 'Buffalo won outright 24-20 at SoFi Stadium in Los Angeles. Covering +3.5 road hook by 7.5 points.',
+        learnedTakeaway: 'Whale handle divergence on road underdogs (+26% money advantage) delivered another winning ATS cover. Reinforced Road Dog + Whale Divergence weight to 1.32x.',
         legs: b.legs.map((leg) => ({
           ...leg,
           status: 'WON' as BetOutcome,
@@ -463,8 +491,8 @@ export function simulateTonightOutcome(): TrackedBetRecommendation[] {
         status: 'WON' as BetOutcome,
         unitsWonLost: 4.05,
         settledAt: new Date().toISOString(),
-        postGameAnalysis: 'Bills covered +3.5, windy weather held game total to 44 (Under 49.0), and Dodgers took Game 4 with 4-2 win. +540 Parlay cashes for +4.05 Units!',
-        learnedTakeaway: 'Correlated ground script in cold wind confirmed 100% win rate for high-wind Unders. Model boosted Wind Under weighting.',
+        postGameAnalysis: 'Bills covered +3.5 as road dogs at SoFi Stadium, ground control held game total to 44 (Under 49.0), and Dodgers took Game 4 with 4-2 win. +540 Parlay cashes for +4.05 Units!',
+        learnedTakeaway: 'Correlated road dog ground script confirmed strong positive expected value. Model reinforced Same-Game Script weighting.',
         legs: [
           {
             ...b.legs[0],
@@ -486,14 +514,14 @@ export function simulateTonightOutcome(): TrackedBetRecommendation[] {
     }
 
     if (b.id === 'rec-20261012-teaser10') {
-      // Day 1 legs hit! Bills +13.5 (W), Under 58.5 (W). Day 2 (Sunday) leg pending or settled.
+      // Day 1 legs hit! Bills +13.5 (W), Under 58.5 (W). Day 2 (Sunday) leg simulated won.
       return {
         ...b,
         status: 'WON' as BetOutcome,
         unitsWonLost: 1.25,
         settledAt: new Date().toISOString(),
-        postGameAnalysis: 'Tonight Day 1 legs cashed with massive margin (Bills +13.5 and Under 58.5). Sunday showcase Lions covered +7.5. Teaser pays out +1.25 Units.',
-        learnedTakeaway: 'Teasers spanning 2 days in the 7-day window crossing key numbers 3 & 7 have maintained an 88.9% hit rate. Model confirmed policy.',
+        postGameAnalysis: 'Tonight Day 1 legs at SoFi Stadium cashed with massive margin (Bills +13.5 and Under 58.5). Sunday showcase Lions covered +7.5. Teaser pays out +1.25 Units.',
+        learnedTakeaway: 'Teasers spanning 2 days in the 7-day window crossing key numbers 3 & 7 have maintained high hit rate. Model confirmed policy.',
         legs: b.legs.map((leg, idx) => ({
           ...leg,
           status: 'WON' as BetOutcome,
@@ -529,8 +557,8 @@ export function simulateTonightOutcome(): TrackedBetRecommendation[] {
         status: 'WON' as BetOutcome,
         unitsWonLost: 2.25,
         settledAt: new Date().toISOString(),
-        postGameAnalysis: 'Prime 1-Game strategy hits cleanly: Bills covered +3.5, Under 49.0 cashed, and Cook rushed 19 times (exceeding 15.5 attempts line).',
-        learnedTakeaway: 'The single prime game algorithm strategy has now produced a 83.3% positive expected value return across tracked slates.',
+        postGameAnalysis: 'Prime 1-Game strategy hits cleanly at SoFi Stadium: Bills covered +3.5 road hook, Under 49.0 cashed, and Cook rushed 19 times (exceeding 15.5 attempts line).',
+        learnedTakeaway: 'The single prime game algorithm strategy has now produced a positive expected value return across tracked slates.',
         legs: b.legs.map((leg, idx) => ({
           ...leg,
           status: 'WON' as BetOutcome,
@@ -552,46 +580,34 @@ export function simulateTonightOutcome(): TrackedBetRecommendation[] {
 }
 
 /**
- * Resets the ledger back to the original historical seed
+ * Resets ledger back to initial clean state with 0 settled bets
  */
 export function resetTrackedBetsToSeed(): TrackedBetRecommendation[] {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_TRACKED_BETS));
   }
   return INITIAL_TRACKED_BETS;
 }
 
+export const resetLedger = resetTrackedBetsToSeed;
+
 /**
- * Exports the tracked recommendations as a CSV string
+ * Formats tracked bets as CSV for export
  */
 export function exportTrackedBetsToCSV(bets: TrackedBetRecommendation[]): string {
-  const headers = [
-    'ID',
-    'Date',
-    'Tier',
-    'Title',
-    'Matchup',
-    'Odds',
-    'Units_Staked',
-    'Units_Won_Lost',
-    'Status',
-    'Signals_Tagged',
-    'Learned_Takeaway',
-  ];
-
+  const headers = ['ID', 'Date', 'Matchup', 'Tier', 'Title', 'Selection', 'Odds', 'Staked', 'Outcome', 'NetUnits'];
   const rows = bets.map((b) => [
     b.id,
     b.date,
+    `"${b.targetMatchup}"`,
     b.tier,
-    `"${b.title.replace(/"/g, '""')}"`,
-    `"${b.targetMatchup.replace(/"/g, '""')}"`,
+    `"${b.title}"`,
+    `"${b.legs.map((l) => l.targetSelection).join('; ')}"`,
     `"${b.payoutOdds}"`,
     b.unitsStaked,
-    b.unitsWonLost,
     b.status,
-    `"${b.signalsTagged.join('; ')}"`,
-    `"${(b.learnedTakeaway || '').replace(/"/g, '""')}"`,
+    b.unitsWonLost,
   ]);
-
   return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
 }

@@ -63,12 +63,12 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
     showToast(`Bet updated to ${editStatus}. Learned weights re-calculated!`);
   };
 
-  // Handle simulation of tonight's Rams @ Bills slate
+  // Handle simulation of tonight's Bills @ Rams slate
   const handleSimulateTonight = () => {
     playSuccessChime();
     const updated = simulateTonightOutcome();
     setBets(updated);
-    showToast('Tonight Rams @ Bills simulated! Buffalo covered +3.5. Model auto-graded 5 bets and adapted future weights.');
+    showToast('Tonight Bills @ Rams simulated! Buffalo covered +3.5 at SoFi Stadium. Model auto-graded 5 bets and adapted future weights.');
   };
 
   // Handle reset to defaults
@@ -723,9 +723,9 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                     ★ TEASER DAY 1 OF 2
                   </span>
                 </div>
-                <div className="text-white font-bold text-sm">Rams @ Bills</div>
+                <div className="text-white font-bold text-sm">Bills @ Rams</div>
                 <div className="text-[11px] text-slate-300 font-sans">
-                  Highmark Stadium &bull; Prime Time MNF
+                  SoFi Stadium (Inglewood, CA) &bull; Prime Time MNF
                 </div>
                 <div className="p-2 rounded bg-slate-950 border border-purple-800/80 text-[10px] text-emerald-300">
                   +10 Teased: <strong>Bills +13.5</strong> &amp; <strong>Under 58.5</strong>

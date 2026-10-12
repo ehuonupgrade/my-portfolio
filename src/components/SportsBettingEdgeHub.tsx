@@ -3,6 +3,7 @@ import { GameMarket, SportsLeague } from '../types/sportsBetting';
 import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BetTrackerAndPatternView } from './BetTrackerAndPatternView';
+import { AnalystConsensusTracker } from './AnalystConsensusTracker';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 
 interface SportsBettingEdgeHubProps {
@@ -10,7 +11,7 @@ interface SportsBettingEdgeHubProps {
 }
 
 export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBack }) => {
-  const [hubViewMode, setHubViewMode] = useState<'board' | 'tracker'>('board');
+  const [hubViewMode, setHubViewMode] = useState<'board' | 'analysts' | 'tracker'>('board');
   const [selectedLeague, setSelectedLeague] = useState<SportsLeague | 'ALL'>('NFL');
   const [activeGameId, setActiveGameId] = useState<string>('nfl-lar-buf-today');
   const [viewTab, setViewTab] = useState<'strategy' | 'splits' | 'books' | 'movement'>('strategy');
@@ -72,45 +73,79 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
   return (
     <div className="space-y-6 animate-fadeIn font-sans pb-12">
       {/* Top Header & Breadcrumb */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 shadow-xl space-y-4 relative overflow-hidden backdrop-blur-md">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2 flex-wrap">
-              {onBack && (
-                <button
-                  onClick={onBack}
-                  className="px-2.5 py-1 text-xs rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 font-mono"
-                >
-                  <span>&larr;</span>
-                  <span>My Projects</span>
-                </button>
-              )}
-              <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span>PROJECT #4 &bull; MULTI-BOOK ARBITRAGE &amp; LINE MOVEMENT AGGREGATOR</span>
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2.5 flex-wrap">
-              <span>LinePulse: Sharp Market Aggregator</span>
-              <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-700/60 text-cyan-300">
-                NFL Primary Focus &bull; All US Sports
-              </span>
-            </h2>
-            <p className="text-sm text-slate-300 leading-relaxed max-w-3xl">
-              Real-time aggregation of betting lines across 8 top public sportsbooks (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Tracks total ticket volume, total dollar handles, reverse line steam, and selects <strong>1 Game with 1 Multi-Leg Strategy</strong> where sharp divergence provides maximum positive expected value (+EV).
-            </p>
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 shadow-xl space-y-5 relative overflow-hidden backdrop-blur-md">
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="px-2.5 py-1 text-xs rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 font-mono"
+              >
+                <span>&larr;</span>
+                <span>My Projects</span>
+              </button>
+            )}
+            <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span>PROJECT #4 &bull; MULTI-BOOK ARBITRAGE &amp; LINE MOVEMENT AGGREGATOR</span>
+            </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 shrink-0 font-mono text-xs">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2.5 flex-wrap">
+            <span>LinePulse: Sharp Market Aggregator</span>
+            <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-700/60 text-cyan-300">
+              NFL Primary Focus &bull; All US Sports
+            </span>
+          </h2>
+
+          <p className="text-sm text-slate-300 leading-relaxed max-w-4xl">
+            Real-time aggregation of betting lines across 8 top public sportsbooks (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Tracks total ticket volume, total dollar handles, reverse line steam, and selects <strong>1 Game with 1 Multi-Leg Strategy</strong> where sharp divergence provides maximum positive expected value (+EV).
+          </p>
+
+          {/* Action & View Buttons Below Summary Text */}
+          <div className="flex flex-wrap items-center gap-2.5 pt-2 font-mono text-xs">
+            <button
+              onClick={() => {
+                playKeyClick();
+                setHubViewMode('board');
+              }}
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
+                hubViewMode === 'board'
+                  ? 'bg-cyan-500 text-slate-950 font-extrabold shadow-cyan-500/20'
+                  : 'bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:border-slate-600'
+              }`}
+            >
+              <span>📊</span>
+              <span>Odds Board &amp; Games</span>
+            </button>
+
+            <button
+              onClick={() => {
+                playKeyClick();
+                setHubViewMode('analysts');
+              }}
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
+                hubViewMode === 'analysts'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-extrabold shadow-indigo-500/30'
+                  : 'bg-indigo-950/70 border border-indigo-700/80 text-indigo-200 hover:text-white hover:border-indigo-500'
+              }`}
+            >
+              <span>🎙️</span>
+              <span>Sports Analysts &amp; Contrarian Radar</span>
+              <span className="px-1.5 py-0.5 rounded bg-rose-500 text-[10px] text-white font-black animate-pulse">
+                FADE
+              </span>
+            </button>
+
             <button
               onClick={() => {
                 playKeyClick();
                 setHubViewMode('tracker');
               }}
-              className={`px-3.5 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-lg active:scale-95 ${
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
                 hubViewMode === 'tracker'
                   ? 'bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 font-extrabold shadow-cyan-500/20'
-                  : 'bg-purple-950/80 border border-purple-700 text-purple-200 hover:text-white'
+                  : 'bg-purple-950/70 border border-purple-700/80 text-purple-200 hover:text-white hover:border-purple-500'
               }`}
             >
               <span>🧠</span>
@@ -123,14 +158,17 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
                 setHubViewMode('board');
                 setShowDailyPortfolio(!showDailyPortfolio);
               }}
-              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg active:scale-95 ${
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
                 hubViewMode === 'board' && showDailyPortfolio
-                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 shadow-cyan-500/20'
-                  : 'bg-slate-900 border border-slate-700 text-slate-300 hover:text-white'
+                  ? 'bg-emerald-500/20 border border-emerald-400 text-emerald-300'
+                  : 'bg-slate-900 border border-slate-700 text-slate-400 hover:text-white'
               }`}
             >
               <span>⭐</span>
               <span>Daily Portfolio Deck (4 Tiers)</span>
+              <span className="text-[10px] text-slate-400">
+                {showDailyPortfolio && hubViewMode === 'board' ? 'Visible' : 'Hidden'}
+              </span>
             </button>
 
             <button
@@ -140,10 +178,10 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
                 setActiveGameId(primeGame.id);
                 setViewTab('strategy');
               }}
-              className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-500 text-slate-300 hover:text-white font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-500 text-slate-300 hover:text-white font-bold transition-all cursor-pointer flex items-center gap-2"
             >
               <span>🎯</span>
-              <span>Game Strategy</span>
+              <span>Prime Game Strategy</span>
             </button>
           </div>
         </div>
@@ -169,40 +207,17 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
         </div>
       </div>
 
-      {/* Primary View Mode Switcher: Odds Board vs Bet Recommendations Tracker */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900/90 border border-slate-800 font-mono text-xs">
-        <button
-          onClick={() => {
-            playKeyClick();
+      {/* VIEW MODES */}
+      {hubViewMode === 'analysts' ? (
+        <AnalystConsensusTracker
+          onSelectGame={(gameId) => {
+            setActiveGameId(gameId);
             setHubViewMode('board');
+            setViewTab('splits');
           }}
-          className={`flex-1 py-2.5 px-4 rounded-xl font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
-            hubViewMode === 'board'
-              ? 'bg-cyan-500 text-slate-950 shadow-md font-extrabold'
-              : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <span>🏢</span>
-          <span>Live Market Odds Board &amp; Daily Strategy</span>
-        </button>
-        <button
-          onClick={() => {
-            playKeyClick();
-            setHubViewMode('tracker');
-          }}
-          className={`flex-1 py-2.5 px-4 rounded-xl font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
-            hubViewMode === 'tracker'
-              ? 'bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 shadow-md font-extrabold'
-              : 'text-slate-400 hover:text-white'
-          }`}
-        >
-          <span>🧠</span>
-          <span>Bet Recommendations Tracker &amp; Pattern AI (Tracking Live · 0 Settled)</span>
-        </button>
-      </div>
-
-      {/* VIEW MODE: TRACKER & PATTERN AI */}
-      {hubViewMode === 'tracker' ? (
+          onOpenBetTracker={() => setHubViewMode('tracker')}
+        />
+      ) : hubViewMode === 'tracker' ? (
         <BetTrackerAndPatternView onBackToBoard={() => setHubViewMode('board')} />
       ) : (
         <>
@@ -318,7 +333,19 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
               {primeGame.primeStrategy.executionInstructions}
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              {primeGame.analystConsensus?.contrarianFadeSignal.triggered && (
+                <button
+                  onClick={() => {
+                    playKeyClick();
+                    setHubViewMode('analysts');
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-indigo-950 hover:bg-indigo-900 border border-indigo-500/60 text-indigo-200 font-bold transition-all text-xs flex items-center gap-1.5"
+                >
+                  <span>🎙️</span>
+                  <span>Fade 80% Media Chalk</span>
+                </button>
+              )}
               <button
                 onClick={copyStrategyToClipboard}
                 className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-all cursor-pointer flex items-center gap-1.5"

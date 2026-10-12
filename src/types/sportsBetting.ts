@@ -155,4 +155,81 @@ export interface GameMarket {
   // Is this the 1 selected Prime Game of the Slate?
   isPrimeOpportunity?: boolean;
   primeStrategy?: PrimeStrategy;
+
+  // Sports Analysts Data & Contrarian Fade Consensus
+  analystConsensus?: AnalystMarketConsensus;
+}
+
+export interface SportsAnalyst {
+  id: string;
+  name: string;
+  network: string;
+  role: string;
+  seasonRecord: string;
+  profileBadge?: string;
+  avatarInitial: string;
+  avatarBg: string;
+}
+
+export interface AnalystPick {
+  id: string;
+  analystId: string;
+  analystName: string;
+  network: string;
+  avatarInitial: string;
+  avatarBg: string;
+  seasonRecord: string;
+  betType: 'SPREAD' | 'MONEYLINE' | 'TOTAL';
+  selection: string;
+  confidenceRating: number; // 1 to 5
+  publishedTime: string;
+  rationale: string;
+  isContrarianFadeTarget?: boolean;
+}
+
+export interface AnalystMarketConsensus {
+  gameId: string;
+  gameMatchup: string;
+  league: SportsLeague;
+  homeTeamName: string;
+  awayTeamName: string;
+  totalAnalystsTracked: number;
+  spread: {
+    homeSelection: string;
+    awaySelection: string;
+    homeCount: number;
+    awayCount: number;
+    homePct: number;
+    awayPct: number;
+    consensusFavoriteSide: 'HOME' | 'AWAY';
+  };
+  total?: {
+    overSelection: string;
+    underSelection: string;
+    overCount: number;
+    underCount: number;
+    overPct: number;
+    underPct: number;
+  };
+  publicComparison: {
+    publicHomeTicketPct: number;
+    publicAwayTicketPct: number;
+    publicHomeMoneyPct: number;
+    publicAwayMoneyPct: number;
+    sharpAdvantageSide: 'HOME' | 'AWAY';
+    sharpHandleDifference: number;
+  };
+  contrarianFadeSignal: {
+    triggered: boolean;
+    severity: 'EXTREME' | 'HIGH' | 'MODERATE' | 'NONE';
+    fadeTarget: string; // The contrarian side to bet on
+    crowdFavorite: string; // The chalk side everyone is on
+    analystChalkPct: number;
+    publicTicketPct: number;
+    sharpMoneyPct: number;
+    echoChamberScore: number; // 0 - 100
+    gamblingTheoryRule: string;
+    recommendedAction: string;
+  };
+  picks: AnalystPick[];
 }
