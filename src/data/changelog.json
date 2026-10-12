@@ -1,5 +1,27 @@
 [
   {
+    "version": "v0.9.11",
+    "date": "October 12, 2026",
+    "title": "Privacy-Preserving Background Alerts & Historical Audit Logs Archive",
+    "summary": "Enhanced phone number privacy across the entire platform by ensuring recipient contact numbers are kept completely confidential and never rendered on UI banners, modals, or toasts. Alerts dispatch silently in the background to verified mobile recipients. Introduced a dedicated Historical Alert Logs audit archive (/api/linepulse/alerts/sms/history) with full movement criteria, whale dollar divergence telemetry, and risk notes.",
+    "tag": "Alerts & Security",
+    "changes": [
+      {
+        "type": "privacy",
+        "description": "Zero UI Exposure: Stripped phone number from all client-rendered banners, dialogs, status badges, and inspection tools while maintaining active background carrier dispatch."
+      },
+      {
+        "type": "feature",
+        "description": "Historical Alert Logs Archive: Dedicated view and audit viewer tab logging every triggered line shift, total swing, and whale money alert with timestamps and risk telemetry."
+      },
+      {
+        "type": "infra",
+        "description": "Fail-Safe Traffic & Network Handlers: Added resilient try/catch fallbacks to traffic tracking endpoints to prevent unhandled fetch rejections."
+      }
+    ],
+    "commits": ["a2b89f1", "4c3d2e0"]
+  },
+  {
     "version": "v0.9.10",
     "date": "October 12, 2026",
     "title": "Prominent Line & Money Movement Alerts, SMS Text Dispatcher & Recharts Trends",
@@ -22,7 +44,8 @@
         "type": "feature",
         "description": "Recharts Performance Trends: Cumulative profit curves (+15.60u net), win rate % margins above break-even, and slate decision distribution stacked bars."
       }
-    ]
+    ],
+    "commits": ["e8a109c", "72d91b4"]
   },
   {
     "version": "v0.9.9",
@@ -43,7 +66,8 @@
         "type": "improvement",
         "description": "Venue & Matchup Accuracy: Corrected Buffalo Bills @ Los Angeles Rams designation at SoFi Stadium, correctly treating Buffalo as a Road Underdog catching the key +3.5 field goal hook against public home Rams chalk."
       }
-    ]
+    ],
+    "commits": ["3f9a710", "1c2d58e"]
   },
   {
     "version": "v0.9.8",

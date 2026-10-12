@@ -15,6 +15,7 @@ import { FeedbackInventoryView } from './components/FeedbackInventoryView';
 import { FeedbackModal } from './components/FeedbackModal';
 import { TrafficAnalyticsCard } from './components/TrafficAnalyticsCard';
 import { RocketLogo } from './components/RocketLogo';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { playKeyClick } from './utils/audio';
 import { recordPageView, recordDwellTime } from './utils/trafficTracker';
 
@@ -653,7 +654,14 @@ export default function App() {
             )}
 
             {/* TAB: VERSION HISTORY / CHANGELOG */}
-            {activeTab === 'changelog' && <ChangelogView />}
+            {activeTab === 'changelog' && (
+              <ErrorBoundary
+                fallbackTitle="Version History & Changelog"
+                onReset={() => navigateTo('home', null)}
+              >
+                <ChangelogView />
+              </ErrorBoundary>
+            )}
 
             {/* TAB: FEEDBACK & EVOLUTION ROADMAP */}
             {activeTab === 'feedback' && <FeedbackInventoryView onBack={() => navigateTo('projects', null)} />}

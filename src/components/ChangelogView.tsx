@@ -14,14 +14,14 @@ interface VersionEntry {
   summary: string;
   tag: string;
   changes: ChangeItem[];
-  commits: string[];
+  commits?: string[];
 }
 
 export const ChangelogView: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string>('ALL');
 
-  const versions: VersionEntry[] = changelogData as VersionEntry[];
-  const tags = ['ALL', ...Array.from(new Set(versions.map((v) => v.tag)))];
+  const versions: VersionEntry[] = (Array.isArray(changelogData) ? changelogData : []) as VersionEntry[];
+  const tags = ['ALL', ...Array.from(new Set(versions.map((v) => v.tag || 'FEATURE').filter(Boolean)))];
 
   const filteredVersions =
     selectedTag === 'ALL' ? versions : versions.filter((v) => v.tag === selectedTag);
@@ -51,12 +51,17 @@ export const ChangelogView: React.FC = () => {
     <div className="space-y-8 font-sans animate-fadeIn">
       {/* Header */}
       <div className="border-b border-slate-800/80 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            Version Control &amp; Project Log
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-700/60 text-emerald-400 font-mono text-[10px] font-bold uppercase tracking-wider">
+              📜 RELEASE ARCHIVE &bull; {versions.length} RELEASES
+            </span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-2.5">
+            <span>Version History &amp; Changelog</span>
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
-            Tracking experiments, architectural milestones, and iterations as this project evolves.
+          <p className="text-sm text-slate-400">
+            Complete chronology of released versions, architectural milestones, features, and iterations across the entire portfolio.
           </p>
         </div>
 
@@ -115,40 +120,44 @@ export const ChangelogView: React.FC = () => {
             </p>
 
             {/* List of Material Changes */}
-            <div className="space-y-2 pt-2">
-              <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider">
-                Material Modifications:
-              </span>
-              <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
-                {ver.changes.map((change, cIdx) => (
-                  <li key={cIdx} className="flex items-start gap-2.5">
-                    <span
-                      className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded border shrink-0 mt-0.5 ${getTypeBadge(
-                        change.type
-                      )}`}
-                    >
-                      {change.type}
-                    </span>
-                    <span className="leading-relaxed">{change.description}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {ver.changes && Array.isArray(ver.changes) && ver.changes.length > 0 && (
+              <div className="space-y-2 pt-2">
+                <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+                  Material Modifications:
+                </span>
+                <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
+                  {ver.changes.map((change, cIdx) => (
+                    <li key={cIdx} className="flex items-start gap-2.5">
+                      <span
+                        className={`text-[10px] uppercase font-mono px-2 py-0.5 rounded border shrink-0 mt-0.5 ${getTypeBadge(
+                          change.type || 'feature'
+                        )}`}
+                      >
+                        {change.type || 'feature'}
+                      </span>
+                      <span className="leading-relaxed">{change.description}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Commits Badge Row */}
-            <div className="pt-3 border-t border-slate-800/40 flex items-center gap-2 text-xs text-slate-500 font-mono">
-              <span>Commits:</span>
-              <div className="flex flex-wrap gap-1.5">
-                {ver.commits.map((hash) => (
-                  <span
-                    key={hash}
-                    className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-[11px]"
-                  >
-                    #{hash}
-                  </span>
-                ))}
+            {ver.commits && Array.isArray(ver.commits) && ver.commits.length > 0 && (
+              <div className="pt-3 border-t border-slate-800/40 flex items-center gap-2 text-xs text-slate-500 font-mono">
+                <span>Commits:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {ver.commits.map((hash) => (
+                    <span
+                      key={hash}
+                      className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400 font-mono text-[11px]"
+                    >
+                      #{hash}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </article>
         ))}
       </div>
