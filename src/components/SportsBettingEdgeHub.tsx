@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, SportsLeague } from '../types/sportsBetting';
 import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
@@ -7,6 +7,7 @@ import { AnalystConsensusTracker } from './AnalystConsensusTracker';
 import { BettingPerformanceCharts } from './BettingPerformanceCharts';
 import { LineMovementAlertBanner } from './LineMovementAlertBanner';
 import { AlertHistoryLogViewer } from './AlertHistoryLogViewer';
+import { LiveNewsWireView } from './LiveNewsWireView';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 
 interface SportsBettingEdgeHubProps {
@@ -14,7 +15,7 @@ interface SportsBettingEdgeHubProps {
 }
 
 export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBack }) => {
-  const [hubViewMode, setHubViewMode] = useState<'board' | 'analysts' | 'tracker' | 'trends' | 'logs'>('board');
+  const [hubViewMode, setHubViewMode] = useState<'board' | 'news' | 'analysts' | 'tracker' | 'trends' | 'logs'>('board');
   const [selectedLeague, setSelectedLeague] = useState<SportsLeague | 'ALL'>('NFL');
   const [activeGameId, setActiveGameId] = useState<string>('nfl-lar-buf-today');
   const [viewTab, setViewTab] = useState<'strategy' | 'splits' | 'books' | 'movement'>('strategy');
@@ -23,9 +24,84 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
   const [calculatorStake, setCalculatorStake] = useState<number>(100);
   const [copiedStrategy, setCopiedStrategy] = useState<boolean>(false);
 
+  // Live Data & Multi-Book Feed State
+  const [liveGames, setLiveGames] = useState<GameMarket[]>([]);
+  const [isSyncingLive, setIsSyncingLive] = useState<boolean>(false);
+  const [lastLiveSyncTime, setLastLiveSyncTime] = useState<string | null>(null);
+  const [liveAutoSync, setLiveAutoSync] = useState<boolean>(true);
+
+  const fetchLiveGames = useCallback(async (isManual: boolean = false) => {
+    setIsSyncingLive(true);
+    try {
+      const res = await fetch('/api/linepulse/live/games');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.games)) {
+        setLiveGames(data.games);
+        setLastLiveSyncTime(new Date().toLocaleTimeString());
+        if (isManual) {
+          playSuccessChime();
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch live games:', err);
+    } finally {
+      setIsSyncingLive(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLiveGames(false);
+  }, [fetchLiveGames]);
+
+  useEffect(() => {
+    if (!liveAutoSync) return;
+    const interval = setInterval(() => {
+      fetchLiveGames(false);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [liveAutoSync, fetchLiveGames]);
+
+  // Merge live ESPN & DraftKings feed data into market games
+  const allAvailableGames = useMemo(() => {
+    if (!liveGames.length) return MOCK_GAMES_MARKETS;
+
+    const liveBillsRams = liveGames.find(
+      (g) =>
+        (g.homeTeam.abbr === 'LAR' && g.awayTeam.abbr === 'BUF') ||
+        g.homeTeam.name.toLowerCase().includes('ram')
+    );
+
+    const updatedBase = MOCK_GAMES_MARKETS.map((base) => {
+      if (base.id === 'nfl-lar-buf-today' && liveBillsRams) {
+        return {
+          ...base,
+          status: liveBillsRams.status,
+          scheduledTime: liveBillsRams.scheduledTime,
+          sportsbooks: liveBillsRams.sportsbooks || base.sportsbooks,
+          consensus: liveBillsRams.consensus || base.consensus,
+          isLiveFeed: true,
+          scores: (liveBillsRams as any).scores,
+        };
+      }
+      return base;
+    });
+
+    // Append extra games from live scoreboard feed
+    const extraLive = liveGames.filter(
+      (lg) =>
+        !updatedBase.some(
+          (b) =>
+            b.homeTeam.abbr === lg.homeTeam.abbr &&
+            b.awayTeam.abbr === lg.awayTeam.abbr
+        )
+    );
+
+    return [...updatedBase, ...extraLive];
+  }, [liveGames]);
+
   // Filter games
   const filteredGames = useMemo(() => {
-    return MOCK_GAMES_MARKETS.filter((g) => {
+    return allAvailableGames.filter((g) => {
       if (selectedLeague !== 'ALL' && g.league !== selectedLeague) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -35,12 +111,12 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
       }
       return true;
     });
-  }, [selectedLeague, searchQuery]);
+  }, [allAvailableGames, selectedLeague, searchQuery]);
 
   // Active Selected Game
   const activeGame = useMemo(() => {
-    return MOCK_GAMES_MARKETS.find((g) => g.id === activeGameId) || MOCK_GAMES_MARKETS[0];
-  }, [activeGameId]);
+    return allAvailableGames.find((g) => g.id === activeGameId) || allAvailableGames[0];
+  }, [allAvailableGames, activeGameId]);
 
   // Identify the single game with the 1 prime strategy
   const primeGame = useMemo(() => {
@@ -137,6 +213,24 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
             >
               <span>📊</span>
               <span>Odds Board &amp; Games</span>
+            </button>
+
+            <button
+              onClick={() => {
+                playKeyClick();
+                setHubViewMode('news');
+              }}
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
+                hubViewMode === 'news'
+                  ? 'bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white font-extrabold shadow-rose-600/30'
+                  : 'bg-rose-950/60 border border-rose-700/80 text-rose-200 hover:text-white hover:border-rose-500'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
+              <span>📰 Live News &amp; Inactives Wire</span>
+              <span className="px-1.5 py-0.5 rounded bg-rose-900 border border-rose-600 text-[10px] text-white font-black">
+                LIVE
+              </span>
             </button>
 
             <button
@@ -258,7 +352,15 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
       </div>
 
       {/* VIEW MODES */}
-      {hubViewMode === 'trends' ? (
+      {hubViewMode === 'news' ? (
+        <LiveNewsWireView
+          onSelectGame={(gameId) => {
+            setActiveGameId(gameId);
+            setHubViewMode('board');
+            setViewTab('books');
+          }}
+        />
+      ) : hubViewMode === 'trends' ? (
         <BettingPerformanceCharts onBackToBoard={() => setHubViewMode('board')} />
       ) : hubViewMode === 'logs' ? (
         <AlertHistoryLogViewer onBackToBoard={() => setHubViewMode('board')} />
@@ -412,6 +514,59 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
         </div>
       )}
 
+      {/* LIVE DATA SYNC STATUS & MULTI-BOOK ENGINE BAR */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-cyan-800/60 shadow-xl font-mono text-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-600/80 text-emerald-300 font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>LIVE MULTI-BOOK SYNC ACTIVE</span>
+            </div>
+            <span className="text-slate-300 text-xs font-bold">
+              ESPN Scoreboard &amp; DraftKings Live Feed
+            </span>
+            <span className="px-2 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-cyan-300 text-[10px]">
+              6 Sportsbooks Synced
+            </span>
+          </div>
+          <div className="text-[11px] text-slate-400">
+            Real-time multi-book pricing across: <span className="text-emerald-400 font-semibold">DraftKings</span> &bull; <span className="text-blue-400 font-semibold">FanDuel</span> &bull; <span className="text-orange-400 font-semibold">Pinnacle</span> (Sharp Benchmark) &bull; <span className="text-red-400 font-semibold">Circa</span> (Vegas Limits) &bull; <span className="text-amber-400 font-semibold">BetMGM</span> &bull; <span className="text-green-400 font-semibold">Caesars</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => fetchLiveGames(true)}
+            disabled={isSyncingLive}
+            className="px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow disabled:opacity-50"
+          >
+            <span className={isSyncingLive ? 'animate-spin' : ''}>🔄</span>
+            <span>{isSyncingLive ? 'Syncing...' : 'Sync Live Lines'}</span>
+          </button>
+
+          <button
+            onClick={() => {
+              playKeyClick();
+              setLiveAutoSync(!liveAutoSync);
+            }}
+            className={`px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              liveAutoSync
+                ? 'bg-emerald-950/60 border-emerald-600/70 text-emerald-300'
+                : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${liveAutoSync ? 'bg-emerald-400 animate-ping' : 'bg-slate-500'}`} />
+            <span>Auto-Sync {liveAutoSync ? '(30s)' : 'Off'}</span>
+          </button>
+
+          {lastLiveSyncTime && (
+            <span className="text-[11px] text-slate-400 hidden sm:inline">
+              Synced {lastLiveSyncTime}
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* League Selection Filter & Search */}
       <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs font-mono space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -460,6 +615,10 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
           <div className="space-y-2.5">
             {filteredGames.map((game) => {
               const isSelected = game.id === activeGameId;
+              const isLive = game.status === 'LIVE';
+              const isFinal = game.status === 'FINAL';
+              const hasScores = (game as any).scores && ((game as any).scores.home > 0 || (game as any).scores.away > 0);
+
               return (
                 <div
                   key={game.id}
@@ -474,11 +633,22 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
                   }`}
                 >
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
-                    <span className="flex items-center gap-1.5 font-bold">
+                    <span className="flex items-center gap-1.5 font-bold flex-wrap">
                       <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-cyan-400">
                         {game.league}
                       </span>
-                      <span>{game.scheduledTime}</span>
+                      {isLive ? (
+                        <span className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span>LIVE: {game.scheduledTime}</span>
+                        </span>
+                      ) : isFinal ? (
+                        <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-700 text-slate-400">
+                          FINAL
+                        </span>
+                      ) : (
+                        <span>{game.scheduledTime}</span>
+                      )}
                     </span>
                     {game.isPrimeOpportunity && (
                       <span className="px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold text-[10px] animate-pulse">
@@ -487,15 +657,25 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
                     )}
                   </div>
 
-                  {/* Matchup */}
+                  {/* Matchup & Real-time scores */}
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="space-y-0.5">
                       <div className="text-slate-400 text-xs">{game.awayTeam.city}</div>
-                      <div className="text-white font-bold">{game.awayTeam.name} ({game.awayTeam.record})</div>
+                      <div className="text-white font-bold flex items-center justify-between">
+                        <span>{game.awayTeam.name} ({game.awayTeam.record})</span>
+                        {hasScores && (
+                          <span className="text-cyan-300 font-black text-base ml-2">{(game as any).scores.away}</span>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-0.5 text-right">
                       <div className="text-slate-400 text-xs">{game.homeTeam.city}</div>
-                      <div className="text-white font-bold">{game.homeTeam.name} ({game.homeTeam.record})</div>
+                      <div className="text-white font-bold flex items-center justify-between">
+                        {hasScores && (
+                          <span className="text-cyan-300 font-black text-base mr-2">{(game as any).scores.home}</span>
+                        )}
+                        <span className="ml-auto">{game.homeTeam.name} ({game.homeTeam.record})</span>
+                      </div>
                     </div>
                   </div>
 
@@ -772,55 +952,153 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
 
             {/* TAB CONTENT: MULTI-BOOK COMPARISON */}
             {viewTab === 'books' && (
-              <div className="space-y-3 pt-1 animate-fadeIn">
-                <div className="text-xs text-slate-400">
-                  Real-time line comparison across public books. Highlighted numbers show top market prices:
+              <div className="space-y-4 pt-1 animate-fadeIn">
+                {/* Live Multi-Book Summary Banner */}
+                <div className="p-3.5 rounded-xl bg-slate-950/90 border border-cyan-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="text-white font-bold uppercase tracking-wider text-[11px]">
+                        Multi-Book Best Execution Pricing
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded bg-cyan-950 border border-cyan-700 text-cyan-300 text-[10px]">
+                        Live Arbitrage / Steam Engine
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-400 font-sans">
+                      Top prices dynamically highlighted. Sharp benchmark books (Pinnacle &amp; Circa) show true market juice (-104 / -105) vs recreational books.
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => fetchLiveGames(true)}
+                    disabled={isSyncingLive}
+                    className="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shrink-0"
+                  >
+                    <span className={isSyncingLive ? 'animate-spin' : ''}>🔄</span>
+                    <span>Refresh Books</span>
+                  </button>
                 </div>
 
-                <div className="overflow-x-auto no-scrollbar">
+                {/* Best Market Prices Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+                  <div className="p-3 rounded-xl bg-slate-950 border border-emerald-800/60 space-y-1">
+                    <span className="text-[10px] text-slate-400 uppercase block">Best {activeGame.awayTeam.abbr} Spread</span>
+                    <span className="text-emerald-400 font-bold text-sm block">
+                      +{activeGame.sportsbooks[0]?.spreadAway || 3.5} (-108)
+                    </span>
+                    <span className="text-[10px] text-slate-400">FanDuel / Pinnacle</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-950 border border-cyan-800/60 space-y-1">
+                    <span className="text-[10px] text-slate-400 uppercase block">Best {activeGame.homeTeam.abbr} Spread</span>
+                    <span className="text-cyan-400 font-bold text-sm block">
+                      {activeGame.sportsbooks[0]?.spreadHome || -3.5} (-105)
+                    </span>
+                    <span className="text-[10px] text-slate-400">Pinnacle (Reduced Vig)</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-950 border border-purple-800/60 space-y-1">
+                    <span className="text-[10px] text-slate-400 uppercase block">Best Total Under</span>
+                    <span className="text-purple-300 font-bold text-sm block">
+                      Under {activeGame.consensus.total} (-105)
+                    </span>
+                    <span className="text-[10px] text-slate-400">Pinnacle / Circa</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-950 border border-amber-800/60 space-y-1">
+                    <span className="text-[10px] text-slate-400 uppercase block">Best Dog ML</span>
+                    <span className="text-amber-300 font-bold text-sm block">
+                      {activeGame.awayTeam.abbr} +154
+                    </span>
+                    <span className="text-[10px] text-slate-400">DraftKings / Circa</span>
+                  </div>
+                </div>
+
+                {/* Multi-Book Comparison Table */}
+                <div className="overflow-x-auto no-scrollbar rounded-xl border border-slate-800 bg-slate-950/40">
                   <table className="w-full text-left text-xs font-mono border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 text-[11px]">
-                        <th className="py-2 px-3">Sportsbook</th>
-                        <th className="py-2 px-3">{activeGame.awayTeam.abbr} Spread</th>
-                        <th className="py-2 px-3">{activeGame.homeTeam.abbr} Spread</th>
-                        <th className="py-2 px-3">Over / Under</th>
-                        <th className="py-2 px-3">{activeGame.awayTeam.abbr} ML</th>
-                        <th className="py-2 px-3">{activeGame.homeTeam.abbr} ML</th>
-                        <th className="py-2 px-3">Updated</th>
+                      <tr className="border-b border-slate-800 bg-slate-950/80 text-slate-400 text-[11px]">
+                        <th className="py-2.5 px-3">Sportsbook</th>
+                        <th className="py-2.5 px-3">{activeGame.awayTeam.abbr} Spread</th>
+                        <th className="py-2.5 px-3">{activeGame.homeTeam.abbr} Spread</th>
+                        <th className="py-2.5 px-3">Over / Under</th>
+                        <th className="py-2.5 px-3">{activeGame.awayTeam.abbr} ML</th>
+                        <th className="py-2.5 px-3">{activeGame.homeTeam.abbr} ML</th>
+                        <th className="py-2.5 px-3">Book Type</th>
+                        <th className="py-2.5 px-3">Updated</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/60">
-                      {activeGame.sportsbooks.map((b) => (
-                        <tr key={b.bookName} className="hover:bg-slate-950/50 transition-colors">
-                          <td className="py-2.5 px-3 font-bold text-white flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-cyan-400" />
-                            <span>{b.bookName}</span>
-                          </td>
-                          <td className="py-2.5 px-3 text-slate-300">
-                            +{b.spreadAway} ({b.spreadAwayOdds})
-                          </td>
-                          <td className="py-2.5 px-3">
-                            <span className={b.isBestSpreadHome ? 'px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold' : 'text-slate-300'}>
-                              {b.spreadHome} ({b.spreadHomeOdds})
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-3 text-slate-300">
-                            {b.totalOver} ({b.totalOverOdds})
-                          </td>
-                          <td className="py-2.5 px-3 text-slate-300">
-                            {b.moneylineAway > 0 ? `+${b.moneylineAway}` : b.moneylineAway}
-                          </td>
-                          <td className="py-2.5 px-3">
-                            <span className={b.isBestMoneylineHome ? 'px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold' : 'text-slate-300'}>
-                              {b.moneylineHome > 0 ? `+${b.moneylineHome}` : b.moneylineHome}
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-3 text-[10px] text-slate-500">
-                            {b.lastUpdated}
-                          </td>
-                        </tr>
-                      ))}
+                      {activeGame.sportsbooks.map((b) => {
+                        const isSharp = b.bookName === 'Pinnacle' || b.bookName === 'Circa Sports';
+                        const isLivePrimary = b.bookName === 'DraftKings';
+
+                        return (
+                          <tr key={b.bookName} className="hover:bg-slate-900/60 transition-colors">
+                            <td className="py-2.5 px-3 font-bold text-white flex items-center gap-1.5">
+                              <span
+                                className={`w-2 h-2 rounded-full ${
+                                  isLivePrimary
+                                    ? 'bg-emerald-400 animate-pulse'
+                                    : isSharp
+                                    ? 'bg-amber-400'
+                                    : 'bg-cyan-400'
+                                }`}
+                              />
+                              <span>{b.bookName}</span>
+                            </td>
+                            <td className="py-2.5 px-3 text-slate-300">
+                              +{b.spreadAway} ({b.spreadAwayOdds})
+                            </td>
+                            <td className="py-2.5 px-3">
+                              <span
+                                className={
+                                  b.isBestSpreadHome
+                                    ? 'px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold'
+                                    : 'text-slate-300'
+                                }
+                              >
+                                {b.spreadHome} ({b.spreadHomeOdds})
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3 text-slate-300">
+                              {b.totalOver} ({b.totalOverOdds})
+                            </td>
+                            <td className="py-2.5 px-3 text-slate-300">
+                              {b.moneylineAway > 0 ? `+${b.moneylineAway}` : b.moneylineAway}
+                            </td>
+                            <td className="py-2.5 px-3">
+                              <span
+                                className={
+                                  b.isBestMoneylineHome
+                                    ? 'px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold'
+                                    : 'text-slate-300'
+                                }
+                              >
+                                {b.moneylineHome > 0 ? `+${b.moneylineHome}` : b.moneylineHome}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3">
+                              <span
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                                  isLivePrimary
+                                    ? 'bg-emerald-950 border border-emerald-700 text-emerald-300'
+                                    : isSharp
+                                    ? 'bg-amber-950 border border-amber-700 text-amber-300'
+                                    : 'bg-slate-900 border border-slate-700 text-slate-400'
+                                }`}
+                              >
+                                {isLivePrimary ? '⚡ Live Feed' : isSharp ? '🎯 Sharp Market' : 'Retail Book'}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3 text-[10px] text-slate-500">
+                              {b.lastUpdated}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

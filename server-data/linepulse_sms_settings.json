@@ -1,0 +1,10 @@
+{
+  "phoneNumber": "650-815-8590",
+  "autoAlertsEnabled": true,
+  "minSpreadShift": 1,
+  "minTotalShift": 1.5,
+  "minWhaleDivergence": 20,
+  "alertOnContrarianTrap": true,
+  "alertOnReverseLineMovement": true,
+  "updatedAt": "2026-10-13T00:16:00.656Z"
+}

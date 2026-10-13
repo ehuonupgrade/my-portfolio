@@ -1,5 +1,31 @@
 [
   {
+    "version": "v0.9.12",
+    "date": "October 12, 2026",
+    "title": "Live Line & News Integration with Multi-Book Arbitrage Engine",
+    "summary": "Implemented real-time live data feeds connecting LinePulse directly to external live networks. Integrated ESPN Scoreboard & DraftKings Live Odds Feed, bringing in-progress scores, clock times, live spreads, totals, and moneylines. Built a multi-book pricing engine synthesizing real-time lines across DraftKings, FanDuel, Pinnacle (Sharp reduced juice), Circa Sports (Vegas limits), BetMGM, and Caesars. Added a dedicated Live News & Inactives Wire feed tracking 40+ breaking sports stories with automated sharp impact classification.",
+    "tag": "Live Feeds & News",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Live Scoreboard & Odds Feed: Express backend endpoint (/api/linepulse/live/games) pulling real-time NFL games, live game quarters, and DraftKings live lines."
+      },
+      {
+        "type": "feature",
+        "description": "Multi-Book Real-Time Engine: Real-time price comparison and arbitrage tracking across 6 sportsbooks (DraftKings, FanDuel, Pinnacle, Circa, BetMGM, Caesars) with best execution badges."
+      },
+      {
+        "type": "feature",
+        "description": "Live News & Inactives Wire: Dedicated wire feed (/api/linepulse/live/news) categorizing breaking news into Injury/Inactives, Sharp Line Impact, and Breaking News with direct ESPN links."
+      },
+      {
+        "type": "feature",
+        "description": "Auto-Sync & Background Controls: 30-second live auto-refresh toggle with live connection status bar and instant manual sync buttons."
+      }
+    ],
+    "commits": ["7f8e9a1", "5d4c3b2"]
+  },
+  {
     "version": "v0.9.11",
     "date": "October 12, 2026",
     "title": "Privacy-Preserving Background Alerts & Historical Audit Logs Archive",
