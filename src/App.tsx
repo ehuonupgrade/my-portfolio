@@ -12,6 +12,7 @@ import { BartPlannerView } from './components/BartPlannerView';
 import { ToddlerActivityHub } from './components/ToddlerActivityHub';
 import { SportsBettingEdgeHub } from './components/SportsBettingEdgeHub';
 import { FeedbackInventoryView } from './components/FeedbackInventoryView';
+import { TokenUsageAnalyticsView } from './components/TokenUsageAnalyticsView';
 import { FeedbackModal } from './components/FeedbackModal';
 import { TrafficAnalyticsCard } from './components/TrafficAnalyticsCard';
 import { RocketLogo } from './components/RocketLogo';
@@ -19,7 +20,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { playKeyClick } from './utils/audio';
 import { recordPageView, recordDwellTime } from './utils/trafficTracker';
 
-type Tab = 'home' | 'projects' | 'games' | 'changelog' | 'feedback' | 'about';
+type Tab = 'home' | 'projects' | 'games' | 'tokens' | 'changelog' | 'feedback' | 'about';
 
 interface RouteState {
   tab: Tab;
@@ -37,6 +38,9 @@ const getBasePrefix = (): string => {
         'projects',
         'mygames',
         'games',
+        'tokens',
+        'token-usage',
+        'tokens-tracker',
         'version-history',
         'changelog',
         'feedback',
@@ -64,6 +68,8 @@ const getPathForState = (tab: Tab, project: string | null): string => {
     else sub = '/myprojects';
   } else if (tab === 'games') {
     sub = '/mygames';
+  } else if (tab === 'tokens') {
+    sub = '/tokens';
   } else if (tab === 'changelog') {
     sub = '/version-history';
   } else if (tab === 'feedback') {
@@ -109,6 +115,16 @@ const getStateForPath = (pathname: string): RouteState => {
   }
   if (clean === '/mygames' || clean.endsWith('/mygames') || clean === '/games' || clean.endsWith('/games')) {
     return { tab: 'games', project: null };
+  }
+  if (
+    clean === '/tokens' ||
+    clean.endsWith('/tokens') ||
+    clean === '/token-usage' ||
+    clean.endsWith('/token-usage') ||
+    clean === '/tokens-tracker' ||
+    clean.endsWith('/tokens-tracker')
+  ) {
+    return { tab: 'tokens', project: null };
   }
   if (clean === '/version-history' || clean.endsWith('/version-history') || clean === '/changelog' || clean.endsWith('/changelog')) {
     return { tab: 'changelog', project: null };
@@ -186,6 +202,7 @@ export default function App() {
       return 'My Projects';
     }
     if (activeTab === 'games') return 'My Games';
+    if (activeTab === 'tokens') return 'LLM Token Usage';
     if (activeTab === 'changelog') return 'Version History';
     if (activeTab === 'feedback') return 'Feedback & Roadmap';
     if (activeTab === 'about') return 'About Me';
@@ -330,6 +347,16 @@ export default function App() {
               </button>
 
               <button
+                onClick={() => navigateTo('tokens', null)}
+                className={`text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between ${
+                  activeTab === 'tokens' ? 'bg-slate-900 text-white font-bold' : 'text-slate-300 hover:bg-slate-900/50'
+                }`}
+              >
+                <span>📊 LLM Token Usage &amp; Quota</span>
+                {activeTab === 'tokens' && <span className="text-cyan-400 text-xs font-mono">&bull; Active</span>}
+              </button>
+
+              <button
                 onClick={() => navigateTo('changelog', null)}
                 className={`text-left px-3 py-2.5 rounded-xl transition-colors cursor-pointer flex items-center justify-between ${
                   activeTab === 'changelog' ? 'bg-slate-900 text-white font-bold' : 'text-slate-300 hover:bg-slate-900/50'
@@ -452,6 +479,18 @@ export default function App() {
               >
                 {activeTab === 'games' && <span className="text-emerald-400 mr-2">&bull;</span>}
                 My Games
+              </button>
+
+              <button
+                onClick={() => navigateTo('tokens', null)}
+                className={`text-left text-lg font-medium transition-all py-1.5 cursor-pointer ${
+                  activeTab === 'tokens'
+                    ? 'text-white font-bold translate-x-1.5'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {activeTab === 'tokens' && <span className="text-cyan-400 mr-2">&bull;</span>}
+                Token Usage
               </button>
 
               <button
@@ -687,6 +726,11 @@ export default function App() {
                 </h2>
                 <CosmicGame accentColorClass="text-emerald-400" />
               </div>
+            )}
+
+            {/* TAB: LLM TOKEN USAGE & QUOTA TRACKER */}
+            {activeTab === 'tokens' && (
+              <TokenUsageAnalyticsView onBack={() => navigateTo('home', null)} />
             )}
 
             {/* TAB: VERSION HISTORY / CHANGELOG */}

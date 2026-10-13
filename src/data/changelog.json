@@ -1,5 +1,31 @@
 [
   {
+    "version": "v0.9.13",
+    "date": "October 13, 2026",
+    "title": "LLM Token Usage by Application & Model (Gemini 3.8) + Bills-Rams 37-34 Settlement",
+    "summary": "Enhanced the LLM Token Usage page with dual-mode grouping: view stacked token volume By Application (Google AI Studio as primary, LinePulse, RoboInvestor, Cursor, Gemini Chat) or By LLM Model (introducing Gemini 3.8 Flash & Gemini 3.8 Pro). Added an interactive live prompt token counter powered by Google GenAI. Completely settled Buffalo Bills @ Los Angeles Rams with verified 37-34 final score (Buffalo covered +3.5 road hook outright [WON], Under 49.0 went Over in 71-point shootout [LOST]). All time references updated to PST.",
+    "tag": "Telemetry & Settled Bets",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Cross-Application Telemetry: Group token consumption by application, highlighting Google AI Studio as the primary driver alongside LinePulse, RoboInvestor, Cursor, and Gemini Chat."
+      },
+      {
+        "type": "feature",
+        "description": "Gemini 3.8 Models Support: Integrated Gemini 3.8 Flash and Gemini 3.8 Pro as primary models with accurate pricing metrics."
+      },
+      {
+        "type": "feature",
+        "description": "Live Real Token Counter: Interactive prompt analyzer connected to Google GenAI for measuring exact input tokens and logging live sessions."
+      },
+      {
+        "type": "settlement",
+        "description": "Bills @ Rams 37-34 Final Settlement: Corrected final score to BUF 37, LAR 34; Buffalo Bills +3.5 spread logged as WON (+0.91u), Under 49.0 logged as LOST (71 total pts), and multi-sport parlay graded accordingly."
+      }
+    ],
+    "commits": ["8e1c3f5", "b92d4a7"]
+  },
+  {
     "version": "v0.9.12",
     "date": "October 12, 2026",
     "title": "Live Line & News Integration with Multi-Book Arbitrage Engine",

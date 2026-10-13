@@ -40,72 +40,14 @@ export interface MovementAlertItem {
 
 export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
   {
-    id: 'alert-buf-lar-20261012',
-    gameId: 'nfl-lar-buf-today',
-    matchup: 'Buffalo Bills @ Los Angeles Rams',
-    league: 'NFL',
-    scheduledTime: 'Tonight · 8:15 PM EDT (MNF)',
-    stadium: 'SoFi Stadium, Inglewood, CA',
-    alertType: 'WHALE_STEAM',
-    severity: 'CRITICAL',
-    headline: 'Massive Whale Inflow Steams Bills (+4.5 to +3.5) & Smashes Total (51.0 to 48.5)',
-    spreadShift: {
-      open: 'Rams -4.5',
-      current: 'Rams -3.0 / Bills +3.5 Hook',
-      delta: '-1.5 Points (Toward Buffalo)',
-      favoredTeam: 'Buffalo Bills',
-    },
-    totalShift: {
-      open: '51.0 O/U',
-      current: '48.5 O/U',
-      delta: '-2.5 Points (Reverse Steam)',
-      direction: 'UNDER',
-    },
-    moneyDivergence: {
-      dollarsPct: 68,
-      ticketsPct: 42,
-      divergenceMargin: 26,
-      dollarVolume: '$16.38M Handle',
-      favoredSide: 'Buffalo Bills +3.5',
-    },
-    riskWarnings: [
-      {
-        title: 'Key Number Hook Risk (+3.5 vs +3.0)',
-        description:
-          'Approximately 15.2% of NFL games land on exactly a 3-point margin. Buffalo holds immense value at +3.5; if you wait and the line moves to +3 flat or +2.5, the edge collapses. Do NOT chase at +2.5.',
-        severityLevel: 'HIGH',
-      },
-      {
-        title: 'Reverse Line Trap Risk (70% Over Tickets)',
-        description:
-          '70% of recreational tickets are hammering Over 48.5, yet sharp syndicate limits drove the total down 2.5 points. Beware of late public flurries trying to pump the total back up before kickoff.',
-        severityLevel: 'MEDIUM',
-      },
-      {
-        title: 'Late Inactive & Medical Clearance Risk',
-        description:
-          'Significant pre-game line steam often precedes official team injury leaks (Rams defensive backfield & Buffalo offensive line status). Confirm official 90-minute inactive reports at 6:45 PM EDT.',
-        severityLevel: 'HIGH',
-      },
-      {
-        title: 'Vig Tax & Juice Inflation Warning',
-        description:
-          'Books that have not moved to +3 flat may increase juice to -120 or -125 on Buffalo +3.5. Avoid paying worse than -112 juice on straight bets.',
-        severityLevel: 'MEDIUM',
-      },
-    ],
-    actionAdvice:
-      'EXECUTE IMMEDIATELY: Lock in Buffalo Bills +3.5 at FanDuel (-110) or Pinnacle (-108) while the +3.5 hook remains available. Pair with Under 49.0 on correlated ground pace.',
-  },
-  {
     id: 'alert-kc-det-20261018',
     gameId: 'nfl-kc-det-w6',
     matchup: 'Kansas City Chiefs @ Detroit Lions',
     league: 'NFL',
-    scheduledTime: 'Sunday, Oct 18 · 4:25 PM EDT',
+    scheduledTime: 'Sunday, Oct 18 · 1:25 PM PST',
     stadium: 'Ford Field (Dome), Detroit, MI',
     alertType: 'REVERSE_LINE_MOVEMENT',
-    severity: 'HIGH',
+    severity: 'CRITICAL',
     headline: 'Reverse Line Movement: Lions Move from +0.5 to -2.5 Despite 68% Public Tickets on Chiefs',
     spreadShift: {
       open: 'Chiefs -0.5',
@@ -120,9 +62,9 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
       direction: 'UNDER',
     },
     moneyDivergence: {
-      dollarsPct: 64,
-      ticketsPct: 32,
-      divergenceMargin: 32,
+      dollarsPct: 67,
+      ticketsPct: 38,
+      divergenceMargin: 29,
       dollarVolume: '$18.45M Handle',
       favoredSide: 'Detroit Lions -2.5 / ML',
     },
@@ -139,9 +81,95 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
           'Rather than laying -2.5 on Detroit against Mahomes, teasing Lions to +7.5 (+10 teaser) or +10.5 (+13 monster teaser) eliminates outright loss exposure.',
         severityLevel: 'MEDIUM',
       },
+      {
+        title: 'Dome Injury Leaks & Inactive Window',
+        description:
+          'Confirm official 90-minute inactive reports for Detroit offensive tackle status at 11:55 AM PST prior to 1:25 PM PST kickoff.',
+        severityLevel: 'MEDIUM',
+      },
     ],
     actionAdvice:
-      'TEASER TARGET: Tease Detroit Lions through key numbers to +7.5 or +10.5 across the 7-day schedule window.',
+      'TEASER TARGET: Tease Detroit Lions through key numbers to +7.5 or +10.5 across the upcoming 7-day schedule window.',
+  },
+  {
+    id: 'alert-mlb-lad-nyy-20261013',
+    gameId: 'mlb-nyy-la-g4',
+    matchup: 'New York Yankees @ Los Angeles Dodgers (WS Game 4)',
+    league: 'MLB',
+    scheduledTime: 'Tonight (Tuesday, Oct 13) · 5:08 PM PST',
+    stadium: 'Dodger Stadium, Los Angeles, CA',
+    alertType: 'HEAVY_SHARP_INFLOW',
+    severity: 'HIGH',
+    headline: 'Heavy Sharp Inflow: 74% Handle Supporting Dodgers Moneyline at Chavez Ravine Tonight',
+    spreadShift: {
+      open: 'Dodgers -138',
+      current: 'Dodgers -148',
+      delta: '-10 Cents Moneyline Steam',
+      favoredTeam: 'Los Angeles Dodgers',
+    },
+    totalShift: {
+      open: '8.5 O/U (-105)',
+      current: '8.5 O/U (-115 Under)',
+      delta: 'Under Juice Steamed',
+      direction: 'UNDER',
+    },
+    moneyDivergence: {
+      dollarsPct: 74,
+      ticketsPct: 63,
+      divergenceMargin: 11,
+      dollarVolume: '$24.6M Handle',
+      favoredSide: 'Los Angeles Dodgers ML',
+    },
+    riskWarnings: [
+      {
+        title: 'Yankees Back-to-Wall Volatility',
+        description:
+          'Trailing in the series, New York will manage bullpen aggressively. Verify starting lineups at 3:30 PM PST.',
+        severityLevel: 'MEDIUM',
+      },
+    ],
+    actionAdvice:
+      'SHARP ALIGNMENT: Include Dodgers ML in multi-sport cross-day parlays or straight wagers at FanDuel (-146).',
+  },
+  {
+    id: 'alert-buf-lar-20261012',
+    gameId: 'nfl-lar-buf-today',
+    matchup: 'Buffalo Bills @ Los Angeles Rams',
+    league: 'NFL',
+    scheduledTime: 'Final (Played Mon Oct 12 · 5:15 PM PST · BUF 37, LAR 34)',
+    stadium: 'SoFi Stadium, Inglewood, CA',
+    alertType: 'WHALE_STEAM',
+    severity: 'HIGH',
+    headline: 'RESULT LOGGED: Buffalo Outright 37-34 Win - Covered +3.5 Road Hook by 6.5 Points',
+    spreadShift: {
+      open: 'Rams -4.5',
+      current: 'Final: BUF 37, LAR 34',
+      delta: 'Covered +3.5 by 6.5 Points',
+      favoredTeam: 'Buffalo Bills',
+    },
+    totalShift: {
+      open: '51.0 O/U',
+      current: 'Final: 71 Total Points',
+      delta: 'Over 48.5/49.0 (Under Missed)',
+      direction: 'OVER',
+    },
+    moneyDivergence: {
+      dollarsPct: 68,
+      ticketsPct: 42,
+      divergenceMargin: 26,
+      dollarVolume: '$16.38M Handle (Cashed)',
+      favoredSide: 'Buffalo Bills +3.5 (Won)',
+    },
+    riskWarnings: [
+      {
+        title: 'Whale Steam Validation',
+        description:
+          'Sharp whale handle divergence (+26% money advantage) on road dog delivered outright cover. Verified and logged in recommendation ledger.',
+        severityLevel: 'MEDIUM',
+      },
+    ],
+    actionAdvice:
+      'LOGGED IN PERFORMANCE LEDGER: Spread recommendation WON (Buffalo +3.5 covered outright by 6.5 pts), while 71-point shootout broke the Under 49.0 total.',
   },
 ];
 

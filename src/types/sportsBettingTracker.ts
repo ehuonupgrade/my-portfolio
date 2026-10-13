@@ -12,7 +12,7 @@ export interface TrackedBetLeg {
   gameMatchup: string;
   league: string;
   gameDate: string;
-  betType: 'SPREAD' | 'MONEYLINE' | 'TOTAL' | 'PLAYER_PROP';
+  betType: 'SPREAD' | 'MONEYLINE' | 'TOTAL' | 'PLAYER_PROP' | 'TEAM_TOTAL';
   targetSelection: string;
   originalLine: string;
   teasedLine?: string;

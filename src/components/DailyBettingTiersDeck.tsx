@@ -31,20 +31,20 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
     { title: string; desc: string }
   > = {
     single: {
-      title: 'Active Formula: Whale Steam & Road Dog Hook (+3.5)',
-      desc: 'Tracking live starting today: Buffalo +3.5 road dog selected on +26% money advantage over tickets against public Rams home chalk.',
+      title: 'Active Formula: Whale Steam & Line Crossing (-2.5 vs KC)',
+      desc: 'Active for Week 6: Detroit -2.5 backed by 67% handle on 38% tickets at Ford Field (Sunday, Oct 18 · 1:25 PM PST).',
     },
     parlay: {
-      title: 'Active Formula: Correlated SoFi Game Script + World Series',
-      desc: 'Tracking live starting today: Pairs Buffalo ground possession with Under 49.0 in climate-controlled SoFi and Dodgers WS home leverage.',
+      title: 'Active Formula: World Series Pitching + Correlated Week 6 Script',
+      desc: 'Active cross-sport parlay: Dodgers home ML tonight (Oct 13 · 5:08 PM PST) paired with Ford Field clock control on Sunday.',
     },
     teaser10: {
       title: 'Active Formula: 7-Day Window Key Threshold Crossings',
-      desc: 'Spanning any 2 days in upcoming 7-day slate (Tonight Oct 12 & Sunday Oct 18), crossing critical numbers 3, 7, and 10.',
+      desc: 'Spanning Sunday Oct 18 and Monday Oct 19 MNF in PST, crossing critical scoring thresholds 3, 7, and 10.',
     },
     teaser13: {
       title: 'Active Formula: Maximum +13 Cushion Across 7-Day Window',
-      desc: 'Spanning any 2 days in 7-day slate (Tonight & Sunday), moving spreads past two converted scores (+16.5 and +10.5).',
+      desc: 'Spanning Sunday Oct 18 and Monday Oct 19 MNF in PST, moving spreads past two converted scores (+10.5, +16.5, +15.5).',
     },
   };
 

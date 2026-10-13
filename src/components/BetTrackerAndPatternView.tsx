@@ -470,7 +470,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                           type="text"
                           value={editScore}
                           onChange={(e) => setEditScore(e.target.value)}
-                          placeholder="e.g. BUF 24, LAR 20"
+                          placeholder="e.g. BUF 37, LAR 34"
                           className="w-full p-2 rounded-lg bg-slate-900 border border-slate-700 text-white font-mono text-xs"
                         />
                       </div>

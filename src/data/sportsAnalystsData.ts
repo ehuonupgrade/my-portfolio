@@ -142,7 +142,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
     contrarianFadeSignal: {
       triggered: true,
       severity: 'EXTREME',
-      fadeTarget: 'Buffalo Bills +3.5 (Road Underdog)',
+      fadeTarget: 'Buffalo Bills +3.5 (Road Underdog) [WON: Final BUF 37, LAR 34]',
       crowdFavorite: 'Los Angeles Rams -3.5 (Home Favorite Chalk)',
       analystChalkPct: 80.0,
       publicTicketPct: 58.0,
@@ -151,7 +151,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
       gamblingTheoryRule:
         'Contrarian Gambling Axiom #1 (The Pundit & Public Trap): When 80%+ of mainstream sports media analysts and the majority of public slips unite on home chalk, Vegas prices the line at a premium to exploit emotional bias. The public and TV experts ignore Buffalo\'s ground efficiency and catching a full field goal hook (+3.5). Fading 75%+ media consensus has historically yielded a 57.4% ATS long-term win rate (+8.8% ROI).',
       recommendedAction:
-        'EXECUTE CONTRARIAN FADE: Bet Buffalo Bills +3.5 at FanDuel / Pinnacle. Fade the 80% TV analyst herd and side with the $16.4M sharp whale handle.',
+        'RESULT LOGGED (SPREAD WON): Buffalo won outright 37-34 at SoFi Stadium in an electric shootout, covering +3.5 by 6.5 points. The contrarian fade of 80% TV analyst herd backing Rams chalk was a complete winner.',
     },
     picks: [
       {
@@ -165,7 +165,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Buffalo Bills +3.5',
         confidenceRating: 5,
-        publishedTime: 'Today · 11:30 AM EDT',
+        publishedTime: 'Oct 12 · 8:30 AM PST',
         rationale:
           'Classic media groupthink trap. 80% of TV pundits are ignoring Buffalo\'s #2 ranked early-down rush EPA and James Cook against light boxes. Grabbing the +3.5 hook is supreme mathematical value.',
         isContrarianFadeTarget: true,
@@ -181,7 +181,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Buffalo Bills +3.5',
         confidenceRating: 5,
-        publishedTime: 'Today · 10:15 AM EDT',
+        publishedTime: 'Oct 12 · 7:15 AM PST',
         rationale:
           'Simulated 10,000 times: Buffalo covers the +3.5 spread in 58.6% of iterations. True fair line is Rams -1.5. Massive +7.4% edge against inflated public chalk.',
         isContrarianFadeTarget: true,
@@ -197,7 +197,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Los Angeles Rams -3.5',
         confidenceRating: 4,
-        publishedTime: 'Today · 8:45 AM EDT',
+        publishedTime: 'Oct 12 · 5:45 AM PST',
         rationale:
           'Rams offense clicked on extra rest. McVay will scheme open Nacua against Buffalo\'s depleted boundary corners. Rams 27, Bills 20.',
         isContrarianFadeTarget: false,
@@ -213,7 +213,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Los Angeles Rams -3.5',
         confidenceRating: 4,
-        publishedTime: 'Today · 9:30 AM EDT',
+        publishedTime: 'Oct 12 · 6:30 AM PST',
         rationale:
           'Matthew Stafford against two-high safeties has been lethal. The Rams pass rush will force Josh Allen into checkdowns. Rams cover.',
         isContrarianFadeTarget: false,
@@ -229,7 +229,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Los Angeles Rams -3.5',
         confidenceRating: 4,
-        publishedTime: 'Today · 9:15 AM EDT',
+        publishedTime: 'Oct 12 · 6:15 AM PST',
         rationale:
           'Look at the tape from last week. Rams motion game creates immediate mismatches. Lay the 3.5 at home in prime time.',
         isContrarianFadeTarget: false,
@@ -245,7 +245,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Los Angeles Rams -3.5',
         confidenceRating: 3,
-        publishedTime: 'Today · 12:00 PM EDT',
+        publishedTime: 'Oct 12 · 9:00 AM PST',
         rationale:
           'I like the Rams here. Better coach, Stafford is in rhythm, playing at home in climate control. Bills traveling cross-country.',
         isContrarianFadeTarget: false,
@@ -261,7 +261,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Los Angeles Rams -3.5',
         confidenceRating: 3,
-        publishedTime: 'Today · 11:00 AM EDT',
+        publishedTime: 'Oct 12 · 8:00 AM PST',
         rationale:
           'Buffalo\'s explosive play rate allowed on road turf has risen to 12.8%. Rams have the vertical weapons to exploit it.',
         isContrarianFadeTarget: false,
@@ -277,7 +277,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Los Angeles Rams -3.5',
         confidenceRating: 3,
-        publishedTime: 'Today · 10:45 AM EDT',
+        publishedTime: 'Oct 12 · 7:45 AM PST',
         rationale:
           'Prime time home crowd at SoFi Stadium. Rams defense gets a late strip sack to seal a 6-point victory.',
         isContrarianFadeTarget: false,
@@ -293,7 +293,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Los Angeles Rams -3.5',
         confidenceRating: 4,
-        publishedTime: 'Today · 1:15 PM EDT',
+        publishedTime: 'Oct 12 · 10:15 AM PST',
         rationale:
           'Public is all over the Rams and for once I agree. Stafford off a mini-bye does not lose at home.',
         isContrarianFadeTarget: false,
@@ -309,7 +309,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Los Angeles Rams -3.5',
         confidenceRating: 3,
-        publishedTime: 'Today · 1:45 PM EDT',
+        publishedTime: 'Oct 12 · 10:45 AM PST',
         rationale:
           'Bills are overdue for a regression game. Rams win by at least a touchdown.',
         isContrarianFadeTarget: false,
@@ -378,7 +378,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'MONEYLINE',
         selection: 'Los Angeles Dodgers Moneyline',
         confidenceRating: 4,
-        publishedTime: 'Today · 1:00 PM EDT',
+        publishedTime: 'Today · 10:00 AM PST',
         rationale:
           'Bullpen leverage at Chavez Ravine is insurmountable. Even with heavy public backing, the sharp handle confirms the Dodgers ML price is justified.',
         isContrarianFadeTarget: false,
@@ -394,7 +394,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'MONEYLINE',
         selection: 'Los Angeles Dodgers Moneyline',
         confidenceRating: 4,
-        publishedTime: 'Today · 11:15 AM EDT',
+        publishedTime: 'Today · 8:15 AM PST',
         rationale:
           'Dodgers top of the order matches up exceptionally well against right-handed breaking balls.',
         isContrarianFadeTarget: false,
@@ -410,7 +410,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'MONEYLINE',
         selection: 'New York Yankees Moneyline (+128)',
         confidenceRating: 3,
-        publishedTime: 'Today · 10:30 AM EDT',
+        publishedTime: 'Today · 7:30 AM PST',
         rationale:
           'Desperation spot for the Yankees with season on the line. Cole gives them 7 scoreless innings.',
         isContrarianFadeTarget: true,
@@ -479,7 +479,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Detroit Lions -2.5 (or Teased +7.5)',
         confidenceRating: 5,
-        publishedTime: 'Oct 12 · 2:00 PM EDT',
+        publishedTime: 'Oct 12 · 11:00 AM PST',
         rationale:
           'Massive Pros vs. Joes divergence. Casual public and TV hosts blindly bet Mahomes. Detroit\'s offensive line has a 28% pass protection advantage over KC\'s blitz packages inside the dome.',
         isContrarianFadeTarget: true,
@@ -495,7 +495,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Kansas City Chiefs +2.5',
         confidenceRating: 5,
-        publishedTime: 'Oct 12 · 1:30 PM EDT',
+        publishedTime: 'Oct 12 · 10:30 AM PST',
         rationale:
           'Mahomes as an underdog or pick\'em is an automatic bet. Spagnuolo will disguise coverages and confuse Goff all afternoon.',
         isContrarianFadeTarget: false,
@@ -511,7 +511,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Kansas City Chiefs +2.5',
         confidenceRating: 4,
-        publishedTime: 'Oct 12 · 12:45 PM EDT',
+        publishedTime: 'Oct 12 · 9:45 AM PST',
         rationale:
           'I\'m taking the best quarterback in football getting points. Lions are good, Chiefs are champions.',
         isContrarianFadeTarget: false,
@@ -527,7 +527,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Kansas City Chiefs +2.5',
         confidenceRating: 4,
-        publishedTime: 'Oct 12 · 11:15 AM EDT',
+        publishedTime: 'Oct 12 · 8:15 AM PST',
         rationale:
           'Chiefs defense is the differentiator. They will eliminate Detroit\'s middle of the field crossing routes.',
         isContrarianFadeTarget: false,
