@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
+import { fetchLiveNewsWithFallback } from '../utils/liveSportsFeed';
 
 export interface LiveNewsArticle {
   id: string;
@@ -15,14 +16,6 @@ export interface LiveNewsArticle {
   byline: string;
 }
 
-interface LiveNewsResponse {
-  success: boolean;
-  source: string;
-  lastSyncedAt: string;
-  totalArticles: number;
-  articles: LiveNewsArticle[];
-}
-
 interface LiveNewsWireViewProps {
   onSelectGame?: (gameId: string) => void;
 }
@@ -31,6 +24,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
   const [articles, setArticles] = useState<LiveNewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
+  const [feedSource, setFeedSource] = useState<string>('Live Wire');
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'INJURY' | 'SHARP' | 'NFL' | 'NBA' | 'MLB'>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
@@ -39,10 +33,10 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
   const fetchNews = useCallback(async (isManual: boolean = false) => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/linepulse/live/news');
-      const data: LiveNewsResponse = await res.json();
+      const data = await fetchLiveNewsWithFallback();
       if (data.success && Array.isArray(data.articles)) {
         setArticles(data.articles);
+        setFeedSource(data.source);
         setLastSynced(new Date().toLocaleTimeString());
         if (isManual) {
           playSuccessChime();

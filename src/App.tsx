@@ -26,61 +26,97 @@ interface RouteState {
   project: string | null;
 }
 
-const getPathForState = (tab: Tab, project: string | null): string => {
-  if (tab === 'projects') {
-    if (project === 'roboinvestor') return '/myprojects/roboinvestor';
-    if (project === 'bart') return '/myprojects/bart';
-    if (project === 'toddler-activities' || project === 'activities') return '/myprojects/toddler-activities';
-    if (project === 'linepulse' || project === 'sports-betting' || project === 'betting') return '/myprojects/linepulse';
-    return '/myprojects';
+const getBasePrefix = (): string => {
+  if (typeof window === 'undefined') return '';
+  if (window.location.hostname.endsWith('github.io')) {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    if (parts.length > 0) {
+      const first = parts[0].toLowerCase();
+      const knownTopRoutes = [
+        'myprojects',
+        'projects',
+        'mygames',
+        'games',
+        'version-history',
+        'changelog',
+        'feedback',
+        'recommendations',
+        'roadmap',
+        'aboutme',
+        'about',
+      ];
+      if (!knownTopRoutes.includes(first)) {
+        return '/' + parts[0];
+      }
+    }
   }
-  if (tab === 'games') return '/mygames';
-  if (tab === 'changelog') return '/version-history';
-  if (tab === 'feedback') return '/feedback';
-  if (tab === 'about') return '/aboutme';
-  return '/';
+  return '';
+};
+
+const getPathForState = (tab: Tab, project: string | null): string => {
+  const prefix = getBasePrefix();
+  let sub = '/';
+  if (tab === 'projects') {
+    if (project === 'roboinvestor') sub = '/myprojects/roboinvestor';
+    else if (project === 'bart') sub = '/myprojects/bart';
+    else if (project === 'toddler-activities' || project === 'activities') sub = '/myprojects/toddler-activities';
+    else if (project === 'linepulse' || project === 'sports-betting' || project === 'betting') sub = '/myprojects/linepulse';
+    else sub = '/myprojects';
+  } else if (tab === 'games') {
+    sub = '/mygames';
+  } else if (tab === 'changelog') {
+    sub = '/version-history';
+  } else if (tab === 'feedback') {
+    sub = '/feedback';
+  } else if (tab === 'about') {
+    sub = '/aboutme';
+  }
+  return (prefix + sub).replace(/\/+/g, '/') || '/';
 };
 
 const getStateForPath = (pathname: string): RouteState => {
-  const clean = pathname.toLowerCase().replace(/\/+$/, '') || '/';
+  let clean = pathname.toLowerCase().replace(/\/+$/, '') || '/';
+  const prefix = getBasePrefix().toLowerCase();
+  if (prefix && clean.startsWith(prefix)) {
+    clean = clean.slice(prefix.length) || '/';
+  }
 
   if (
     clean === '/myprojects/linepulse' ||
-    clean === '/projects/linepulse' ||
-    clean === '/myprojects/sports-betting' ||
-    clean === '/projects/sports-betting' ||
-    clean === '/myprojects/betting' ||
-    clean === '/projects/betting'
+    clean.endsWith('/myprojects/linepulse') ||
+    clean.endsWith('/projects/linepulse') ||
+    clean.endsWith('/sports-betting') ||
+    clean.endsWith('/betting')
   ) {
     return { tab: 'projects', project: 'linepulse' };
   }
   if (
     clean === '/myprojects/toddler-activities' ||
-    clean === '/projects/toddler-activities' ||
-    clean === '/myprojects/activities' ||
-    clean === '/projects/activities'
+    clean.endsWith('/myprojects/toddler-activities') ||
+    clean.endsWith('/projects/toddler-activities') ||
+    clean.endsWith('/activities')
   ) {
     return { tab: 'projects', project: 'toddler-activities' };
   }
-  if (clean === '/myprojects/bart' || clean === '/projects/bart') {
+  if (clean === '/myprojects/bart' || clean.endsWith('/myprojects/bart') || clean.endsWith('/projects/bart')) {
     return { tab: 'projects', project: 'bart' };
   }
-  if (clean === '/myprojects/roboinvestor' || clean === '/projects/roboinvestor') {
+  if (clean === '/myprojects/roboinvestor' || clean.endsWith('/myprojects/roboinvestor') || clean.endsWith('/projects/roboinvestor')) {
     return { tab: 'projects', project: 'roboinvestor' };
   }
-  if (clean === '/myprojects' || clean === '/projects') {
+  if (clean === '/myprojects' || clean.endsWith('/myprojects') || clean === '/projects' || clean.endsWith('/projects')) {
     return { tab: 'projects', project: null };
   }
-  if (clean === '/mygames' || clean === '/games') {
+  if (clean === '/mygames' || clean.endsWith('/mygames') || clean === '/games' || clean.endsWith('/games')) {
     return { tab: 'games', project: null };
   }
-  if (clean === '/version-history' || clean === '/changelog') {
+  if (clean === '/version-history' || clean.endsWith('/version-history') || clean === '/changelog' || clean.endsWith('/changelog')) {
     return { tab: 'changelog', project: null };
   }
-  if (clean === '/feedback' || clean === '/recommendations' || clean === '/roadmap') {
+  if (clean === '/feedback' || clean.endsWith('/feedback') || clean.endsWith('/recommendations') || clean.endsWith('/roadmap')) {
     return { tab: 'feedback', project: null };
   }
-  if (clean === '/aboutme' || clean === '/about') {
+  if (clean === '/aboutme' || clean.endsWith('/aboutme') || clean === '/about' || clean.endsWith('/about')) {
     return { tab: 'about', project: null };
   }
 

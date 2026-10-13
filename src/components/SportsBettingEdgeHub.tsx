@@ -9,6 +9,7 @@ import { LineMovementAlertBanner } from './LineMovementAlertBanner';
 import { AlertHistoryLogViewer } from './AlertHistoryLogViewer';
 import { LiveNewsWireView } from './LiveNewsWireView';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
+import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
 
 interface SportsBettingEdgeHubProps {
   onBack?: () => void;
@@ -28,15 +29,16 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
   const [liveGames, setLiveGames] = useState<GameMarket[]>([]);
   const [isSyncingLive, setIsSyncingLive] = useState<boolean>(false);
   const [lastLiveSyncTime, setLastLiveSyncTime] = useState<string | null>(null);
+  const [liveFeedSource, setLiveFeedSource] = useState<string>('Multi-Book Feed');
   const [liveAutoSync, setLiveAutoSync] = useState<boolean>(true);
 
   const fetchLiveGames = useCallback(async (isManual: boolean = false) => {
     setIsSyncingLive(true);
     try {
-      const res = await fetch('/api/linepulse/live/games');
-      const data = await res.json();
-      if (data.success && Array.isArray(data.games)) {
+      const data = await fetchLiveGamesWithFallback();
+      if (data.success && Array.isArray(data.games) && data.games.length > 0) {
         setLiveGames(data.games);
+        setLiveFeedSource(data.source);
         setLastLiveSyncTime(new Date().toLocaleTimeString());
         if (isManual) {
           playSuccessChime();
