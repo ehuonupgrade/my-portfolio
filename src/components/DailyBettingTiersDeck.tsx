@@ -31,26 +31,26 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
     { title: string; desc: string }
   > = {
     single: {
-      title: 'Active Formula: Whale Steam & Line Crossing (-2.5 vs KC)',
-      desc: 'Active for Week 6: Detroit -2.5 backed by 67% handle on 38% tickets at Ford Field (Sunday, Oct 18 · 1:25 PM PST).',
+      title: 'Nearest Game Formula: Whale Steam on Short-Week Home Favorite (-3.0)',
+      desc: 'Nearest NFL Game: Seattle -3.0 backed by 71% handle on 38% tickets at Lumen Field on Thursday Night Football (Thursday, Oct 15 · 5:15 PM PST).',
     },
     parlay: {
-      title: 'Active Formula: World Series Pitching + Correlated Week 6 Script',
-      desc: 'Active cross-sport parlay: Dodgers home ML tonight (Oct 13 · 5:08 PM PST) paired with Ford Field clock control on Sunday.',
+      title: 'Nearest Slate + Cross-Sport Formula: Tonight, Thursday TNF & Sunday',
+      desc: 'Active cross-sport parlay: Dodgers home ML tonight (Oct 13 · 5:08 PM PST) paired with Thursday TNF Seahawks (-3.0) and Sunday Lions clock control.',
     },
     teaser10: {
-      title: 'Active Formula: 7-Day Window Key Threshold Crossings',
-      desc: 'Spanning Sunday Oct 18 and Monday Oct 19 MNF in PST, crossing critical scoring thresholds 3, 7, and 10.',
+      title: 'Upcoming Window Formula: Nearest TNF Game + Sunday Key Margins',
+      desc: 'Spanning Thursday Night Football (Oct 15) and Sunday (Oct 18) in PST, moving Seahawks to +7.0, Under to 53.5, and Lions to +7.5.',
     },
     teaser13: {
-      title: 'Active Formula: Maximum +13 Cushion Across 7-Day Window',
-      desc: 'Spanning Sunday Oct 18 and Monday Oct 19 MNF in PST, moving spreads past two converted scores (+10.5, +16.5, +15.5).',
+      title: 'Maximum +13 Cushion Across Thursday TNF & Sunday Showcase',
+      desc: 'Spanning Thursday Night Football and Sunday afternoon, moving lines past two converted scores (+10.0, Under 56.5, +10.5, Under 64.5).',
     },
   };
 
   const copyPackageToClipboard = (pkg: DailyBetPackage) => {
     playSuccessChime();
-    const text = `🎯 LINEPULSE DAILY PLAY: ${pkg.title}\nOdds: ${pkg.payoutOdds} | EV: +${pkg.expectedValue}% | Timeframe: ${pkg.daySpanNote}\n\nLEGS:\n${pkg.legs.map((l, i) => `${i + 1}. [${l.betType}] ${l.targetSelection} (${l.teasedLine ? `Teased to ${l.teasedLine}` : l.originalLine}) @ ${l.bestSportsbook}\n   Edge: +${l.modelEdge}% - ${l.rationale}`).join('\n\n')}\n\nExecution:\n${pkg.executionInstructions}`;
+    const text = `🎯 EDGEDETECT DAILY PLAY: ${pkg.title}\nOdds: ${pkg.payoutOdds} | EV: +${pkg.expectedValue}% | Timeframe: ${pkg.daySpanNote}\n\nLEGS:\n${pkg.legs.map((l, i) => `${i + 1}. [${l.betType}] ${l.targetSelection} (${l.teasedLine ? `Teased to ${l.teasedLine}` : l.originalLine}) @ ${l.bestSportsbook}\n   Edge: +${l.modelEdge}% - ${l.rationale}`).join('\n\n')}\n\nExecution:\n${pkg.executionInstructions}`;
     navigator.clipboard.writeText(text);
     setCopiedKey(pkg.id);
     setTimeout(() => setCopiedKey(null), 3000);
@@ -285,6 +285,105 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
             ))}
           </div>
         </div>
+
+        {/* Multi-Sport Nearest Single Game Straight Bets */}
+        {activeTierKey === 'single' && (
+          <div className="space-y-2 pt-2 border-t border-slate-800/80">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-300 font-bold uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                <span>🎯</span>
+                <span>Nearest Single Game Bet on Any Given Day for Each Sport:</span>
+              </span>
+              <span className="text-slate-500 text-[10px]">
+                Nearest Game Priority Engine (PST)
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+              {[
+                {
+                  sport: 'NFL',
+                  icon: '🏈',
+                  matchup: 'Broncos @ Seahawks',
+                  gameDate: 'Thursday, Oct 15 · 5:15 PM PST (TNF)',
+                  selection: 'Seattle Seahawks -3.0 Point Spread',
+                  odds: '-106 (Circa / DraftKings)',
+                  ev: '+8.6%',
+                  confidence: '88%',
+                  badge: 'Nearest NFL Game (Thursday)',
+                  rationale: '71% whale handle divergence backing Seattle on short week at Lumen Field.',
+                  gameId: 'nfl-sea-den-tnf',
+                },
+                {
+                  sport: 'MLB',
+                  icon: '⚾',
+                  matchup: 'Yankees @ Dodgers (WS Game 4)',
+                  gameDate: 'Tonight (Tuesday, Oct 13) · 5:08 PM PST',
+                  selection: 'Los Angeles Dodgers Moneyline',
+                  odds: '-146 (FanDuel)',
+                  ev: '+6.2%',
+                  confidence: '86%',
+                  badge: 'Nearest MLB Game (Tonight)',
+                  rationale: 'Chavez Ravine bullpen dominance backed by 74% sharp dollars.',
+                  gameId: 'mlb-nyy-la-g4',
+                },
+                {
+                  sport: 'NBA',
+                  icon: '🏀',
+                  matchup: 'Celtics @ Knicks (Opening Showcase)',
+                  gameDate: 'Tonight (Tuesday, Oct 13) · 4:30 PM PST',
+                  selection: 'Boston Celtics -4.5 Point Spread',
+                  odds: '-110 (DraftKings)',
+                  ev: '+5.8%',
+                  confidence: '84%',
+                  badge: 'Nearest NBA Game (Tonight)',
+                  rationale: 'Defending champions 3-point spacing mismatch against drop coverage.',
+                  gameId: 'nba-bos-nyk-pre',
+                },
+                {
+                  sport: 'NHL',
+                  icon: '🏒',
+                  matchup: 'Oilers @ Maple Leafs (Opening Night)',
+                  gameDate: 'Tonight (Tuesday, Oct 13) · 4:00 PM PST',
+                  selection: 'Edmonton Oilers Moneyline',
+                  odds: '-130 (BetMGM)',
+                  ev: '+5.4%',
+                  confidence: '82%',
+                  badge: 'Nearest NHL Game (Tonight)',
+                  rationale: 'Power play conversion rate against Toronto penalty kill.',
+                  gameId: 'nhl-edm-tor-w1',
+                },
+              ].map((item) => (
+                <div
+                  key={item.sport}
+                  onClick={() => onSelectGame && onSelectGame(item.gameId)}
+                  className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/60 transition-all cursor-pointer space-y-1.5 group"
+                >
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="font-bold text-cyan-300 flex items-center gap-1">
+                      <span>{item.icon}</span>
+                      <span>{item.sport}</span>
+                    </span>
+                    <span className="text-emerald-400 font-bold">{item.ev} EV</span>
+                  </div>
+
+                  <div>
+                    <div className="text-[10px] text-slate-400 truncate">{item.matchup}</div>
+                    <div className="text-white font-bold text-xs group-hover:text-cyan-300 transition-colors line-clamp-1">
+                      {item.selection}
+                    </div>
+                  </div>
+
+                  <div className="text-[10px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/60">
+                    <span className="text-cyan-400 font-semibold">{item.odds}</span>
+                    <span className="text-slate-400">{item.confidence} Conf</span>
+                  </div>
+                  <div className="text-[9px] text-slate-500 truncate">{item.gameDate}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Kelly Criterion Calculator & Execution Actions */}
         <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 text-xs">

@@ -107,7 +107,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
 
   const copyArticleBrief = (a: LiveNewsArticle) => {
     playSuccessChime();
-    const text = `📰 [LINEPULSE WIRE] ${a.headline}\nLeague: ${a.league} | Published: ${new Date(a.publishedAt).toLocaleString()}\n\n${a.description}\n\nLink: ${a.linkUrl}`;
+    const text = `📰 [EDGEDETECT WIRE] ${a.headline}\nLeague: ${a.league} | Published: ${new Date(a.publishedAt).toLocaleString()}\n\n${a.description}\n\nLink: ${a.linkUrl}`;
     navigator.clipboard.writeText(text);
     setCopiedId(a.id);
     setTimeout(() => setCopiedId(null), 3000);

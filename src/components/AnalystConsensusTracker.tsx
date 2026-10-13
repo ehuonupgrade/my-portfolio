@@ -17,7 +17,7 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
   onOpenBetTracker,
 }) => {
   const [activeTab, setActiveTab] = useState<'radar' | 'roster' | 'theory'>('radar');
-  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-lar-buf-today');
+  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-sea-den-tnf');
   const [networkFilter, setNetworkFilter] = useState<string>('ALL');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -48,7 +48,7 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
 
   const handleCopyContrarianPlay = (consensus: AnalystMarketConsensus) => {
     playSuccessChime();
-    const text = `🎯 CONTRARIAN FADE PLAY (LinePulse)\nMatchup: ${consensus.gameMatchup}\nContrarian Bet: ${consensus.contrarianFadeSignal.fadeTarget}\n\nWHY FADE:\n• Analysts: ${consensus.spread.homePct}% on ${consensus.spread.homeSelection}\n• Public Tickets: ${consensus.publicComparison.publicHomeTicketPct}% on Home Favorite\n• Sharp Handle: ${consensus.publicComparison.publicAwayMoneyPct}% Dollars backing ${consensus.contrarianFadeSignal.fadeTarget}\n\nRule: ${consensus.contrarianFadeSignal.gamblingTheoryRule}`;
+    const text = `🎯 CONTRARIAN FADE PLAY (EdgeDetect)\nMatchup: ${consensus.gameMatchup}\nContrarian Selection: ${consensus.contrarianFadeSignal.fadeTarget}\n\nWHY FADE:\n• Analysts: ${consensus.spread.homePct}% on ${consensus.spread.homeSelection}\n• Public Tickets: ${consensus.publicComparison.publicHomeTicketPct}% on Home Favorite\n• Sharp Handle: ${consensus.publicComparison.publicAwayMoneyPct}% Dollars backing ${consensus.contrarianFadeSignal.fadeTarget}\n\nRule: ${consensus.contrarianFadeSignal.gamblingTheoryRule}`;
     navigator.clipboard.writeText(text);
     setCopiedText(consensus.gameId);
     setTimeout(() => setCopiedText(null), 3000);
@@ -619,12 +619,12 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
                 Mathematical Foundations
               </span>
               <h3 className="text-xl font-bold text-white mt-1">
-                The Science of Contrarian Betting: Why Fading the Herd Works
+                The Science of Contrarian Market Dynamics: Why Fading the Herd Works
               </h3>
               <p className="text-xs sm:text-sm text-slate-300 font-sans mt-2 leading-relaxed">
-                Recreational sports betting is driven by emotion, recency bias, and media narratives.
-                Professional sportsbooks are not prediction companies &mdash; they are market makers seeking balanced liability or shaded positions.
-                Understanding this reality allows contrarian bettors to capitalize on systematically mispriced lines.
+                Recreational market participants are driven by emotion, recency bias, and media narratives.
+                Professional market makers are not prediction companies &mdash; they seek balanced liability or shaded positions.
+                Understanding this reality allows contrarian market analysts to capitalize on systematically mispriced lines.
               </p>
             </div>
 
@@ -655,7 +655,7 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
                   <span>3. The Pros vs. Joes Divergence</span>
                 </div>
                 <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                  The ideal contrarian wager is when <strong>Ticket %</strong> is on one side, but <strong>Dollar Handle %</strong> is on the opposite. In today&rsquo;s Rams vs Bills game, 58% of public tickets are on the Rams, but 68% of the money is on Buffalo. The syndicates are already executing the contrarian fade.
+                  The ideal contrarian wager is when <strong>Ticket %</strong> is on one side, but <strong>Dollar Handle %</strong> is on the opposite. In Thursday&rsquo;s Broncos vs Seahawks game, 62% of public tickets are on Denver, but 71% of the money is on Seattle at Lumen Field. The syndicates are already executing the contrarian fade.
                 </p>
               </div>
 

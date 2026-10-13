@@ -64,12 +64,12 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
     showToast(`Bet updated to ${editStatus}. Learned weights re-calculated!`);
   };
 
-  // Handle simulation of tonight's Bills @ Rams slate
+  // Handle simulation of nearest upcoming slate (Thursday TNF Seahawks & cross-slate legs)
   const handleSimulateTonight = () => {
     playSuccessChime();
     const updated = simulateTonightOutcome();
     setBets(updated);
-    showToast('Tonight Bills @ Rams simulated! Buffalo covered +3.5 at SoFi Stadium. Model auto-graded 5 bets and adapted future weights.');
+    showToast('Upcoming slate simulated! Seahawks covered -3.0 on Thursday TNF (24-17), Dodgers ML won, and model updated weights.');
   };
 
   // Handle reset to defaults
@@ -214,10 +214,10 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
           <span className="text-xl shrink-0">🎯</span>
           <div className="space-y-1">
             <strong className="font-mono text-cyan-300 uppercase block text-[11px]">
-              Live Tracking Started As Of Today (October 12, 2026) &bull; Clean Performance Baseline
+              Live Tracking Baseline &bull; Nearest Upcoming Slate Priority (October 13, 2026 PST)
             </strong>
             <p className="text-slate-300 leading-relaxed">
-              Performance metrics reset to <strong>0 Settled (0.00 Units Won/Lost)</strong> with a <strong>0 Win Streak</strong>. We have logged 5 live algorithmic recommendations for today's slate (Buffalo Bills +3.5, 3-Leg Value Parlay, 3-Team +10 Teaser, 4-Team +13 Teaser, and 1-Game Strategy). As tonight&apos;s games conclude, settle results manually or click &quot;Simulate Tonight &amp; Learn&quot; to test the pattern learning engine!
+              Active recommendations prioritize the nearest upcoming games: <strong>Seattle Seahawks -3.0</strong> on Thursday Night Football (Oct 15), <strong>Dodgers ML</strong> tonight (Oct 13), 3-Leg Value Parlay, and 7-day multi-day Teasers. Historical Bills @ Rams (37-34) bets are settled and logged in the performance ledger.
             </p>
           </div>
         </div>
@@ -732,49 +732,50 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Day 1: Oct 12 (Tonight) - SELECTED */}
+              {/* Day 1: Oct 13 (Tonight) */}
+              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 opacity-80">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-cyan-400">TUE &bull; OCT 13 (TODAY)</span>
+                  <span className="text-[10px] text-slate-500">World Series</span>
+                </div>
+                <div className="text-white font-bold text-sm">Yankees @ Dodgers</div>
+                <div className="text-[11px] text-slate-400 font-sans">Dodger Stadium &bull; 5:08 PM PST</div>
+                <div className="text-[10px] text-slate-500">
+                  Straight ML Option: Dodgers -146
+                </div>
+              </div>
+
+              {/* Day 3: Oct 15 (Thursday Night) - SELECTED AS TEASER DAY 1 */}
               <div className="p-4 rounded-xl bg-purple-950/30 border-2 border-purple-500 shadow-lg space-y-2 relative">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-purple-400">MON &bull; OCT 12</span>
+                  <span className="text-[10px] font-bold text-purple-400">THU &bull; OCT 15</span>
                   <span className="px-2 py-0.5 rounded-full bg-purple-900 text-purple-200 font-bold text-[9px]">
                     ★ TEASER DAY 1 OF 2
                   </span>
                 </div>
-                <div className="text-white font-bold text-sm">Bills @ Rams</div>
+                <div className="text-white font-bold text-sm">Broncos @ Seahawks</div>
                 <div className="text-[11px] text-slate-300 font-sans">
-                  SoFi Stadium (Inglewood, CA) &bull; Prime Time MNF
+                  Lumen Field &bull; 5:15 PM PST (TNF)
                 </div>
                 <div className="p-2 rounded bg-slate-950 border border-purple-800/80 text-[10px] text-emerald-300">
-                  +10 Teased: <strong>Bills +13.5</strong> &amp; <strong>Under 58.5</strong>
+                  +10 Teased: <strong>Seahawks +7.0</strong> &amp; <strong>Under 53.5</strong>
                 </div>
               </div>
 
-              {/* Day 2: Oct 13 (Tomorrow) */}
+              {/* Day 5: Oct 17 (Saturday) */}
               <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 opacity-70">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-slate-400">TUE &bull; OCT 13</span>
-                  <span className="text-[10px] text-slate-500">Available</span>
+                  <span className="text-[10px] font-bold text-slate-400">SAT &bull; OCT 17</span>
+                  <span className="text-[10px] text-slate-500">College &amp; MLB</span>
                 </div>
-                <div className="text-white font-bold text-sm">Celtics @ Knicks</div>
-                <div className="text-[11px] text-slate-400 font-sans">Madison Square Garden</div>
+                <div className="text-white font-bold text-sm">Georgia @ Texas</div>
+                <div className="text-[11px] text-slate-400 font-sans">NCAA Football Showcase</div>
                 <div className="text-[10px] text-slate-500">
-                  Teased Line Option: Knicks +15.5
+                  Teased Line Option: Longhorns +4.5
                 </div>
               </div>
 
-              {/* Day 4: Oct 15 (Thursday Night) */}
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-cyan-400">THU &bull; OCT 15</span>
-                  <span className="text-[10px] text-cyan-500 font-bold">ALT PAIR OPTION</span>
-                </div>
-                <div className="text-white font-bold text-sm">Broncos @ Saints</div>
-                <div className="text-[11px] text-slate-300 font-sans">Thursday Night Football (TNF)</div>
-                <div className="p-2 rounded bg-slate-900 border border-slate-800 text-[10px] text-cyan-300">
-                  TNF Option: Saints +9.5 (+10 Teased)
-                </div>
-              </div>
-
-              {/* Day 7: Oct 18 (Sunday) - SELECTED */}
+              {/* Day 6: Oct 18 (Sunday) - SELECTED AS TEASER DAY 2 */}
               <div className="p-4 rounded-xl bg-purple-950/30 border-2 border-purple-500 shadow-lg space-y-2 relative">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-purple-400">SUN &bull; OCT 18</span>
@@ -784,7 +785,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                 </div>
                 <div className="text-white font-bold text-sm">Chiefs @ Lions</div>
                 <div className="text-[11px] text-slate-300 font-sans">
-                  Ford Field Showcase &bull; 4:25 PM EDT
+                  Ford Field Showcase &bull; 1:25 PM PST
                 </div>
                 <div className="p-2 rounded bg-slate-950 border border-purple-800/80 text-[10px] text-emerald-300">
                   +10 Teased: <strong>Lions +7.5</strong> &amp; <strong>Under 64.5</strong>
@@ -800,13 +801,13 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                 <span className="px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-800 text-amber-300 font-bold">
                   1 3-TEAM +10 TEASER (ACTIVE)
                 </span>
-                <span className="text-emerald-400 font-bold">+14.8% EV</span>
+                <span className="text-emerald-400 font-bold">+15.2% EV</span>
               </div>
               <h4 className="text-base font-bold text-white">
-                Tonight Oct 12 (Day 1) + Sunday Oct 18 (Day 2)
+                Thursday TNF Oct 15 (Day 1) + Sunday Oct 18 (Day 2)
               </h4>
               <p className="text-slate-300 text-xs font-sans leading-relaxed">
-                Legs: (1) Bills +13.5 (Tonight), (2) Under 58.5 (Tonight), (3) Lions +7.5 (Sunday Oct 18).
+                Legs: (1) Seahawks +7.0 (Thursday TNF), (2) Under 53.5 (Thursday TNF), (3) Lions +7.5 (Sunday Oct 18).
               </p>
               <div className="text-[11px] text-slate-400">
                 Payout: -120 at DraftKings / Circa Sports. Risk 1.5u to win 1.25u.
@@ -818,13 +819,13 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                 <span className="px-2.5 py-0.5 rounded-full bg-purple-950 border border-purple-800 text-purple-300 font-bold">
                   1 4-TEAM +13 MONSTER TEASER (ACTIVE)
                 </span>
-                <span className="text-emerald-400 font-bold">+16.2% EV</span>
+                <span className="text-emerald-400 font-bold">+16.8% EV</span>
               </div>
               <h4 className="text-base font-bold text-white">
-                Tonight Oct 12 (Day 1) + Sunday Oct 18 (Day 2)
+                Thursday TNF Oct 15 (Day 1) + Sunday Oct 18 (Day 2)
               </h4>
               <p className="text-slate-300 text-xs font-sans leading-relaxed">
-                Legs: (1) Bills +16.5 (Tonight), (2) Under 61.5 (Tonight), (3) Lions +10.5 (Sunday Oct 18), (4) Under 64.5 (Sunday Oct 18).
+                Legs: (1) Seahawks +10.0 (Thursday TNF), (2) Under 56.5 (Thursday TNF), (3) Lions +10.5 (Sunday Oct 18), (4) Under 64.5 (Sunday Oct 18).
               </p>
               <div className="text-[11px] text-slate-400">
                 Payout: -135 at Circa Sports / Caesars. Risk 1.35u to win 1.00u.

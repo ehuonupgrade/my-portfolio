@@ -64,7 +64,7 @@ const getPathForState = (tab: Tab, project: string | null): string => {
     if (project === 'roboinvestor') sub = '/myprojects/roboinvestor';
     else if (project === 'bart') sub = '/myprojects/bart';
     else if (project === 'toddler-activities' || project === 'activities') sub = '/myprojects/toddler-activities';
-    else if (project === 'linepulse' || project === 'sports-betting' || project === 'betting') sub = '/myprojects/linepulse';
+    else if (project === 'edgedetect' || project === 'linepulse' || project === 'sports-betting' || project === 'betting') sub = '/myprojects/edgedetect';
     else sub = '/myprojects';
   } else if (tab === 'games') {
     sub = '/mygames';
@@ -88,13 +88,16 @@ const getStateForPath = (pathname: string): RouteState => {
   }
 
   if (
+    clean === '/myprojects/edgedetect' ||
+    clean.endsWith('/myprojects/edgedetect') ||
+    clean.endsWith('/projects/edgedetect') ||
     clean === '/myprojects/linepulse' ||
     clean.endsWith('/myprojects/linepulse') ||
     clean.endsWith('/projects/linepulse') ||
     clean.endsWith('/sports-betting') ||
     clean.endsWith('/betting')
   ) {
-    return { tab: 'projects', project: 'linepulse' };
+    return { tab: 'projects', project: 'edgedetect' };
   }
   if (
     clean === '/myprojects/toddler-activities' ||
@@ -198,7 +201,7 @@ export default function App() {
       if (activeProject === 'bart') return 'BART Planner';
       if (activeProject === 'roboinvestor') return 'RoboInvestor';
       if (activeProject === 'toddler-activities' || activeProject === 'activities') return 'Activity Hub';
-      if (activeProject === 'linepulse') return 'LinePulse Sports Odds';
+      if (activeProject === 'edgedetect' || activeProject === 'linepulse') return 'EdgeDetect Market Edge';
       return 'My Projects';
     }
     if (activeTab === 'games') return 'My Games';
@@ -323,15 +326,15 @@ export default function App() {
                   </button>
 
                   <button
-                    onClick={() => navigateTo('projects', 'linepulse')}
+                    onClick={() => navigateTo('projects', 'edgedetect')}
                     className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
-                      activeProject === 'linepulse'
+                      activeProject === 'edgedetect' || activeProject === 'linepulse'
                         ? 'bg-indigo-950/70 border border-cyan-800 text-cyan-300 font-bold'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    <span>&rarr; LinePulse (Sports Betting Lines &amp; 1-Game Strategy)</span>
-                    {activeProject === 'linepulse' && <span className="text-cyan-400 text-[10px]">CURRENT</span>}
+                    <span>&rarr; EdgeDetect (Market Intelligence &amp; 1-Game Strategy)</span>
+                    {(activeProject === 'edgedetect' || activeProject === 'linepulse') && <span className="text-cyan-400 text-[10px]">CURRENT</span>}
                   </button>
                 </div>
               </div>
@@ -456,14 +459,14 @@ export default function App() {
                       &rarr; Kids Activity Hub (Ages 0–17)
                     </button>
                     <button
-                      onClick={() => navigateTo('projects', 'linepulse')}
+                      onClick={() => navigateTo('projects', 'edgedetect')}
                       className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
-                        activeProject === 'linepulse'
+                        activeProject === 'edgedetect' || activeProject === 'linepulse'
                           ? 'text-cyan-400 font-semibold'
                           : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
-                      &rarr; LinePulse (Sports Betting)
+                      &rarr; EdgeDetect (Market Intelligence)
                     </button>
                   </div>
                 )}
@@ -554,8 +557,8 @@ export default function App() {
                   <ToddlerActivityHub onBack={() => navigateTo('projects', null)} />
                 )}
 
-                {/* Sub-Project 4: LinePulse Sports Betting Lines & 1-Game Strategy */}
-                {activeProject === 'linepulse' && (
+                {/* Sub-Project 4: EdgeDetect Market Intelligence & 1-Game Strategy */}
+                {(activeProject === 'edgedetect' || activeProject === 'linepulse') && (
                   <SportsBettingEdgeHub onBack={() => navigateTo('projects', null)} />
                 )}
 
@@ -674,9 +677,9 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Project 4: LinePulse Sports Betting Aggregator */}
+                      {/* Project 4: EdgeDetect Sharp Market Intelligence Aggregator */}
                       <div
-                        onClick={() => navigateTo('projects', 'linepulse')}
+                        onClick={() => navigateTo('projects', 'edgedetect')}
                         className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-cyan-500/60 transition-all duration-200 cursor-pointer backdrop-blur-md space-y-4 group"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-3">
@@ -685,7 +688,7 @@ export default function App() {
                               US Sports Market Intelligence &bull; NFL Primary Focus
                             </span>
                             <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
-                              LinePulse: Sports Betting Lines &amp; 1-Game Strategy
+                              EdgeDetect: Market Intelligence &amp; 1-Game Strategy
                             </h3>
                           </div>
                           <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 self-start sm:self-auto font-medium">
@@ -694,7 +697,7 @@ export default function App() {
                         </div>
 
                         <p className="text-sm text-slate-300 leading-relaxed font-normal">
-                          Aggregates publicly available sports betting lines across 8 top books (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Compares odds, tracks total bets placed vs. total dollars wagered to detect sharp money divergence, logs line movement history, and isolates <strong>1 Game with 1 Multi-Leg Strategy</strong> where market pricing creates positive expected value (+EV).
+                          Aggregates publicly available consensus odds and line movement across 8 top books (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Compares market pricing, tracks total ticket count vs. total dollars wagered to detect sharp money divergence, logs line movement history, and isolates <strong>1 Game with 1 Multi-Leg Strategy</strong> where market pricing creates positive expected value (+EV).
                         </p>
 
                         <div className="flex items-center justify-between pt-2 text-xs font-mono">

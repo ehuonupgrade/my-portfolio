@@ -18,7 +18,7 @@ interface SportsBettingEdgeHubProps {
 export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBack }) => {
   const [hubViewMode, setHubViewMode] = useState<'board' | 'news' | 'analysts' | 'tracker' | 'trends' | 'logs'>('board');
   const [selectedLeague, setSelectedLeague] = useState<SportsLeague | 'ALL'>('NFL');
-  const [activeGameId, setActiveGameId] = useState<string>('nfl-lar-buf-today');
+  const [activeGameId, setActiveGameId] = useState<string>('nfl-sea-den-tnf');
   const [viewTab, setViewTab] = useState<'strategy' | 'splits' | 'books' | 'movement'>('strategy');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showDailyPortfolio, setShowDailyPortfolio] = useState<boolean>(true);
@@ -101,9 +101,9 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
     return [...updatedBase, ...extraLive];
   }, [liveGames]);
 
-  // Filter games
+  // Filter games with Closest Upcoming Slate Priority
   const filteredGames = useMemo(() => {
-    return allAvailableGames.filter((g) => {
+    const list = allAvailableGames.filter((g) => {
       if (selectedLeague !== 'ALL' && g.league !== selectedLeague) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -113,12 +113,31 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
       }
       return true;
     });
+
+    // Priority sorting: Closest upcoming slate first, settled/final games at bottom
+    return list.sort((a, b) => {
+      const getPriority = (g: GameMarket) => {
+        if (g.status === 'FINAL') return 99;
+        const timeStr = (g.scheduledTime || '').toLowerCase();
+        if (timeStr.includes('tonight') || timeStr.includes('today') || timeStr.includes('oct 13')) return 1;
+        if (timeStr.includes('thursday') || timeStr.includes('oct 15')) return 2;
+        if (timeStr.includes('sunday') || timeStr.includes('oct 18')) return 3;
+        if (timeStr.includes('monday') || timeStr.includes('oct 19')) return 4;
+        return 10;
+      };
+      return getPriority(a) - getPriority(b);
+    });
   }, [allAvailableGames, selectedLeague, searchQuery]);
 
-  // Active Selected Game
+  // Active Selected Game (guarantees upcoming game focus)
   const activeGame = useMemo(() => {
-    return allAvailableGames.find((g) => g.id === activeGameId) || allAvailableGames[0];
-  }, [allAvailableGames, activeGameId]);
+    return (
+      filteredGames.find((g) => g.id === activeGameId) ||
+      filteredGames.find((g) => g.status !== 'FINAL') ||
+      filteredGames[0] ||
+      allAvailableGames[0]
+    );
+  }, [filteredGames, activeGameId, allAvailableGames]);
 
   // Identify the single game with the 1 prime strategy
   const primeGame = useMemo(() => {
@@ -190,14 +209,14 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2.5 flex-wrap">
-            <span>LinePulse: Sharp Market Aggregator</span>
+            <span>EdgeDetect: Sharp Market Aggregator</span>
             <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-700/60 text-cyan-300">
               NFL Primary Focus &bull; All US Sports
             </span>
           </h2>
 
           <p className="text-sm text-slate-300 leading-relaxed max-w-4xl">
-            Real-time aggregation of betting lines across 8 top public sportsbooks (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Tracks total ticket volume, total dollar handles, reverse line steam, and selects <strong>1 Game with 1 Multi-Leg Strategy</strong> where sharp divergence provides maximum positive expected value (+EV).
+            Real-time aggregation of consensus market lines across 8 top public sportsbooks (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Tracks total ticket volume, total dollar handles, reverse line steam, and selects <strong>1 Game with 1 Multi-Leg Strategy</strong> where sharp divergence provides maximum positive expected value (+EV).
           </p>
 
           {/* Action & View Buttons Below Summary Text */}

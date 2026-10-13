@@ -1,5 +1,31 @@
 [
   {
+    "version": "v0.9.14",
+    "date": "October 13, 2026",
+    "title": "Nearest Game Priority, Thursday Night Football (Seahawks vs Broncos) & Multi-Sport Single Bets",
+    "summary": "Moved active LinePulse focus forward from the settled Bills game to the closest upcoming slate: Thursday Night Football between Denver Broncos and Seattle Seahawks at Lumen Field. Prioritized nearest upcoming games across all sports boards. Updated sports analyst commentary with 10 analysts covering Broncos @ Seahawks. Refactored Single Game Bets to prioritize the nearest game for each sport (Thursday Seahawks -3.0 for NFL, Dodgers ML for MLB), while allowing multi-day cross-slate parlays and teasers spanning Thursday and Sunday.",
+    "tag": "Nearest Slate & TNF Analysis",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Thursday Night Football (Broncos @ Seahawks): Added complete market data, 8-sportsbook matrix, and 71% whale handle divergence favoring Seattle -3.0 at Lumen Field on short week."
+      },
+      {
+        "type": "feature",
+        "description": "Sports Analyst Commentary Moved Forward: Transitioned Analyst Consensus Tracker from the completed Bills game to the upcoming Thursday Broncos vs Seahawks matchup with picks and commentary from all 10 tracked analysts."
+      },
+      {
+        "type": "feature",
+        "description": "Nearest Single Game Bet Priority: Structured single straight wagers around the nearest upcoming game on any given day for any given sport (NFL: Thursday Seahawks -3.0, MLB: Tonight Dodgers ML, NBA: Celtics -4.5, NHL: Oilers ML)."
+      },
+      {
+        "type": "feature",
+        "description": "Cross-Slate Multi-Day Parlays & Teasers: Built 3-leg parlay and +10/+13 teasers spanning the nearest games (Tonight Dodgers ML / Thursday TNF Seahawks) through Sunday's showcase slate."
+      }
+    ],
+    "commits": ["f1a4e72", "c3b8d91"]
+  },
+  {
     "version": "v0.9.13",
     "date": "October 13, 2026",
     "title": "LLM Token Usage by Application & Model (Gemini 3.8) + Bills-Rams 37-34 Settlement",
@@ -150,8 +176,8 @@
   {
     "version": "v0.9.7",
     "date": "October 12, 2026",
-    "title": "Project #4: LinePulse — Sports Betting Sharp Lines & 1-Game Strategy",
-    "summary": "Launched Project #4: LinePulse. Aggregates publicly available betting lines across 8 top books (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Compares odds, tracks total bets placed vs. total dollars wagered to isolate sharp money divergence, graphs chronological line movement, and algorithmically identifies 1 Game with 1 Multi-Leg Strategy with positive expected value (+EV), focusing on NFL football while analyzing all major US sports.",
+    "title": "Project #4: EdgeDetect — Market Intelligence Lines & 1-Game Strategy",
+    "summary": "Launched Project #4: EdgeDetect. Aggregates publicly available consensus lines across 8 top books (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Compares odds, tracks total ticket count vs. total dollars wagered to isolate sharp money divergence, graphs chronological line movement, and algorithmically identifies 1 Game with 1 Multi-Leg Strategy with positive expected value (+EV), focusing on NFL football while analyzing all major US sports.",
     "tag": "Sports & Markets",
     "changes": [
       {

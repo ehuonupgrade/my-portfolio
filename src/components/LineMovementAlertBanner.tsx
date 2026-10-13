@@ -40,6 +40,52 @@ export interface MovementAlertItem {
 
 export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
   {
+    id: 'alert-sea-den-20261015',
+    gameId: 'nfl-sea-den-tnf',
+    matchup: 'Denver Broncos @ Seattle Seahawks (TNF)',
+    league: 'NFL',
+    scheduledTime: 'Thursday, Oct 15 · 5:15 PM PST',
+    stadium: 'Lumen Field, Seattle, WA',
+    alertType: 'WHALE_STEAM',
+    severity: 'CRITICAL',
+    headline: 'Nearest Upcoming NFL Game: Sharp Steam Pushes Seahawks to -3.0 on 71% Dollars Despite 62% Public on Broncos',
+    spreadShift: {
+      open: 'Seahawks -1.5',
+      current: 'Seahawks -3.0',
+      delta: '-1.5 Points (Toward Seattle)',
+      favoredTeam: 'Seattle Seahawks',
+    },
+    totalShift: {
+      open: '44.5 O/U',
+      current: '43.5 O/U',
+      delta: '-1.0 Point',
+      direction: 'UNDER',
+    },
+    moneyDivergence: {
+      dollarsPct: 71,
+      ticketsPct: 38,
+      divergenceMargin: 33,
+      dollarVolume: '$14.8M Handle',
+      favoredSide: 'Seattle Seahawks -3.0 / ML',
+    },
+    riskWarnings: [
+      {
+        title: 'Key Number Threshold Warning',
+        description:
+          'Line is currently sitting on the crucial 3-point key number. Take SEA -3.0 (-106) at DraftKings/Circa before books shade to -3.5 hook.',
+        severityLevel: 'HIGH',
+      },
+      {
+        title: 'Short-Week Home Crowd Edge',
+        description:
+          'Visiting road offenses traveling on 3 days rest struggle with pre-snap communication against Lumen Field crowd noise.',
+        severityLevel: 'MEDIUM',
+      },
+    ],
+    actionAdvice:
+      'NEAREST SLATE STRAIGHT BET: Wager Seattle Seahawks -3.0 straight or tease to +7.0 in multi-day cross-slate packages.',
+  },
+  {
     id: 'alert-kc-det-20261018',
     gameId: 'nfl-kc-det-w6',
     matchup: 'Kansas City Chiefs @ Detroit Lions',
@@ -225,36 +271,42 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
           actionRecommendation: alert.actionAdvice,
         };
 
-        const res = await fetch('/api/linepulse/alerts/sms', {
+        const res = await fetch('/api/edgedetect/alerts/sms', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-        });
+        }).catch(() =>
+          fetch('/api/linepulse/alerts/sms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          })
+        );
 
         const data = await res.json();
         const sentTime = new Date().toLocaleTimeString();
         playSuccessChime();
 
         if (typeof window !== 'undefined') {
-          localStorage.setItem('linepulse_user_phone_number', phone.trim());
+          localStorage.setItem('edgedetect_user_phone_number', phone.trim());
         }
 
         setSmsDeliveryStatus(`Alert Dispatched to Background Receiver at ${sentTime}! (${reasonLabel})`);
         setLastSentTimestamp(sentTime);
         setLastSentText(
           data.formattedText ||
-            `[LINEPULSE ALERT] 🚨 ${alert.headline}\nMatchup: ${alert.matchup}\nMovement: Spread ${alert.spreadShift.current} | ${alert.moneyDivergence.dollarVolume} (${alert.moneyDivergence.dollarsPct}% handle)\nRISKS:\n${alert.riskWarnings.map((r, i) => `${i + 1}) ${r.title}`).join('\n')}\nAction: ${alert.actionAdvice}`
+            `[EDGEDETECT ALERT] 🚨 ${alert.headline}\nMatchup: ${alert.matchup}\nMovement: Spread ${alert.spreadShift.current} | ${alert.moneyDivergence.dollarVolume} (${alert.moneyDivergence.dollarsPct}% handle)\nRISKS:\n${alert.riskWarnings.map((r, i) => `${i + 1}) ${r.title}`).join('\n')}\nAction: ${alert.actionAdvice}`
         );
       } catch {
         const sentTime = new Date().toLocaleTimeString();
         playSuccessChime();
         if (typeof window !== 'undefined') {
-          localStorage.setItem('linepulse_user_phone_number', phone.trim());
+          localStorage.setItem('edgedetect_user_phone_number', phone.trim());
         }
         setSmsDeliveryStatus(`Dispatched via SMS Carrier Gateway at ${sentTime}!`);
         setLastSentTimestamp(sentTime);
         setLastSentText(
-          `[LINEPULSE ALERT] 🚨 ${alert.headline}\nMatchup: ${alert.matchup}\nMovement: Spread ${alert.spreadShift.current} | ${alert.moneyDivergence.dollarVolume} (${alert.moneyDivergence.dollarsPct}% handle)\nRISKS:\n${alert.riskWarnings.map((r, i) => `${i + 1}) ${r.title}`).join('\n')}\nAction: ${alert.actionAdvice}`
+          `[EDGEDETECT ALERT] 🚨 ${alert.headline}\nMatchup: ${alert.matchup}\nMovement: Spread ${alert.spreadShift.current} | ${alert.moneyDivergence.dollarVolume} (${alert.moneyDivergence.dollarsPct}% handle)\nRISKS:\n${alert.riskWarnings.map((r, i) => `${i + 1}) ${r.title}`).join('\n')}\nAction: ${alert.actionAdvice}`
         );
       } finally {
         setIsSendingSms(false);
@@ -565,7 +617,7 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
                 <span className="text-xl">📱</span>
                 <div>
                   <h3 className="text-base font-bold text-white">
-                    LinePulse Background SMS Alert Dispatcher
+                    EdgeDetect Background SMS Alert Dispatcher
                   </h3>
                   <span className="text-[11px] text-slate-400">
                     Background carrier watcher: <strong className="text-emerald-400">Active &amp; Configured</strong>
@@ -694,14 +746,14 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
               <div className="rounded-2xl bg-slate-950 border-2 border-slate-700 p-4 space-y-3 shadow-inner">
                 {/* Phone Header Bar */}
                 <div className="flex items-center justify-between text-[10px] text-slate-500 border-b border-slate-800 pb-2">
-                  <span>LINEPULSE-SHARP-ALERT</span>
+                  <span>EDGEDETECT-SHARP-ALERT</span>
                   <span>{new Date().toLocaleTimeString()}</span>
                 </div>
 
                 {/* SMS Bubble */}
                 <div className="p-3.5 rounded-2xl rounded-tl-sm bg-indigo-950/70 border border-indigo-700/80 text-slate-200 text-xs font-sans leading-relaxed space-y-2">
                   <div className="font-bold text-white flex items-center gap-1 text-[13px]">
-                    <span>🚨 [LINEPULSE ALERT]</span>
+                    <span>🚨 [EDGEDETECT ALERT]</span>
                     <span className="text-amber-300 font-mono">{currentAlert.headline}</span>
                   </div>
 

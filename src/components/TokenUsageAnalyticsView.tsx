@@ -49,7 +49,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
 
   // Live Token Counter Tool State
   const [testPrompt, setTestPrompt] = useState<string>(
-    'Analyze sharp betting handle divergence for Buffalo Bills @ Los Angeles Rams and calculate positive expected value.'
+    'Analyze sharp money handle divergence for Denver Broncos @ Seattle Seahawks (Thursday Night Football) and calculate positive expected value.'
   );
   const [testModel, setTestModel] = useState<string>('gemini-3.8-flash');
   const [testApp, setTestApp] = useState<string>('google-ai-studio');
@@ -121,7 +121,11 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
         if (groupingMode === 'by_application') {
           SUPPORTED_LLM_APPLICATIONS.forEach((app) => {
             if (selectedAppId === 'ALL' || selectedAppId === app.id) {
-              item[app.id] = r.applications?.[app.id]?.totalTokens || 0;
+              const val =
+                r.applications?.[app.id]?.totalTokens ||
+                (app.id === 'edgedetect' ? r.applications?.['linepulse']?.totalTokens : 0) ||
+                0;
+              item[app.id] = val;
             } else {
               item[app.id] = 0;
             }
@@ -598,7 +602,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
               LLM Token Usage by Application &amp; Model
             </h2>
             <p className="text-sm text-slate-300 leading-relaxed font-sans max-w-3xl">
-              Tracks multi-model token consumption across the last 30 days broken down by <strong>Application</strong> (Google AI Studio, LinePulse, RoboInvestor, Cursor, Gemini Chat) and <strong>LLM Model</strong> (Gemini 3.8 Flash/Pro, Gemini 2.5, Claude, GPT-4o).
+              Tracks multi-model token consumption across the last 30 days broken down by <strong>Application</strong> (Google AI Studio, EdgeDetect, RoboInvestor, Cursor, Gemini Chat) and <strong>LLM Model</strong> (Gemini 3.8 Flash/Pro, Gemini 2.5, Claude, GPT-4o).
             </p>
           </div>
 
@@ -1443,7 +1447,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
                               className={`px-1.5 py-0.5 rounded text-[9px] border font-semibold ${appDef.badgeBg} ${appDef.badgeBorder} ${appDef.badgeText} flex items-center gap-1`}
                             >
                               <span>{appDef.icon}</span>
-                              <span>{appDef.name.replace(' (Sports Betting Engine)', '').replace(' (Robinhood Agent)', '')}: {formatTokens(u.totalTokens)}</span>
+                              <span>{appDef.name.replace(' (Market Intelligence Engine)', '').replace(' (Sports Betting Engine)', '').replace(' (Robinhood Agent)', '')}: {formatTokens(u.totalTokens)}</span>
                             </span>
                           );
                         })}

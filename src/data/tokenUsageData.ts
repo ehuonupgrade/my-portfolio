@@ -17,14 +17,14 @@ export const SUPPORTED_LLM_APPLICATIONS: LLMApplicationInfo[] = [
     description: 'Direct interactive prompt engineering, code synthesis, agent generation & build sessions',
   },
   {
-    id: 'linepulse',
-    name: 'LinePulse (Sports Betting Engine)',
+    id: 'edgedetect',
+    name: 'EdgeDetect (Market Intelligence Engine)',
     category: 'Internal Tool',
     color: '#06b6d4', // Cyan
     badgeBg: 'bg-cyan-950/70',
     badgeBorder: 'border-cyan-700/80',
     badgeText: 'text-cyan-300',
-    icon: '🏈',
+    icon: '⚡',
     description: 'Live odds aggregation, sharp money divergence detection & 1-game strategy generation',
   },
   {
@@ -360,7 +360,7 @@ export const SEED_DAILY_TOKEN_RECORDS: DailyTokenRecord[] = [
     totalTokens: 1_045_000,
     isFullyUtilized: true,
     utilizationPercentage: 104.5,
-    workloadNote: '🔥 FULLY UTILIZED: Google AI Studio intensive live coding sprint on sports betting edge hub via Gemini 3.8',
+    workloadNote: '🔥 FULLY UTILIZED: Google AI Studio intensive live coding sprint on EdgeDetect market intelligence hub via Gemini 3.8',
     peakTimePST: '06:00 PM PST',
     applications: {
       'google-ai-studio': { promptTokens: 750_000, completionTokens: 165_000, totalTokens: 915_000 },

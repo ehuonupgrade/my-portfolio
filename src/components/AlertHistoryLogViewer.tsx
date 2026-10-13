@@ -31,7 +31,7 @@ export const AlertHistoryLogViewer: React.FC<AlertHistoryLogViewerProps> = ({
   const fetchLogs = async () => {
     try {
       setRefreshing(true);
-      const res = await fetch('/api/linepulse/alerts/sms/history').catch(() => null);
+      const res = await fetch('/api/edgedetect/alerts/sms/history').catch(() => fetch('/api/linepulse/alerts/sms/history').catch(() => null));
       if (res && res.ok) {
         const data = await res.json();
         if (data.logs) {
@@ -273,7 +273,7 @@ export const AlertHistoryLogViewer: React.FC<AlertHistoryLogViewerProps> = ({
 
                   <div className="rounded-2xl bg-slate-950 border-2 border-slate-800 p-4 font-sans text-xs space-y-2">
                     <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between border-b border-slate-800 pb-1.5">
-                      <span>FROM: LINEPULSE-SHARP-GATEWAY</span>
+                      <span>FROM: EDGEDETECT-SHARP-GATEWAY</span>
                       <span>DELIVERY: CONFIRMED</span>
                     </div>
                     <pre className="text-slate-200 text-xs whitespace-pre-wrap font-sans leading-relaxed">

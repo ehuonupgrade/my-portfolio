@@ -9,7 +9,7 @@ export async function fetchLiveNewsWithFallback(): Promise<{
 }> {
   // 1. Try local server-side endpoint first
   try {
-    const res = await fetch('/api/linepulse/live/news');
+    const res = await fetch('/api/edgedetect/live/news').catch(() => fetch('/api/linepulse/live/news'));
     if (res.ok) {
       const data = await res.json();
       if (data && data.success && Array.isArray(data.articles) && data.articles.length > 0) {
@@ -119,7 +119,7 @@ export async function fetchLiveGamesWithFallback(): Promise<{
 }> {
   // 1. Try local server-side endpoint first
   try {
-    const res = await fetch('/api/linepulse/live/games');
+    const res = await fetch('/api/edgedetect/live/games').catch(() => fetch('/api/linepulse/live/games'));
     if (res.ok) {
       const data = await res.json();
       if (data && data.success && Array.isArray(data.games) && data.games.length > 0) {

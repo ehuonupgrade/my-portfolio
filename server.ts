@@ -65,11 +65,22 @@ const DEFAULT_PROJECTS = {
     mobileViews: 0,
     desktopViews: 0,
   },
+  edgedetect: {
+    id: 'edgedetect',
+    name: 'EdgeDetect (Market Intelligence & 1-Game Strategy)',
+    category: 'Sports Analytics & Probability',
+    path: '/myprojects/edgedetect',
+    viewCount: 0,
+    totalDwellSeconds: 0,
+    lastVisitedAt: null,
+    mobileViews: 0,
+    desktopViews: 0,
+  },
   linepulse: {
     id: 'linepulse',
-    name: 'LinePulse (Sports Betting Sharp Lines & Strategy)',
+    name: 'EdgeDetect (Market Intelligence & 1-Game Strategy)',
     category: 'Sports Analytics & Probability',
-    path: '/myprojects/linepulse',
+    path: '/myprojects/edgedetect',
     viewCount: 0,
     totalDwellSeconds: 0,
     lastVisitedAt: null,
@@ -387,7 +398,7 @@ function writeSmsLogs(logs: any[]): void {
 }
 
 // GET: Current Auto-Alert Settings (Private background config)
-app.get('/api/linepulse/alerts/settings', (req, res) => {
+app.get(['/api/edgedetect/alerts/settings', '/api/linepulse/alerts/settings'], (req, res) => {
   const settings = readSmsSettings();
   const safeSettings = {
     ...settings,
@@ -398,7 +409,7 @@ app.get('/api/linepulse/alerts/settings', (req, res) => {
 });
 
 // POST: Update Auto-Alert Settings
-app.post('/api/linepulse/alerts/settings', (req, res) => {
+app.post(['/api/edgedetect/alerts/settings', '/api/linepulse/alerts/settings'], (req, res) => {
   const current = readSmsSettings();
   const updated = {
     ...current,
@@ -417,15 +428,15 @@ app.post('/api/linepulse/alerts/settings', (req, res) => {
 });
 
 // POST: Send/Log SMS Alert to user's phone
-app.post('/api/linepulse/alerts/sms', async (req, res) => {
+app.post(['/api/edgedetect/alerts/sms', '/api/linepulse/alerts/sms'], async (req, res) => {
   const { phoneNumber, alertTitle, matchup, movementSummary, riskWarnings, actionRecommendation } = req.body;
   const targetPhone = phoneNumber || readSmsSettings().phoneNumber || '650-815-8590';
 
   const messageId = `sms-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
   const timestamp = new Date().toISOString();
 
-  const formattedText = `[LINEPULSE ALERT] 🚨 ${alertTitle || 'LARGE LINE & MONEY MOVEMENT'}
-Matchup: ${matchup || 'Buffalo Bills @ Los Angeles Rams'}
+  const formattedText = `[EDGEDETECT ALERT] 🚨 ${alertTitle || 'LARGE LINE & MONEY MOVEMENT'}
+Matchup: ${matchup || 'Denver Broncos @ Seattle Seahawks'}
 Movement: ${movementSummary || 'Bills steamed +4.5 to +3.5 | Under 51.0 crashed to 48.5 ($16.4M Handle, 68% dollars)'}
 
 CRITICAL RISKS TO AVOID:
@@ -503,7 +514,7 @@ Time: ${new Date().toLocaleTimeString()} EDT`;
 });
 
 // GET: Retrieve SMS alert history (with sensitive phone numbers masked/redacted)
-app.get('/api/linepulse/alerts/sms/history', (req, res) => {
+app.get(['/api/edgedetect/alerts/sms/history', '/api/linepulse/alerts/sms/history'], (req, res) => {
   const logs = readSmsLogs();
   const sanitizedLogs = logs.map((log) => ({
     ...log,
@@ -635,7 +646,7 @@ function synthesizeMultiBookOdds(
 }
 
 // GET: Live games and multi-book odds
-app.get('/api/linepulse/live/games', async (req, res) => {
+app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req, res) => {
   const now = Date.now();
   if (cachedLiveGames && now - cachedLiveGames.cachedAt < GAMES_CACHE_TTL_MS) {
     return res.json(cachedLiveGames.data);
@@ -908,7 +919,7 @@ app.get('/api/linepulse/live/games', async (req, res) => {
 });
 
 // GET: Live breaking sports news & injury wire
-app.get('/api/linepulse/live/news', async (req, res) => {
+app.get(['/api/edgedetect/live/news', '/api/linepulse/live/news'], async (req, res) => {
   const now = Date.now();
   if (cachedLiveNews && now - cachedLiveNews.cachedAt < NEWS_CACHE_TTL_MS) {
     return res.json(cachedLiveNews.data);
@@ -1008,7 +1019,7 @@ app.get('/api/linepulse/live/news', async (req, res) => {
 });
 
 // GET: Live feed network status
-app.get('/api/linepulse/live/status', (req, res) => {
+app.get(['/api/edgedetect/live/status', '/api/linepulse/live/status'], (req, res) => {
   const settings = readSmsSettings();
   res.json({
     success: true,
