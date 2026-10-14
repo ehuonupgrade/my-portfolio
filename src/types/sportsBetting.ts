@@ -158,6 +158,47 @@ export interface GameMarket {
 
   // Sports Analysts Data & Contrarian Fade Consensus
   analystConsensus?: AnalystMarketConsensus;
+
+  // Latest News & Injury Report Summaries with Line Impact
+  injuries?: GameInjurySummary;
+  weatherForecast?: GameWeatherForecast;
+  latestNews?: GameNewsItem[];
+}
+
+export interface PlayerInjuryItem {
+  player: string;
+  position: string;
+  status: 'OUT' | 'DOUBTFUL' | 'QUESTIONABLE' | 'IR' | 'ACTIVE';
+  injury: string; // e.g. "Concussion", "Hamstring", "Ankle", "Knee"
+  gameImpact: string; // Tactical description of impact on the game/line
+}
+
+export interface GameInjurySummary {
+  homeInjuries: PlayerInjuryItem[];
+  awayInjuries: PlayerInjuryItem[];
+  lineImpactAnalysis: string; // Concrete breakdown of how bookmakers adjust lines
+  totalImpactRating: 'MINIMAL' | 'MODERATE' | 'SIGNIFICANT' | 'GAME_CHANGING';
+}
+
+export interface GameWeatherForecast {
+  isDome: boolean;
+  temperature: string; // e.g. "54°F"
+  conditions: string; // e.g. "Clear Autumn Night", "Sustained Lake Winds", "Climate-Controlled Dome"
+  wind: string; // e.g. "6 mph NW", "18-24 mph Gusts"
+  humidity: string; // e.g. "32%"
+  precipitationChance: string; // e.g. "0%", "35% Drizzle"
+  altitudeFt?: number; // e.g. 5280
+  impactLevel: 'LOW' | 'MODERATE' | 'HIGH' | 'NONE_DOME';
+  impactSummary: string; // Tactical impact on totals, field goals, passing depth, and ball security
+}
+
+export interface GameNewsItem {
+  id: string;
+  headline: string;
+  source: string; // e.g. "ESPN NFL Wire", "CBS Sports", "NFL Network"
+  timeAgo: string; // e.g. "1h ago"
+  summary: string;
+  relevance: 'CRITICAL_LINE_MOVE' | 'INJURY_UPDATE' | 'COACHING_SCHEME' | 'MARKET_FLOW';
 }
 
 export interface SportsAnalyst {

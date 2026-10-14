@@ -25,7 +25,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [feedSource, setFeedSource] = useState<string>('Live Wire');
-  const [activeFilter, setActiveFilter] = useState<'ALL' | 'INJURY' | 'SHARP' | 'NFL' | 'NBA' | 'MLB'>('ALL');
+  const [activeFilter, setActiveFilter] = useState<'ALL' | 'INJURY' | 'SHARP' | 'NFL'>('NFL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -67,8 +67,6 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
       if (activeFilter === 'INJURY' && a.wireType !== 'INJURY_INACTIVES') return false;
       if (activeFilter === 'SHARP' && a.wireType !== 'SHARP_LINE_IMPACT' && a.impactLevel !== 'CRITICAL') return false;
       if (activeFilter === 'NFL' && a.league !== 'NFL') return false;
-      if (activeFilter === 'NBA' && a.league !== 'NBA') return false;
-      if (activeFilter === 'MLB' && a.league !== 'MLB') return false;
 
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -176,7 +174,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
           <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
             <span className="text-slate-400 text-[11px] block">Tracked Stories</span>
             <span className="text-lg font-bold text-white">{articles.length}</span>
-            <span className="text-[10px] text-slate-500 block">Across NFL, NBA, MLB</span>
+            <span className="text-[10px] text-slate-500 block">Active NFL Wire &amp; Reports</span>
           </div>
 
           <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/40">
@@ -258,41 +256,14 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
               playKeyClick();
               setActiveFilter('NFL');
             }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               activeFilter === 'NFL'
-                ? 'bg-indigo-600 text-white font-extrabold'
+                ? 'bg-indigo-600 text-white font-extrabold shadow'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
           >
-            🏈 NFL
-          </button>
-
-          <button
-            onClick={() => {
-              playKeyClick();
-              setActiveFilter('NBA');
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              activeFilter === 'NBA'
-                ? 'bg-indigo-600 text-white font-extrabold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            🏀 NBA
-          </button>
-
-          <button
-            onClick={() => {
-              playKeyClick();
-              setActiveFilter('MLB');
-            }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              activeFilter === 'MLB'
-                ? 'bg-indigo-600 text-white font-extrabold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            ⚾ MLB
+            <span>🏈</span>
+            <span>NFL News Wire (Active Focus)</span>
           </button>
         </div>
 
