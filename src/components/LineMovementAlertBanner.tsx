@@ -220,18 +220,20 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
 ];
 
 interface LineMovementAlertBannerProps {
+  defaultCollapsed?: boolean;
   onSelectGame?: (gameId: string) => void;
   onOpenStrategy?: () => void;
   onOpenAlertLogs?: () => void;
 }
 
 export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = ({
+  defaultCollapsed = false,
   onSelectGame,
   onOpenStrategy,
   onOpenAlertLogs,
 }) => {
   const [activeAlertIndex, setActiveAlertIndex] = useState<number>(0);
-  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+  const [isExpanded, setIsExpanded] = useState<boolean>(!defaultCollapsed);
   const [showSmsModal, setShowSmsModal] = useState<boolean>(false);
   // Background receiver configuration (stored securely in backend/localStorage without displaying in clear text)
   const [phoneNumber, setPhoneNumber] = useState<string>('650-815-8590');
@@ -450,11 +452,15 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
               </button>
 
               <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-colors text-xs"
-                title={isExpanded ? 'Collapse Alert' : 'Expand Alert'}
+                onClick={() => {
+                  playKeyClick();
+                  setIsExpanded(!isExpanded);
+                }}
+                className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 hover:border-amber-400 text-amber-300 hover:text-white font-mono text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                title={isExpanded ? 'Collapse Radar Alert' : 'Expand Radar Alert'}
               >
-                {isExpanded ? '▲' : '▼'}
+                <span>{isExpanded ? '▲' : '▼'}</span>
+                <span>{isExpanded ? 'Collapse Radar' : 'Expand Radar'}</span>
               </button>
             </div>
           </div>
@@ -472,6 +478,52 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
               </span>
             )}
           </div>
+
+          {/* WHILE COLLAPSED: SHOW BRIEF EXPLANATION OF THE ALERT AS REQUESTED */}
+          {!isExpanded && (
+            <div className="pt-2 pb-1 space-y-3 border-t border-rose-900/40 animate-fadeIn">
+              <div className="p-3.5 rounded-xl bg-slate-950/85 border border-amber-600/50 text-xs space-y-2.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2 py-0.5 rounded bg-amber-950 border border-amber-600 text-amber-300 font-bold text-[10px] uppercase">
+                      ⚡ BRIEF ALERT EXPLANATION
+                    </span>
+                    <span className="text-white font-bold">
+                      {currentAlert.spreadShift.open} &rarr; <span className="text-emerald-400">{currentAlert.spreadShift.current}</span> ({currentAlert.spreadShift.delta})
+                    </span>
+                    <span className="text-slate-400">
+                      &bull; Sharp Volume: <span className="text-amber-300 font-bold">{currentAlert.moneyDivergence.dollarsPct}% Dollars</span> on {currentAlert.moneyDivergence.dollarVolume} vs {currentAlert.moneyDivergence.ticketsPct}% Tickets
+                    </span>
+                  </div>
+                  <span className="text-rose-400 text-[11px] font-bold shrink-0">
+                    +{currentAlert.moneyDivergence.divergenceMargin}% Whale Divergence Margin
+                  </span>
+                </div>
+
+                <p className="text-slate-200 text-xs leading-relaxed font-sans">
+                  <strong className="text-amber-300 font-mono">Why this alert triggered: </strong>
+                  {currentAlert.riskWarnings[0]?.description || currentAlert.headline}
+                </p>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-slate-800/80 font-sans text-xs">
+                  <span className="text-slate-300">
+                    <strong className="text-emerald-400 font-mono">Recommended Execution: </strong>
+                    {currentAlert.actionAdvice}
+                  </span>
+                  <button
+                    onClick={() => {
+                      playKeyClick();
+                      setIsExpanded(true);
+                    }}
+                    className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-mono font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 shadow-sm"
+                  >
+                    <span>▼</span>
+                    <span>Expand Full Movement Radar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* EXPANDED CONTENT: MOVEMENT DETAILS + RISK ANALYSIS */}
           {isExpanded && (

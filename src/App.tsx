@@ -89,6 +89,8 @@ const getStateForPath = (pathname: string): RouteState => {
 
   if (
     clean === '/myprojects/edgedetect' ||
+    clean.startsWith('/myprojects/edgedetect') ||
+    clean.startsWith('/projects/edgedetect') ||
     clean.endsWith('/myprojects/edgedetect') ||
     clean.endsWith('/projects/edgedetect') ||
     clean === '/myprojects/linepulse' ||
@@ -688,7 +690,7 @@ export default function App() {
                               US Sports Market Intelligence &bull; NFL Primary Focus
                             </span>
                             <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
-                              EdgeDetect: Market Intelligence &amp; 1-Game Strategy
+                              EdgeDetect: Daily Bet Recommendations, Market Radar &amp; NFL Hub
                             </h3>
                           </div>
                           <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 self-start sm:self-auto font-medium">
@@ -697,7 +699,7 @@ export default function App() {
                         </div>
 
                         <p className="text-sm text-slate-300 leading-relaxed font-normal">
-                          Aggregates publicly available consensus odds and line movement across 8 top books (DraftKings, FanDuel, Circa, Pinnacle, BetMGM, Caesars). Compares market pricing, tracks total ticket count vs. total dollars wagered to detect sharp money divergence, logs line movement history, and isolates <strong>1 Game with 1 Multi-Leg Strategy</strong> where market pricing creates positive expected value (+EV).
+                          Main dashboard presents today&apos;s <strong>Bet Recommendations</strong> (Spread, Moneyline &amp; Over/Under ranked by confidence), real-time <strong>Critical Line &amp; Money Movement Radar</strong> (unit tickets &amp; dollar handle shifts), and a transparent <strong>Historical Bet Ledger</strong>, with league-specific analysis nested under dedicated sub-pages starting with the <strong>NFL Intelligence Hub</strong>.
                         </p>
 
                         <div className="flex items-center justify-between pt-2 text-xs font-mono">

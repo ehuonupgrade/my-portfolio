@@ -10,14 +10,44 @@ import { AlertHistoryLogViewer } from './AlertHistoryLogViewer';
 import { LiveNewsWireView } from './LiveNewsWireView';
 import { SlateConfidenceRankingsView } from './SlateConfidenceRankingsView';
 import { LiveVolumeShiftDashboard } from './LiveVolumeShiftDashboard';
+import { EdgeDetectMainDashboard } from './EdgeDetectMainDashboard';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
 
 interface SportsBettingEdgeHubProps {
   onBack?: () => void;
+  initialSubPage?: 'main' | 'nfl';
+  onSubPageChange?: (sub: 'main' | 'nfl') => void;
 }
 
-export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBack }) => {
+export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
+  onBack,
+  initialSubPage,
+  onSubPageChange,
+}) => {
+  const [activeSubPage, setActiveSubPage] = useState<'main' | 'nfl'>(() => {
+    if (initialSubPage) return initialSubPage;
+    if (typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('/nfl')) {
+      return 'nfl';
+    }
+    return 'main';
+  });
+
+  useEffect(() => {
+    if (initialSubPage && initialSubPage !== activeSubPage) {
+      setActiveSubPage(initialSubPage);
+    }
+  }, [initialSubPage]);
+
+  const switchSubPage = (page: 'main' | 'nfl') => {
+    playKeyClick();
+    setActiveSubPage(page);
+    onSubPageChange?.(page);
+    if (typeof window !== 'undefined' && window.history) {
+      const newPath = page === 'nfl' ? '/myprojects/edgedetect/nfl' : '/myprojects/edgedetect';
+      window.history.pushState(null, '', newPath);
+    }
+  };
   const [hubViewMode, setHubViewMode] = useState<'board' | 'rankings' | 'volume-shifts' | 'news' | 'analysts' | 'tracker' | 'trends' | 'logs'>('board');
   const [selectedLeague, setSelectedLeague] = useState<SportsLeague | 'ALL'>('NFL');
   const [activeGameId, setActiveGameId] = useState<string>('nfl-sea-den-tnf');
@@ -173,48 +203,107 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
     setTimeout(() => setCopiedStrategy(false), 3000);
   };
 
+  if (activeSubPage === 'main') {
+    return (
+      <EdgeDetectMainDashboard
+        games={allAvailableGames}
+        onNavigateToLeague={(league) => {
+          setActiveSubPage('nfl');
+          setSelectedLeague('NFL');
+          if (typeof window !== 'undefined' && window.history) {
+            window.history.pushState(null, '', '/myprojects/edgedetect/nfl');
+          }
+        }}
+        onSelectGameAndInspect={(gameId, tab) => {
+          setActiveSubPage('nfl');
+          setSelectedLeague('NFL');
+          setActiveGameId(gameId);
+          if (tab) setViewTab(tab);
+          setHubViewMode('board');
+          if (typeof window !== 'undefined' && window.history) {
+            window.history.pushState(null, '', '/myprojects/edgedetect/nfl');
+          }
+        }}
+        onBackToProjects={onBack}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fadeIn font-sans pb-12">
-      {/* PROMINENT REAL-TIME LINE & MONEY MOVEMENT ALERT BANNER */}
-      <LineMovementAlertBanner
-        onSelectGame={(gameId) => {
-          setActiveGameId(gameId);
-          setViewTab('movement');
-          setHubViewMode('board');
-        }}
-        onOpenStrategy={() => {
-          setActiveGameId(primeGame.id);
-          setViewTab('strategy');
-          setHubViewMode('board');
-        }}
-        onOpenAlertLogs={() => {
-          setHubViewMode('logs');
-        }}
-      />
+      {/* Top Header & Breadcrumb for NFL Sub-Page (Critical Line & Movement Radar moved to Main Page) */}
 
-      {/* Top Header & Breadcrumb */}
+      {/* Top Header & Breadcrumb for NFL Sub-Page */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 shadow-xl space-y-5 relative overflow-hidden backdrop-blur-md">
         <div className="space-y-2.5">
-          <div className="flex items-center gap-2 flex-wrap">
-            {onBack && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+            <div className="flex items-center gap-2 flex-wrap font-mono text-xs">
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className="px-2.5 py-1 text-xs rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <span>&larr;</span>
+                  <span>My Projects</span>
+                </button>
+              )}
+              <span className="text-slate-500">/</span>
               <button
-                onClick={onBack}
-                className="px-2.5 py-1 text-xs rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 font-mono"
+                onClick={() => {
+                  playKeyClick();
+                  setActiveSubPage('main');
+                  if (typeof window !== 'undefined' && window.history) {
+                    window.history.pushState(null, '', '/myprojects/edgedetect');
+                  }
+                }}
+                className="text-cyan-400 hover:text-cyan-300 font-bold transition-colors cursor-pointer flex items-center gap-1"
               >
-                <span>&larr;</span>
-                <span>My Projects</span>
+                <span>⚡ EdgeDetect Hub</span>
               </button>
-            )}
-            <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span>PROJECT #4 &bull; MULTI-BOOK ARBITRAGE &amp; LINE MOVEMENT AGGREGATOR</span>
-            </span>
+              <span className="text-slate-500">/</span>
+              <span className="text-amber-400 font-bold flex items-center gap-1">
+                <span>🏈 NFL Sub-Page</span>
+              </span>
+            </div>
+
+            {/* Sub-Page Navigation Switcher */}
+            <div className="flex items-center gap-2 font-mono text-xs overflow-x-auto no-scrollbar">
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  setActiveSubPage('main');
+                  if (typeof window !== 'undefined' && window.history) {
+                    window.history.pushState(null, '', '/myprojects/edgedetect');
+                  }
+                }}
+                className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 hover:border-cyan-500 text-slate-300 hover:text-white font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+              >
+                <span>🏠</span>
+                <span>Main Page (Today&apos;s Recommendations &amp; Radar)</span>
+              </button>
+
+              <button
+                className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-black shadow-md flex items-center gap-1.5 shrink-0"
+              >
+                <span>🏈</span>
+                <span>NFL Hub (Active Focus)</span>
+              </button>
+
+              <div className="hidden md:flex items-center gap-1 text-slate-500 text-[11px] px-2 py-1 rounded-xl bg-slate-950/80 border border-slate-800/80 shrink-0">
+                <span>🏀 NBA</span>
+                <span className="text-[9px] text-slate-600 bg-slate-900 px-1 py-0.2 rounded">Upcoming</span>
+              </div>
+              <div className="hidden md:flex items-center gap-1 text-slate-500 text-[11px] px-2 py-1 rounded-xl bg-slate-950/80 border border-slate-800/80 shrink-0">
+                <span>⚾ MLB</span>
+                <span className="text-[9px] text-slate-600 bg-slate-900 px-1 py-0.2 rounded">Upcoming</span>
+              </div>
+            </div>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2.5 flex-wrap">
-            <span>EdgeDetect: NFL Sharp Market Aggregator</span>
-            <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-700/60 text-cyan-300">
-              🏈 NFL Exclusive Focus &bull; Week 6 (2026 Regular Season)
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2.5 flex-wrap pt-1">
+            <span>EdgeDetect: NFL Intelligence Hub &amp; Markets</span>
+            <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-600/70 text-amber-300">
+              🏈 NFL Sub-Page &bull; Week 6 (2026 Regular Season)
             </span>
             <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-600/60 text-emerald-300 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -223,7 +312,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
           </h2>
 
           <p className="text-sm text-slate-300 leading-relaxed max-w-4xl">
-            Real-time consensus market line aggregator narrowed exclusively to the <strong>NFL</strong> to eliminate cross-sport data inconsistencies. Integrates live multi-book odds from 8 top sportsbooks, tactical <strong>weather forecast impact models</strong>, <strong>injury report summaries</strong> with line movement analysis, and <strong>100% verified team records & scores through today</strong> (Wednesday, Oct 14, 2026).
+            Dedicated league sub-page for the <strong>NFL</strong>. Aggregates live odds across 8 top sportsbooks, in-depth <strong>3-way game opinions (Spread, ML, Over/Under ranked #1 to #10)</strong>, real-time <strong>volume shift telemetry in units and dollars</strong>, tactical <strong>weather impact models</strong>, <strong>injury reports</strong>, and <strong>100% verified team records through today</strong> (Wednesday, Oct 14, 2026).
           </p>
 
           {/* Action & View Buttons Below Summary Text */}
