@@ -163,6 +163,90 @@ export interface GameMarket {
   injuries?: GameInjurySummary;
   weatherForecast?: GameWeatherForecast;
   latestNews?: GameNewsItem[];
+
+  // 3-Way Bet Opinions (Spread, Moneyline, Over/Under) & Slate-Wide Confidence Ranking
+  marketOpinions?: GameMarketOpinions;
+
+  // Real-time Active Shifts in Betting Volume (Units & Dollars)
+  liveVolumeShifts?: ActiveGameVolumeShifts;
+}
+
+export interface ActiveVolumeShiftWindow {
+  window: '5M' | '15M' | '1H';
+  unitsHome: number; // + tickets on home
+  unitsAway: number; // + tickets on away
+  dollarsHome: number; // + dollars on home
+  dollarsAway: number; // + dollars on away
+  unitsOver: number; // + tickets on over
+  unitsUnder: number; // + tickets on under
+  dollarsOver: number; // + dollars on over
+  dollarsUnder: number; // + dollars on under
+  dominantSide: string; // e.g. "Seattle Seahawks -2.5"
+  swingVelocity: 'HEAVY_STEAM' | 'STEADY_ACCUMULATION' | 'BALANCED_DRIFT';
+  swingSummary: string; // e.g. "+$420k / +1,850 units swinging to SEA in last 15m"
+}
+
+export interface VolumeTickPulse {
+  id: string;
+  timestamp: string;
+  gameId: string;
+  matchup: string;
+  targetSelection: string;
+  marketType: 'SPREAD' | 'MONEYLINE' | 'TOTAL';
+  unitDelta: number; // e.g. +340 bets
+  dollarDelta: number; // e.g. +$85,000
+  sportsbook: string;
+  tag: 'WHALE_LIMIT' | 'STEAM_SURGE' | 'PUBLIC_SWARM';
+  summary: string;
+}
+
+export interface ActiveGameVolumeShifts {
+  lastUpdated: string;
+  shiftVelocityRatePerMinute: {
+    unitsPerMin: number;
+    dollarsPerMin: number;
+  };
+  netSpreadSwingPct: number; // -100 (100% Home) to +100 (100% Away)
+  netTotalSwingPct: number; // -100 (100% Under) to +100 (100% Over)
+  windows: {
+    fiveMin: ActiveVolumeShiftWindow;
+    fifteenMin: ActiveVolumeShiftWindow;
+    oneHour: ActiveVolumeShiftWindow;
+  };
+  recentPulses: VolumeTickPulse[];
+}
+
+export type BetVerdictRating = 'STRONG_BUY' | 'BUY' | 'LEAN' | 'AVOID_PASS';
+export type ConfidenceTier = 'MAX_LOCK' | 'HIGH_CONVICTION' | 'STRONG_VALUE' | 'MODERATE_EDGE' | 'VOLATILE_LEAN';
+
+export interface SingleMarketVerdict {
+  betType: 'SPREAD' | 'MONEYLINE' | 'TOTAL';
+  pick: string; // e.g. "Seattle Seahawks -2.5", "Seattle Seahawks ML (-140)", "Under 40.5"
+  odds: string; // e.g. "-110", "-140", "-110"
+  bestSportsbook: string; // e.g. "DraftKings", "Circa Sports", "FanDuel"
+  modelEdge: number; // e.g. 7.4 (percentage)
+  confidenceRating: number; // 1 to 100 (e.g. 96, 91, 84)
+  confidenceStars: number; // 1 to 5
+  verdict: BetVerdictRating;
+  selectionSummary: string; // Short actionable callout
+  rationale: string; // Comprehensive explanation of why this was picked
+}
+
+export interface GameMarketOpinions {
+  overallConfidenceRank: number; // 1 = Most Confident, 2 = 2nd most confident, ..., 10 = least confident
+  overallConfidenceScore: number; // 1 to 100 (e.g. 96)
+  confidenceTier: ConfidenceTier;
+  primaryRecommendedBet: 'SPREAD' | 'MONEYLINE' | 'TOTAL';
+  executiveMatchupVerdict: string; // Complete executive thesis of why this game is ranked here
+  spreadOpinion: SingleMarketVerdict;
+  moneylineOpinion: SingleMarketVerdict;
+  totalOpinion: SingleMarketVerdict;
+  keyFactors: {
+    weatherImpactFactor: string;
+    injuryAdvantage: string;
+    sharpMoneySignal: string;
+    schemeEdge: string;
+  };
 }
 
 export interface PlayerInjuryItem {

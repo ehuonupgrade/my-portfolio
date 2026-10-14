@@ -109,3 +109,10 @@ export function playErrorBuzz() {
     // ignore
   }
 }
+
+// High chime for alert notifications
+export function playChime() {
+  if (!soundEnabled) return;
+  playBeep(880.0, 0.08);
+}
+

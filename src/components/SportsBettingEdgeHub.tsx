@@ -8,6 +8,8 @@ import { BettingPerformanceCharts } from './BettingPerformanceCharts';
 import { LineMovementAlertBanner } from './LineMovementAlertBanner';
 import { AlertHistoryLogViewer } from './AlertHistoryLogViewer';
 import { LiveNewsWireView } from './LiveNewsWireView';
+import { SlateConfidenceRankingsView } from './SlateConfidenceRankingsView';
+import { LiveVolumeShiftDashboard } from './LiveVolumeShiftDashboard';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
 
@@ -16,10 +18,10 @@ interface SportsBettingEdgeHubProps {
 }
 
 export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBack }) => {
-  const [hubViewMode, setHubViewMode] = useState<'board' | 'news' | 'analysts' | 'tracker' | 'trends' | 'logs'>('board');
+  const [hubViewMode, setHubViewMode] = useState<'board' | 'rankings' | 'volume-shifts' | 'news' | 'analysts' | 'tracker' | 'trends' | 'logs'>('board');
   const [selectedLeague, setSelectedLeague] = useState<SportsLeague | 'ALL'>('NFL');
   const [activeGameId, setActiveGameId] = useState<string>('nfl-sea-den-tnf');
-  const [viewTab, setViewTab] = useState<'strategy' | 'weather' | 'injuries' | 'news' | 'splits' | 'books' | 'movement'>('strategy');
+  const [viewTab, setViewTab] = useState<'opinions' | 'strategy' | 'weather' | 'injuries' | 'news' | 'splits' | 'books' | 'movement'>('opinions');
   const [showVerificationModal, setShowVerificationModal] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showDailyPortfolio, setShowDailyPortfolio] = useState<boolean>(true);
@@ -258,6 +260,42 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
             <button
               onClick={() => {
                 playKeyClick();
+                setHubViewMode('rankings');
+              }}
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
+                hubViewMode === 'rankings'
+                  ? 'bg-gradient-to-r from-cyan-400 to-emerald-400 text-slate-950 font-extrabold shadow-cyan-500/20'
+                  : 'bg-cyan-950/70 border border-cyan-700/80 text-cyan-200 hover:text-white hover:border-cyan-500'
+              }`}
+            >
+              <span>🎯</span>
+              <span>Confidence Rankings (#1 &rarr; #10)</span>
+              <span className="px-1.5 py-0.5 rounded bg-cyan-900 border border-cyan-600 text-[10px] text-cyan-100 font-black">
+                OPINIONS
+              </span>
+            </button>
+
+            <button
+              onClick={() => {
+                playKeyClick();
+                setHubViewMode('volume-shifts');
+              }}
+              className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
+                hubViewMode === 'volume-shifts'
+                  ? 'bg-gradient-to-r from-emerald-400 to-teal-400 text-slate-950 font-extrabold shadow-emerald-500/20'
+                  : 'bg-emerald-950/70 border border-emerald-700/80 text-emerald-200 hover:text-white hover:border-emerald-500'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>⚡ Live Volume Shifts (Units &amp; $)</span>
+              <span className="px-1.5 py-0.5 rounded bg-emerald-900 border border-emerald-600 text-[10px] text-emerald-100 font-black">
+                SWINGS
+              </span>
+            </button>
+
+            <button
+              onClick={() => {
+                playKeyClick();
                 setHubViewMode('news');
               }}
               className={`px-4 py-2.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 shadow-sm ${
@@ -392,7 +430,27 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
       </div>
 
       {/* VIEW MODES */}
-      {hubViewMode === 'news' ? (
+      {hubViewMode === 'rankings' ? (
+        <SlateConfidenceRankingsView
+          games={allAvailableGames}
+          onSelectGame={(gameId) => {
+            setActiveGameId(gameId);
+            setHubViewMode('board');
+            setViewTab('opinions');
+          }}
+          onOpenLiveShifts={() => setHubViewMode('volume-shifts')}
+        />
+      ) : hubViewMode === 'volume-shifts' ? (
+        <LiveVolumeShiftDashboard
+          games={allAvailableGames}
+          onSelectGame={(gameId) => {
+            setActiveGameId(gameId);
+            setHubViewMode('board');
+            setViewTab('opinions');
+          }}
+          onOpenRankings={() => setHubViewMode('rankings')}
+        />
+      ) : hubViewMode === 'news' ? (
         <LiveNewsWireView
           onSelectGame={(gameId) => {
             setActiveGameId(gameId);
@@ -688,11 +746,29 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
                         <span>{game.scheduledTime}</span>
                       )}
                     </span>
-                    {game.isPrimeOpportunity && (
-                      <span className="px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold text-[10px] animate-pulse">
-                        ★ 1 PRIME GAME
-                      </span>
-                    )}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {game.marketOpinions && (
+                        <span
+                          className={`px-2 py-0.5 rounded font-black text-[10px] flex items-center gap-1 ${
+                            game.marketOpinions.overallConfidenceRank === 1
+                              ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                              : game.marketOpinions.overallConfidenceRank === 2
+                              ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                              : game.marketOpinions.overallConfidenceRank <= 4
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-slate-950 border border-slate-700 text-slate-300'
+                          }`}
+                        >
+                          <span>{game.marketOpinions.overallConfidenceRank === 1 ? '🏆' : '#'}</span>
+                          <span>Rank #{game.marketOpinions.overallConfidenceRank} ({game.marketOpinions.overallConfidenceScore}%)</span>
+                        </span>
+                      )}
+                      {game.isPrimeOpportunity && (
+                        <span className="px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold text-[10px] animate-pulse">
+                          ★ PRIME
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Matchup & Real-time scores */}
@@ -753,6 +829,17 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
                         <span>{game.latestNews.length} News</span>
                       </span>
                     )}
+
+                    {game.liveVolumeShifts && (
+                      <span className={`px-2 py-0.5 rounded font-mono font-bold flex items-center gap-1 ${
+                        Math.abs(game.liveVolumeShifts.netSpreadSwingPct) > 50
+                          ? 'bg-emerald-950/80 border border-emerald-600/80 text-emerald-300'
+                          : 'bg-slate-950 border border-slate-800 text-slate-400'
+                      }`}>
+                        <span>⚡</span>
+                        <span>{game.liveVolumeShifts.netSpreadSwingPct > 0 ? `+${game.liveVolumeShifts.netSpreadSwingPct}% ${game.awayTeam.abbr} Swing` : `+${Math.abs(game.liveVolumeShifts.netSpreadSwingPct)}% ${game.homeTeam.abbr} Swing`}</span>
+                      </span>
+                    )}
                   </div>
 
                   {/* Line summary & Handle split preview */}
@@ -795,7 +882,8 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
             </div>
 
             {/* Quick Telemetry: Weather & Venue, Injury Impact, Latest News Wire */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1 font-mono text-xs">
+            {/* Quick Telemetry: Weather, Injuries, News & Confidence Rank */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1 font-mono text-xs">
               {/* Box 1: Weather Forecast */}
               <div
                 onClick={() => setViewTab('weather')}
@@ -877,10 +965,63 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
                   Source: {activeGame.latestNews?.[0]?.source || 'NFL Wire'}
                 </div>
               </div>
+
+              {/* Box 4: Confidence Hierarchy & Opinions */}
+              <div
+                onClick={() => setViewTab('opinions')}
+                className="p-3 rounded-xl bg-slate-950/90 border border-slate-800 hover:border-cyan-500 transition-all cursor-pointer space-y-1 group"
+              >
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400 font-bold flex items-center gap-1 group-hover:text-cyan-300 transition-colors">
+                    <span>🎯</span>
+                    <span>Confidence Rank</span>
+                  </span>
+                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-black ${
+                    activeGame.marketOpinions?.overallConfidenceRank === 1
+                      ? 'bg-cyan-500 text-slate-950'
+                      : activeGame.marketOpinions?.overallConfidenceRank === 2
+                      ? 'bg-emerald-500 text-slate-950'
+                      : 'bg-indigo-950 border border-indigo-700 text-indigo-300'
+                  }`}>
+                    #{activeGame.marketOpinions?.overallConfidenceRank || 1} OF 10
+                  </span>
+                </div>
+                <div className="text-white font-bold text-xs truncate">
+                  {activeGame.marketOpinions?.overallConfidenceScore || 90}% Conviction Score
+                </div>
+                <div className="text-[10px] text-emerald-400 truncate">
+                  Top Bet: {activeGame.marketOpinions?.primaryRecommendedBet || 'SPREAD'} &bull; View 3-Way &rarr;
+                </div>
+              </div>
             </div>
 
             {/* Navigation Tabs for Active Game Details */}
             <div className="flex items-center gap-1.5 border-b border-slate-800 pb-2 overflow-x-auto text-xs">
+              <button
+                onClick={() => setViewTab('opinions')}
+                className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                  viewTab === 'opinions'
+                    ? 'bg-cyan-500 text-slate-950 font-black shadow-md'
+                    : 'bg-cyan-950/70 border border-cyan-800/80 text-cyan-300 hover:text-white'
+                }`}
+              >
+                <span>🎯</span>
+                <span>3-Way Opinions (Spread, ML, O/U)</span>
+                {activeGame.marketOpinions && (
+                  <span className="px-1.5 py-0.2 rounded bg-cyan-900 text-[10px] text-slate-950 font-black">
+                    RANK #{activeGame.marketOpinions.overallConfidenceRank}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setHubViewMode('volume-shifts')}
+                className="px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 bg-emerald-950/70 border border-emerald-800/80 text-emerald-300 hover:text-white"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span>⚡ Live Volume Swings (Units &amp; $)</span>
+              </button>
+
               <button
                 onClick={() => setViewTab('strategy')}
                 className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
@@ -962,6 +1103,171 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({ onBa
                 📈 Line Movement History
               </button>
             </div>
+
+            {/* TAB CONTENT: 3-WAY OPINIONS & CONFIDENCE RANKING */}
+            {viewTab === 'opinions' && (
+              <div className="space-y-4 pt-1 animate-fadeIn font-mono">
+                {activeGame.marketOpinions ? (
+                  <div className="space-y-4">
+                    {/* Header Banner */}
+                    <div className="p-4 rounded-xl bg-slate-950 border border-cyan-800/80 space-y-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={`px-2.5 py-0.5 rounded font-black text-xs ${
+                              activeGame.marketOpinions.overallConfidenceRank === 1
+                                ? 'bg-cyan-500 text-slate-950 shadow-md'
+                                : activeGame.marketOpinions.overallConfidenceRank === 2
+                                ? 'bg-emerald-500 text-slate-950 shadow-md'
+                                : 'bg-indigo-600 text-white'
+                            }`}
+                          >
+                            RANK #{activeGame.marketOpinions.overallConfidenceRank} OF 10
+                          </span>
+                          <span className="text-white font-bold text-sm">
+                            {activeGame.marketOpinions.overallConfidenceScore}% Model Conviction
+                          </span>
+                          <span className="text-[10px] text-slate-400 uppercase">
+                            ({activeGame.marketOpinions.confidenceTier.replace(/_/g, ' ')})
+                          </span>
+                        </div>
+
+                        <div className="text-xs text-emerald-400 font-bold">
+                          Primary Recommended Bet: {activeGame.marketOpinions.primaryRecommendedBet}
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-slate-300 font-sans leading-relaxed">
+                        <span className="font-bold text-cyan-400 font-mono text-[11px] uppercase block mb-0.5">
+                          Executive Angle &amp; Confidence Rationale:
+                        </span>
+                        {activeGame.marketOpinions.executiveMatchupVerdict}
+                      </div>
+                    </div>
+
+                    {/* 3 Side-by-Side Opinion Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {/* SPREAD OPINION */}
+                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-3">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-slate-400 uppercase font-bold">1. Spread Pick</span>
+                            <span className="px-2 py-0.5 rounded bg-cyan-950 border border-cyan-600 text-cyan-300 font-black">
+                              {activeGame.marketOpinions.spreadOpinion.verdict.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                          <div className="text-base font-black text-white font-sans">
+                            {activeGame.marketOpinions.spreadOpinion.pick}
+                          </div>
+                          <div className="text-xs text-emerald-400 font-bold flex items-center justify-between">
+                            <span>{activeGame.marketOpinions.spreadOpinion.odds} ({activeGame.marketOpinions.spreadOpinion.bestSportsbook})</span>
+                            <span>+{activeGame.marketOpinions.spreadOpinion.modelEdge}% EV</span>
+                          </div>
+                          <div className="text-[11px] text-slate-300 font-sans italic border-t border-slate-800/80 pt-1">
+                            &ldquo;{activeGame.marketOpinions.spreadOpinion.selectionSummary}&rdquo;
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-800/80">
+                          <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">
+                            Why We Picked This Spread:
+                          </div>
+                          <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                            {activeGame.marketOpinions.spreadOpinion.rationale}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* MONEYLINE OPINION */}
+                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-3">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-slate-400 uppercase font-bold">2. Moneyline Pick</span>
+                            <span className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-600 text-emerald-300 font-black">
+                              {activeGame.marketOpinions.moneylineOpinion.verdict.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                          <div className="text-base font-black text-white font-sans">
+                            {activeGame.marketOpinions.moneylineOpinion.pick}
+                          </div>
+                          <div className="text-xs text-emerald-400 font-bold flex items-center justify-between">
+                            <span>{activeGame.marketOpinions.moneylineOpinion.odds} ({activeGame.marketOpinions.moneylineOpinion.bestSportsbook})</span>
+                            <span>+{activeGame.marketOpinions.moneylineOpinion.modelEdge}% EV</span>
+                          </div>
+                          <div className="text-[11px] text-slate-300 font-sans italic border-t border-slate-800/80 pt-1">
+                            &ldquo;{activeGame.marketOpinions.moneylineOpinion.selectionSummary}&rdquo;
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-800/80">
+                          <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">
+                            Why We Picked This Moneyline:
+                          </div>
+                          <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                            {activeGame.marketOpinions.moneylineOpinion.rationale}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* TOTAL OPINION */}
+                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-3">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-slate-400 uppercase font-bold">3. Over / Under Total</span>
+                            <span className="px-2 py-0.5 rounded bg-purple-950 border border-purple-600 text-purple-300 font-black">
+                              {activeGame.marketOpinions.totalOpinion.verdict.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                          <div className="text-base font-black text-white font-sans">
+                            {activeGame.marketOpinions.totalOpinion.pick}
+                          </div>
+                          <div className="text-xs text-emerald-400 font-bold flex items-center justify-between">
+                            <span>{activeGame.marketOpinions.totalOpinion.odds} ({activeGame.marketOpinions.totalOpinion.bestSportsbook})</span>
+                            <span>+{activeGame.marketOpinions.totalOpinion.modelEdge}% EV</span>
+                          </div>
+                          <div className="text-[11px] text-slate-300 font-sans italic border-t border-slate-800/80 pt-1">
+                            &ldquo;{activeGame.marketOpinions.totalOpinion.selectionSummary}&rdquo;
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-800/80">
+                          <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">
+                            Why We Picked This Total:
+                          </div>
+                          <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                            {activeGame.marketOpinions.totalOpinion.rationale}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Key Drivers */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
+                      <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-0.5">
+                        <span className="text-slate-500 uppercase font-bold text-[10px]">🌦️ Weather Impact:</span>
+                        <div className="text-slate-300 font-sans">{activeGame.marketOpinions.keyFactors.weatherImpactFactor}</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-0.5">
+                        <span className="text-slate-500 uppercase font-bold text-[10px]">🏥 Roster / Injury Advantage:</span>
+                        <div className="text-slate-300 font-sans">{activeGame.marketOpinions.keyFactors.injuryAdvantage}</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-0.5">
+                        <span className="text-slate-500 uppercase font-bold text-[10px]">🐋 Sharp Handle Inflow:</span>
+                        <div className="text-slate-300 font-sans">{activeGame.marketOpinions.keyFactors.sharpMoneySignal}</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 space-y-0.5">
+                        <span className="text-slate-500 uppercase font-bold text-[10px]">⚔️ Scheme Matchup Edge:</span>
+                        <div className="text-slate-300 font-sans">{activeGame.marketOpinions.keyFactors.schemeEdge}</div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-6 text-center text-slate-400">
+                    Opinions loading for this live game...
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* TAB CONTENT: 1-GAME STRATEGY */}
             {viewTab === 'strategy' && (

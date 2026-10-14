@@ -1,11 +1,12 @@
 import { GameMarket, DailySlatePortfolio } from '../types/sportsBetting';
 import { MOCK_ANALYST_CONSENSUS_DATA } from './sportsAnalystsData';
+import { NFL_MARKET_OPINIONS_MAP, NFL_LIVE_VOLUME_SHIFTS_MAP } from './nflMarketOpinionsData';
 
 export const PUBLIC_SPORTSBOOKS = [
   { name: 'DraftKings', code: 'DK', color: '#53d337' },
   { name: 'FanDuel', code: 'FD', color: '#1493ff' },
   { name: 'BetMGM', code: 'MGM', color: '#c3a159' },
-  { name: 'Caesars', code: 'CZR', color: '#0d7335' },
+  { name: 'Caesars', code: 'CZR', code_id: 'czr', color: '#0d7335' },
   { name: 'Circa Sports', code: 'CIRCA', color: '#df2423' },
   { name: 'Pinnacle', code: 'PINN', color: '#ff6600' },
   { name: 'BetRivers', code: 'RIV', color: '#163f84' },
@@ -17,7 +18,7 @@ export const PUBLIC_SPORTSBOOKS = [
  * All team records, matchups, injury reports, weather forecasts, and game scores
  * are verified accurate through today (Wednesday, Oct 14, 2026).
  */
-export const MOCK_GAMES_MARKETS: GameMarket[] = [
+const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
   // =========================================================================
   // GAME 1: THURSDAY NIGHT FOOTBALL (Denver Broncos vs. Seattle Seahawks)
   // =========================================================================
@@ -1355,7 +1356,364 @@ export const MOCK_GAMES_MARKETS: GameMarket[] = [
       },
     ],
   },
+  // =========================================================================
+  // GAME 9: SUNDAY AFTERNOON (Pittsburgh Steelers vs. Tampa Bay Buccaneers)
+  // =========================================================================
+  {
+    id: 'nfl-pit-tb-w6',
+    league: 'NFL',
+    homeTeam: {
+      name: 'Buccaneers',
+      city: 'Tampa Bay',
+      abbr: 'TB',
+      record: '3-2',
+      logoColor: '#d3bc8d',
+    },
+    awayTeam: {
+      name: 'Steelers',
+      city: 'Pittsburgh',
+      abbr: 'PIT',
+      record: '3-2',
+      logoColor: '#ffb612',
+    },
+    scheduledTime: 'Sunday, Oct 18 · 1:00 PM EDT',
+    stadium: 'Raymond James Stadium, Tampa, FL',
+    weatherCondition: '82°F, Sweltering 68% Gulf Humidity, 8 mph SE breeze',
+    status: 'UPCOMING',
+    totalBetsPlaced: 86400,
+    totalDollarsWagered: 11200000,
+    splits: {
+      spread: {
+        home: {
+          side: 'Tampa Bay Buccaneers -2.5',
+          ticketPercentage: 54,
+          moneyPercentage: 42,
+          totalTicketsCount: 46650,
+          totalHandleAmount: 4704000,
+          sharpSignal: 'PUBLIC_HEAVY',
+          divergenceNotice: 'Public backing home favorites, but sharps taking Tomlin points (+2.5).',
+        },
+        away: {
+          side: 'Pittsburgh Steelers +2.5',
+          ticketPercentage: 46,
+          moneyPercentage: 58,
+          totalTicketsCount: 39750,
+          totalHandleAmount: 6496000,
+          sharpSignal: 'MODERATE_SHARP',
+          divergenceNotice: 'Sharp syndicate support backing Mike Tomlin road underdog profile.',
+        },
+      },
+      moneyline: {
+        home: {
+          side: 'Buccaneers ML (-140)',
+          ticketPercentage: 52,
+          moneyPercentage: 48,
+          totalTicketsCount: 32000,
+          totalHandleAmount: 1800000,
+          sharpSignal: 'BALANCED',
+        },
+        away: {
+          side: 'Steelers ML (+120)',
+          ticketPercentage: 48,
+          moneyPercentage: 52,
+          totalTicketsCount: 29500,
+          totalHandleAmount: 1950000,
+          sharpSignal: 'BALANCED',
+        },
+      },
+      total: {
+        over: {
+          side: 'Over 39.5',
+          ticketPercentage: 45,
+          moneyPercentage: 32,
+          totalTicketsCount: 24000,
+          totalHandleAmount: 980000,
+          sharpSignal: 'PUBLIC_HEAVY',
+        },
+        under: {
+          side: 'Under 39.5',
+          ticketPercentage: 55,
+          moneyPercentage: 68,
+          totalTicketsCount: 29500,
+          totalHandleAmount: 2080000,
+          sharpSignal: 'HEAVY_SHARP',
+          divergenceNotice: 'Heavy sharp money driving total under 40 points in defensive clash.',
+        },
+      },
+    },
+    lineMovements: [
+      { timestamp: '2026-10-11T18:00:00Z', timeLabel: 'Sunday Open', spread: -3.0, total: 41.5, moneylineHome: -150, note: 'Market opened TB -3.0 (41.5 Total)' },
+      { timestamp: '2026-10-13T12:00:00Z', timeLabel: 'Tuesday Midday', spread: -2.5, total: 40.0, moneylineHome: -142, note: 'Steelers +3.0 bought by sharp syndicates; line moved to -2.5' },
+      { timestamp: '2026-10-14T07:00:00Z', timeLabel: 'Current Consensus', spread: -2.5, total: 39.5, moneylineHome: -140, note: 'Steady limit action on Under 39.5' },
+    ],
+    sportsbooks: [
+      {
+        bookName: 'DraftKings',
+        spreadHome: -2.5,
+        spreadHomeOdds: -110,
+        spreadAway: 2.5,
+        spreadAwayOdds: -110,
+        totalOver: 39.5,
+        totalOverOdds: -110,
+        totalUnder: 39.5,
+        totalUnderOdds: -110,
+        moneylineHome: -140,
+        moneylineAway: 120,
+        lastUpdated: 'Live Feed',
+      },
+      {
+        bookName: 'FanDuel',
+        spreadHome: -2.5,
+        spreadHomeOdds: -108,
+        spreadAway: 2.5,
+        spreadAwayOdds: -112,
+        totalOver: 39.5,
+        totalOverOdds: -105,
+        totalUnder: 39.5,
+        totalUnderOdds: -115,
+        moneylineHome: -138,
+        moneylineAway: 118,
+        isBestMoneylineHome: true,
+        lastUpdated: 'Live Feed',
+      },
+      {
+        bookName: 'Circa Sports',
+        spreadHome: -2.5,
+        spreadHomeOdds: -107,
+        spreadAway: 2.5,
+        spreadAwayOdds: -107,
+        totalOver: 40.0,
+        totalOverOdds: -106,
+        totalUnder: 40.0,
+        totalUnderOdds: -108,
+        moneylineHome: -140,
+        moneylineAway: 121,
+        lastUpdated: 'Live Feed',
+      },
+    ],
+    consensus: {
+      spread: 'TB -2.5 (-110)',
+      total: 39.5,
+      moneylineHome: -140,
+      moneylineAway: 120,
+    },
+    weatherForecast: {
+      isDome: false,
+      temperature: '82°F',
+      conditions: 'Sweltering Florida heat and thick humidity',
+      wind: '8 mph SE',
+      humidity: '68%',
+      precipitationChance: '20% isolated shower',
+      impactLevel: 'MODERATE',
+      impactSummary: 'High temperature and humidity create severe fatigue factor for visiting defense in the 3rd and 4th quarters. Running backs Najee Harris and Jaylen Warren will cycle frequently.',
+    },
+    injuries: {
+      homeInjuries: [
+        { player: 'Antoine Winfield Jr.', position: 'S', status: 'ACTIVE', injury: 'Ankle', gameImpact: 'All-Pro safety fully cleared; stabilizes deep safety coverage.' },
+        { player: 'Mike Evans', position: 'WR', status: 'ACTIVE', injury: 'Hamstring', gameImpact: 'Starting wideout active for red zone target share.' },
+      ],
+      awayInjuries: [
+        { player: 'Alex Highsmith', position: 'LB', status: 'ACTIVE', injury: 'Groin', gameImpact: 'Edge rusher active opposite TJ Watt.' },
+        { player: 'Nick Herbig', position: 'LB', status: 'OUT', injury: 'Hamstring', gameImpact: 'Rotational pass rusher inactive.' },
+      ],
+      lineImpactAnalysis: 'Antoine Winfield\'s clearance solidified Tampa\'s defense, keeping the game total under 40 points.',
+      totalImpactRating: 'MODERATE',
+    },
+    latestNews: [
+      {
+        id: 'news-pit-tb-1',
+        headline: 'Mike Tomlin says ball security and clock control paramount in Florida heat',
+        source: 'Steelers Wire',
+        timeAgo: '4h ago',
+        summary: 'Pittsburgh emphasizes sustained rushing drives to keep Tampa Bay\'s aerial attack off the field.',
+        relevance: 'COACHING_SCHEME',
+      },
+    ],
+  },
+  // =========================================================================
+  // GAME 10: SUNDAY AFTERNOON (Chicago Bears vs. Atlanta Falcons)
+  // =========================================================================
+  {
+    id: 'nfl-chi-atl-w6',
+    league: 'NFL',
+    homeTeam: {
+      name: 'Falcons',
+      city: 'Atlanta',
+      abbr: 'ATL',
+      record: '3-2',
+      logoColor: '#a71930',
+    },
+    awayTeam: {
+      name: 'Bears',
+      city: 'Chicago',
+      abbr: 'CHI',
+      record: '3-2',
+      logoColor: '#c83803',
+    },
+    scheduledTime: 'Sunday, Oct 18 · 1:00 PM EDT',
+    stadium: 'Mercedes-Benz Stadium, Atlanta, GA',
+    weatherCondition: 'Climate-Controlled Dome (72°F Fixed Environment)',
+    status: 'UPCOMING',
+    totalBetsPlaced: 94000,
+    totalDollarsWagered: 12800000,
+    splits: {
+      spread: {
+        home: {
+          side: 'Atlanta Falcons -3.0',
+          ticketPercentage: 58,
+          moneyPercentage: 51,
+          totalTicketsCount: 54520,
+          totalHandleAmount: 6528000,
+          sharpSignal: 'PUBLIC_HEAVY',
+        },
+        away: {
+          side: 'Chicago Bears +3.0',
+          ticketPercentage: 42,
+          moneyPercentage: 49,
+          totalTicketsCount: 39480,
+          totalHandleAmount: 6272000,
+          sharpSignal: 'BALANCED',
+        },
+      },
+      moneyline: {
+        home: {
+          side: 'Falcons ML (-160)',
+          ticketPercentage: 61,
+          moneyPercentage: 57,
+          totalTicketsCount: 38000,
+          totalHandleAmount: 2400000,
+          sharpSignal: 'PUBLIC_HEAVY',
+        },
+        away: {
+          side: 'Bears ML (+135)',
+          ticketPercentage: 39,
+          moneyPercentage: 43,
+          totalTicketsCount: 24300,
+          totalHandleAmount: 1810000,
+          sharpSignal: 'BALANCED',
+        },
+      },
+      total: {
+        over: {
+          side: 'Over 44.5',
+          ticketPercentage: 64,
+          moneyPercentage: 68,
+          totalTicketsCount: 34500,
+          totalHandleAmount: 2380000,
+          sharpSignal: 'MODERATE_SHARP',
+          divergenceNotice: 'Dome track speed attracting over bets on both public and sharp tickets.',
+        },
+        under: {
+          side: 'Under 44.5',
+          ticketPercentage: 36,
+          moneyPercentage: 32,
+          totalTicketsCount: 19400,
+          totalHandleAmount: 1120000,
+          sharpSignal: 'BALANCED',
+        },
+      },
+    },
+    lineMovements: [
+      { timestamp: '2026-10-11T18:00:00Z', timeLabel: 'Sunday Open', spread: -2.5, total: 43.0, moneylineHome: -145, note: 'Market opened ATL -2.5' },
+      { timestamp: '2026-10-13T15:00:00Z', timeLabel: 'Tuesday Afternoon', spread: -3.0, total: 44.0, moneylineHome: -155, note: 'Public money moved Falcons to flat -3.0' },
+      { timestamp: '2026-10-14T07:00:00Z', timeLabel: 'Current Consensus', spread: -3.0, total: 44.5, moneylineHome: -160, note: 'Total bet up to 44.5 on dome speed expectations' },
+    ],
+    sportsbooks: [
+      {
+        bookName: 'DraftKings',
+        spreadHome: -3.0,
+        spreadHomeOdds: -110,
+        spreadAway: 3.0,
+        spreadAwayOdds: -110,
+        totalOver: 44.5,
+        totalOverOdds: -110,
+        totalUnder: 44.5,
+        totalUnderOdds: -110,
+        moneylineHome: -160,
+        moneylineAway: 135,
+        lastUpdated: 'Live Feed',
+      },
+      {
+        bookName: 'FanDuel',
+        spreadHome: -3.0,
+        spreadHomeOdds: -108,
+        spreadAway: 3.0,
+        spreadAwayOdds: -112,
+        totalOver: 44.5,
+        totalOverOdds: -108,
+        totalUnder: 44.5,
+        totalUnderOdds: -112,
+        moneylineHome: -158,
+        moneylineAway: 134,
+        lastUpdated: 'Live Feed',
+      },
+      {
+        bookName: 'Circa Sports',
+        spreadHome: -3.0,
+        spreadHomeOdds: -109,
+        spreadAway: 3.0,
+        spreadAwayOdds: -105,
+        totalOver: 44.5,
+        totalOverOdds: -107,
+        totalUnder: 44.5,
+        totalUnderOdds: -107,
+        moneylineHome: -162,
+        moneylineAway: 138,
+        lastUpdated: 'Live Feed',
+      },
+    ],
+    consensus: {
+      spread: 'ATL -3.0 (-110)',
+      total: 44.5,
+      moneylineHome: -160,
+      moneylineAway: 135,
+    },
+    weatherForecast: {
+      isDome: true,
+      temperature: '72°F',
+      conditions: 'Climate-Controlled Dome (Mercedes-Benz Stadium)',
+      wind: '0 mph',
+      humidity: '45%',
+      precipitationChance: '0%',
+      impactLevel: 'NONE_DOME',
+      impactSummary: 'Fast artificial turf surface and 0 mph atmospheric resistance. Maximizes field goal accuracy and deep ball velocity for Caleb Williams and Kirk Cousins.',
+    },
+    injuries: {
+      homeInjuries: [
+        { player: 'Bijan Robinson', position: 'RB', status: 'ACTIVE', injury: 'None', gameImpact: 'Primary playmaker active; high target and rushing volume inside dome.' },
+        { player: 'Drake London', position: 'WR', status: 'ACTIVE', injury: 'None', gameImpact: 'Leading receiver active.' },
+      ],
+      awayInjuries: [
+        { player: 'Caleb Williams', position: 'QB', status: 'ACTIVE', injury: 'None', gameImpact: 'Rookie making second indoor start of the year.' },
+        { player: 'Keenan Allen', position: 'WR', status: 'ACTIVE', injury: 'Heel', gameImpact: 'Veteran slot target cleared.' },
+      ],
+      lineImpactAnalysis: 'Zero major offensive injuries; clean health profile anchored total at 44.5.',
+      totalImpactRating: 'MINIMAL',
+    },
+    latestNews: [
+      {
+        id: 'news-chi-atl-1',
+        headline: 'Caleb Williams embraces fast turf at Mercedes-Benz Stadium',
+        source: 'NFL Network',
+        timeAgo: '5h ago',
+        summary: 'Bears offensive coordinator plans accelerated quick-release rhythm to counter Falcons blitzes.',
+        relevance: 'COACHING_SCHEME',
+      },
+    ],
+  },
 ];
+
+/**
+ * EXPORTED FULL MOCK_GAMES_MARKETS:
+ * Automatically maps:
+ * 1. 3-Way Market Opinions & Confidence Hierarchy (Rank #1 to #10)
+ * 2. Active Live Volume Shifts (Units & Dollars) with 5M / 15M / 1H Windows
+ */
+export const MOCK_GAMES_MARKETS: GameMarket[] = BASE_MOCK_GAMES_MARKETS.map((g) => ({
+  ...g,
+  marketOpinions: NFL_MARKET_OPINIONS_MAP[g.id] || g.marketOpinions,
+  liveVolumeShifts: NFL_LIVE_VOLUME_SHIFTS_MAP[g.id] || g.liveVolumeShifts,
+}));
 
 export const DAILY_SLATE_PORTFOLIOS: DailySlatePortfolio[] = [
   {
