@@ -517,6 +517,28 @@ export function computeDynamicSlatePoints(
   let totalLosses = 0;
   let totalPushes = 0;
 
+  // Include Origin Baseline point (Day 0: Start of First Bets at 0.00 Units)
+  slatePoints.push({
+    slateId: 'slate-0-start',
+    slateNumber: 0,
+    dateLabel: 'Inception (Sep 05, 2026)',
+    shortDate: 'Sep 05 Start',
+    matchups: 'Inception Baseline (Start of First Bets)',
+    verifiedFinalScores: '0-0-0 Initial Bankroll Baseline',
+    cumUnitsAll: 0,
+    cumUnitsSingle: 0,
+    cumUnitsParlay: 0,
+    cumUnitsTeaser10: 0,
+    cumUnitsTeaser13: 0,
+    cumUnitsPrime: 0,
+    cumUnitsContrarian: 0,
+    slateWins: 0,
+    slateLosses: 0,
+    slatePushes: 0,
+    slateNetUnits: 0,
+    cumulativeWinRate: 0,
+  });
+
   // Process historical slates 1 through 7
   const slateNumbers = Object.keys(historicalBySlate)
     .map(Number)

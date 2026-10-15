@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
-import { ACTIVE_MOVEMENT_ALERTS, MovementAlertItem } from './LineMovementAlertBanner';
+import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, MovementAlertItem } from './LineMovementAlertBanner';
 import {
   TrackedBetRecommendation,
   BetOutcome,
@@ -16,6 +16,9 @@ import {
 } from '../utils/bettingTrackerStore';
 import { calculatePerformanceSummary } from '../utils/bettingPatternEngine';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
+import { BettingPerformanceCharts } from './BettingPerformanceCharts';
+import { GameLineMovementView } from './GameLineMovementView';
+import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { playKeyClick, playSuccessChime, playBeep, playChime } from '../utils/audio';
 
 interface EdgeDetectMainDashboardProps {
@@ -41,6 +44,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   const [radarTimeframe, setRadarTimeframe] = useState<'5M' | '15M' | '1H'>('15M');
   const [radarSeverityFilter, setRadarSeverityFilter] = useState<'ALL' | 'CRITICAL' | 'HIGH' | 'MODERATE'>('ALL');
   const [isLiveRadarStreaming, setIsLiveRadarStreaming] = useState<boolean>(true);
+  const [isRadarSectionExpanded, setIsRadarSectionExpanded] = useState<boolean>(false);
   const [radarPulses, setRadarPulses] = useState<VolumeTickPulse[]>([]);
   const [radarVolumeDeltas, setRadarVolumeDeltas] = useState<Record<string, { units: number; dollars: number }>>({});
   const [activeRadarAlertIndex, setActiveRadarAlertIndex] = useState<number>(0);
@@ -52,6 +56,8 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [copiedCsv, setCopiedCsv] = useState<boolean>(false);
   const [calculatorStake, setCalculatorStake] = useState<number>(100);
+  const [isPerformanceChartExpanded, setIsPerformanceChartExpanded] = useState<boolean>(true);
+  const [inspectingLineMoveGame, setInspectingLineMoveGame] = useState<GameMarket | null>(null);
 
   // Performance calculations
   const summary = useMemo(() => calculatePerformanceSummary(bets), [bets]);
@@ -576,8 +582,18 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                           </div>
                         </div>
 
-                        {/* Quick Jump to NFL Deep Dive */}
-                        <div className="flex items-center gap-2 font-mono text-xs shrink-0 self-start sm:self-auto">
+                        {/* Quick Jump Buttons */}
+                        <div className="flex flex-wrap items-center gap-2 font-mono text-xs shrink-0 self-start sm:self-auto">
+                          <button
+                            onClick={() => {
+                              playKeyClick();
+                              setInspectingLineMoveGame(game);
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-amber-950/80 border border-amber-500/60 hover:border-amber-400 text-amber-300 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                          >
+                            <span>📈 Line Movement History</span>
+                          </button>
+
                           <button
                             onClick={() => {
                               playKeyClick();
@@ -585,7 +601,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                             }}
                             className="px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 hover:border-cyan-500 text-cyan-300 hover:text-white font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                           >
-                            <span>🏈 Deep-Dive in NFL Hub</span>
+                            <span>🏈 NFL Hub</span>
                             <span>&rarr;</span>
                           </button>
                         </div>
@@ -822,6 +838,12 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
           ========================================================================= */}
       {(activeMainSection === 'all' || activeMainSection === 'radar') && (
         <section className="space-y-6 pt-4">
+          {/* Real-time Line & Money Movement Alert Banner (Collapsed by default) */}
+          <LineMovementAlertBanner
+            defaultCollapsed={true}
+            onSelectGame={(gameId) => onSelectGameAndInspect(gameId, 'movement')}
+          />
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -843,6 +865,16 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               <button
                 onClick={() => {
                   playKeyClick();
+                  setIsRadarSectionExpanded(!isRadarSectionExpanded);
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-md"
+              >
+                <span>{isRadarSectionExpanded ? '▲ Collapse Telemetry Radar' : '▼ Expand Telemetry Radar'}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  playKeyClick();
                   setIsLiveRadarStreaming(!isLiveRadarStreaming);
                 }}
                 className={`px-3 py-1.5 rounded-xl border font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -852,7 +884,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                 }`}
               >
                 <span className={`w-2 h-2 rounded-full ${isLiveRadarStreaming ? 'bg-emerald-400 animate-ping' : 'bg-slate-500'}`} />
-                <span>Radar Ticker {isLiveRadarStreaming ? 'Active' : 'Paused'}</span>
+                <span>Ticker {isLiveRadarStreaming ? 'Active' : 'Paused'}</span>
               </button>
 
               <div className="flex items-center rounded-xl bg-slate-950 border border-slate-800 p-0.5">
@@ -876,8 +908,37 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
             </div>
           </div>
 
-          {/* Radar Alert Highlight Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Brief alert explanation card while telemetry grid is collapsed */}
+          {!isRadarSectionExpanded ? (
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-950 border border-amber-500/40 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-400 font-bold text-xs uppercase tracking-wider font-mono flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    <span>Active Alert Summary:</span>
+                  </span>
+                  <span className="text-sm font-bold text-white">
+                    {ACTIVE_MOVEMENT_ALERTS[0]?.matchup || 'Seattle Seahawks @ Denver Broncos'} &mdash; {ACTIVE_MOVEMENT_ALERTS[0]?.headline || 'Heavy Sharp Whale Movement Crossing Critical 3.0 Line'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {ACTIVE_MOVEMENT_ALERTS[0]?.actionAdvice || '71% ticket volume and 84% dollar handle streaming into Seahawks -3.0 key threshold against Denver.'}{' '}
+                  <span className="text-amber-300 font-semibold">Model Recommendation: Take Seahawks -3.0 before line crosses to -3.5 hook.</span>
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  setIsRadarSectionExpanded(true);
+                }}
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs font-mono transition-all cursor-pointer shrink-0 shadow-md flex items-center gap-2"
+              >
+                <span>▼ Expand Full Telemetry &amp; Steam Charts</span>
+                <span className="text-[10px] bg-slate-950 text-amber-300 px-1.5 py-0.5 rounded font-mono">3 Active Signals</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left 7 Cols: Critical Alerts Carousel / Board */}
             <div className="lg:col-span-7 space-y-4">
               <div className="flex items-center justify-between text-xs font-mono text-slate-400">
@@ -939,11 +1000,16 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                         onClick={(e) => {
                           e.stopPropagation();
                           playKeyClick();
-                          onSelectGameAndInspect(alert.gameId, 'movement');
+                          const targetGame = games.find((g) => g.id === alert.gameId);
+                          if (targetGame) {
+                            setInspectingLineMoveGame(targetGame);
+                          } else {
+                            onSelectGameAndInspect(alert.gameId, 'movement');
+                          }
                         }}
-                        className="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-400 text-amber-300 hover:text-white font-mono text-xs font-bold transition-all shrink-0"
+                        className="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-400 text-amber-300 hover:text-white font-mono text-xs font-bold transition-all shrink-0 cursor-pointer"
                       >
-                        Inspect &rarr;
+                        Inspect Line Movement &rarr;
                       </button>
                     </div>
 
@@ -1054,6 +1120,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               </div>
             </div>
           </div>
+          )}
         </section>
       )}
 
@@ -1079,6 +1146,21 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
             </div>
 
             <div className="flex flex-wrap items-center gap-2 font-mono text-xs shrink-0">
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  setIsPerformanceChartExpanded(!isPerformanceChartExpanded);
+                }}
+                className={`px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 border shadow ${
+                  isPerformanceChartExpanded
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/60'
+                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white'
+                }`}
+              >
+                <span>📈</span>
+                <span>{isPerformanceChartExpanded ? 'Hide Trends Chart' : 'Show Performance Trends Chart'}</span>
+              </button>
+
               <button
                 onClick={handleSimulateTonight}
                 className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow"
@@ -1145,6 +1227,13 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               <div className="text-amber-300 font-bold text-lg">{ongoingBets.length} Pending</div>
             </div>
           </div>
+
+          {/* RECHARTS PERFORMANCE TRENDS CHART */}
+          {isPerformanceChartExpanded && (
+            <div className="p-2 sm:p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+              <BettingPerformanceCharts />
+            </div>
+          )}
 
           {/* 3A. CURRENT & ONGOING BETS (ACTIVE / PENDING SLATE) */}
           <div className="space-y-3">
@@ -1317,6 +1406,18 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
             </div>
           </div>
         </section>
+      )}
+
+      {/* LINE MOVEMENT DETAIL MODAL */}
+      {inspectingLineMoveGame && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 shadow-2xl space-y-4 relative">
+            <GameLineMovementView
+              game={inspectingLineMoveGame}
+              onClose={() => setInspectingLineMoveGame(null)}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

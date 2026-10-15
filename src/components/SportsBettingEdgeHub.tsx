@@ -11,6 +11,8 @@ import { LiveNewsWireView } from './LiveNewsWireView';
 import { SlateConfidenceRankingsView } from './SlateConfidenceRankingsView';
 import { LiveVolumeShiftDashboard } from './LiveVolumeShiftDashboard';
 import { EdgeDetectMainDashboard } from './EdgeDetectMainDashboard';
+import { GameLineMovementView } from './GameLineMovementView';
+import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
 
@@ -1979,46 +1981,10 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
               </div>
             )}
 
-            {/* TAB CONTENT: LINE MOVEMENT HISTORY */}
+            {/* TAB CONTENT: LINE MOVEMENT HISTORY & MATERIAL SHIFTS */}
             {viewTab === 'movement' && (
-              <div className="space-y-4 pt-1 animate-fadeIn">
-                <div className="text-xs text-slate-400">
-                  Chronological line history tracking how books moved odds from opening release to game day:
-                </div>
-
-                <div className="space-y-3">
-                  {activeGame.lineMovements.map((pt, i) => (
-                    <div
-                      key={pt.timestamp}
-                      className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="w-6 h-6 rounded-full bg-slate-900 border border-slate-700 text-cyan-400 flex items-center justify-center font-bold text-xs shrink-0">
-                          {i + 1}
-                        </span>
-                        <div>
-                          <div className="text-white font-bold">{pt.timeLabel}</div>
-                          <div className="text-[11px] text-slate-400">{pt.note || 'Market adjustment'}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 text-xs">
-                        <div>
-                          <span className="text-slate-500 text-[10px]">Spread:</span>{' '}
-                          <strong className="text-cyan-300">{pt.spread > 0 ? `+${pt.spread}` : pt.spread}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 text-[10px]">Total:</span>{' '}
-                          <strong className="text-purple-300">{pt.total}</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 text-[10px]">Home ML:</span>{' '}
-                          <strong className="text-emerald-400">{pt.moneylineHome > 0 ? `+${pt.moneylineHome}` : pt.moneylineHome}</strong>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="pt-1 animate-fadeIn">
+                <GameLineMovementView game={activeGame} />
               </div>
             )}
           </div>

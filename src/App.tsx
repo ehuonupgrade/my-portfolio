@@ -64,6 +64,7 @@ const getPathForState = (tab: Tab, project: string | null): string => {
     if (project === 'roboinvestor') sub = '/myprojects/roboinvestor';
     else if (project === 'bart') sub = '/myprojects/bart';
     else if (project === 'toddler-activities' || project === 'activities') sub = '/myprojects/toddler-activities';
+    else if (project === 'edgedetect-nfl' || project === 'edgedetect/nfl') sub = '/myprojects/edgedetect/nfl';
     else if (project === 'edgedetect' || project === 'linepulse' || project === 'sports-betting' || project === 'betting') sub = '/myprojects/edgedetect';
     else sub = '/myprojects';
   } else if (tab === 'games') {
@@ -85,6 +86,10 @@ const getStateForPath = (pathname: string): RouteState => {
   const prefix = getBasePrefix().toLowerCase();
   if (prefix && clean.startsWith(prefix)) {
     clean = clean.slice(prefix.length) || '/';
+  }
+
+  if (clean.includes('/edgedetect/nfl') || clean.endsWith('/edgedetect-nfl')) {
+    return { tab: 'projects', project: 'edgedetect-nfl' };
   }
 
   if (
@@ -327,17 +332,58 @@ export default function App() {
                     {activeProject === 'toddler-activities' && <span className="text-pink-400 text-[10px]">CURRENT</span>}
                   </button>
 
-                  <button
-                    onClick={() => navigateTo('projects', 'edgedetect')}
-                    className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
-                      activeProject === 'edgedetect' || activeProject === 'linepulse'
-                        ? 'bg-indigo-950/70 border border-cyan-800 text-cyan-300 font-bold'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <span>&rarr; EdgeDetect (Market Intelligence &amp; 1-Game Strategy)</span>
-                    {(activeProject === 'edgedetect' || activeProject === 'linepulse') && <span className="text-cyan-400 text-[10px]">CURRENT</span>}
-                  </button>
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => navigateTo('projects', 'edgedetect')}
+                      className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
+                        activeProject === 'edgedetect' || activeProject === 'edgedetect-nfl' || activeProject === 'linepulse'
+                          ? 'bg-indigo-950/70 border border-cyan-800 text-cyan-300 font-bold'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <span>&rarr; EdgeDetect (Market Intelligence)</span>
+                      {(activeProject === 'edgedetect' || activeProject === 'edgedetect-nfl' || activeProject === 'linepulse') && <span className="text-cyan-400 text-[10px]">CURRENT</span>}
+                    </button>
+                    {(activeProject === 'edgedetect' || activeProject === 'edgedetect-nfl' || activeProject === 'linepulse') && (
+                      <div className="ml-4 pl-2 border-l border-cyan-800/60 space-y-1 my-1">
+                        <button
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            navigateTo('projects', 'edgedetect');
+                          }}
+                          className={`text-xs block text-left transition-colors cursor-pointer w-full py-1 ${
+                            activeProject === 'edgedetect' ? 'text-cyan-300 font-bold' : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          &bull; Main Page (Recs &amp; Radar)
+                        </button>
+                        <button
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            navigateTo('projects', 'edgedetect-nfl');
+                          }}
+                          className={`text-xs block text-left transition-colors cursor-pointer w-full py-1 flex items-center justify-between pr-2 ${
+                            activeProject === 'edgedetect-nfl' ? 'text-emerald-300 font-bold' : 'text-emerald-400 hover:text-emerald-200'
+                          }`}
+                        >
+                          <span>🏈 NFL Data Hub</span>
+                          <span className="text-[9px] font-mono px-1 rounded bg-emerald-950 border border-emerald-800 text-emerald-400">ACTIVE</span>
+                        </button>
+                        <div className="text-[11px] text-slate-500 py-0.5 flex items-center justify-between pr-2">
+                          <span>🏀 NBA Data</span>
+                          <span className="text-[9px] font-mono text-slate-500 italic">SOON</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500 py-0.5 flex items-center justify-between pr-2">
+                          <span>⚾ MLB Data</span>
+                          <span className="text-[9px] font-mono text-slate-500 italic">SOON</span>
+                        </div>
+                        <div className="text-[11px] text-slate-500 py-0.5 flex items-center justify-between pr-2">
+                          <span>🏒 NHL Data</span>
+                          <span className="text-[9px] font-mono text-slate-500 italic">SOON</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -460,16 +506,55 @@ export default function App() {
                     >
                       &rarr; Kids Activity Hub (Ages 0–17)
                     </button>
-                    <button
-                      onClick={() => navigateTo('projects', 'edgedetect')}
-                      className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
-                        activeProject === 'edgedetect' || activeProject === 'linepulse'
-                          ? 'text-cyan-400 font-semibold'
-                          : 'text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      &rarr; EdgeDetect (Market Intelligence)
-                    </button>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => navigateTo('projects', 'edgedetect')}
+                        className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
+                          activeProject === 'edgedetect' || activeProject === 'edgedetect-nfl' || activeProject === 'linepulse'
+                            ? 'text-cyan-400 font-semibold'
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        &rarr; EdgeDetect (Market Intelligence)
+                      </button>
+                      {(activeProject === 'edgedetect' || activeProject === 'edgedetect-nfl' || activeProject === 'linepulse') && (
+                        <div className="ml-4 pl-2 border-l border-cyan-800/60 space-y-1.5 my-1">
+                          <button
+                            onClick={() => navigateTo('projects', 'edgedetect')}
+                            className={`text-xs block text-left transition-colors cursor-pointer ${
+                              activeProject === 'edgedetect'
+                                ? 'text-cyan-300 font-bold'
+                                : 'text-slate-400 hover:text-slate-200'
+                            }`}
+                          >
+                            &bull; Main Page (Recs &amp; Radar)
+                          </button>
+                          <button
+                            onClick={() => navigateTo('projects', 'edgedetect-nfl')}
+                            className={`text-xs block text-left transition-colors cursor-pointer flex items-center justify-between gap-1.5 ${
+                              activeProject === 'edgedetect-nfl'
+                                ? 'text-emerald-300 font-bold'
+                                : 'text-emerald-400/90 hover:text-emerald-200'
+                            }`}
+                          >
+                            <span>🏈 NFL Data Hub</span>
+                            <span className="text-[9px] font-mono px-1 rounded bg-emerald-950 border border-emerald-800 text-emerald-400 font-semibold">ACTIVE</span>
+                          </button>
+                          <div className="text-[11px] text-slate-500 flex items-center justify-between pr-1">
+                            <span>🏀 NBA Data</span>
+                            <span className="text-[9px] font-mono text-slate-500 italic">SOON</span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 flex items-center justify-between pr-1">
+                            <span>⚾ MLB Data</span>
+                            <span className="text-[9px] font-mono text-slate-500 italic">SOON</span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 flex items-center justify-between pr-1">
+                            <span>🏒 NHL Data</span>
+                            <span className="text-[9px] font-mono text-slate-500 italic">SOON</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -560,8 +645,18 @@ export default function App() {
                 )}
 
                 {/* Sub-Project 4: EdgeDetect Market Intelligence & 1-Game Strategy */}
-                {(activeProject === 'edgedetect' || activeProject === 'linepulse') && (
-                  <SportsBettingEdgeHub onBack={() => navigateTo('projects', null)} />
+                {(activeProject === 'edgedetect' || activeProject === 'edgedetect-nfl' || activeProject === 'linepulse') && (
+                  <SportsBettingEdgeHub
+                    onBack={() => navigateTo('projects', null)}
+                    initialSubPage={activeProject === 'edgedetect-nfl' ? 'nfl' : 'main'}
+                    onSubPageChange={(sub) => {
+                      if (sub === 'nfl') {
+                        navigateTo('projects', 'edgedetect-nfl');
+                      } else {
+                        navigateTo('projects', 'edgedetect');
+                      }
+                    }}
+                  />
                 )}
 
                 {/* Parent Projects Directory */}

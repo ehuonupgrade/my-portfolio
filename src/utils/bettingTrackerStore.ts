@@ -665,20 +665,20 @@ export function simulateTonightOutcome(): TrackedBetRecommendation[] {
       return {
         ...b,
         status: 'WON' as BetOutcome,
-        unitsWonLost: 4.01,
+        unitsWonLost: 3.71,
         settledAt: new Date().toISOString(),
-        postGameAnalysis: 'All 3 legs hit: Dodgers won 5-3 at Chavez Ravine, Seahawks covered -3.0 on Thursday (24-17), and Lions covered -2.5 on Sunday (27-23). Cross-slate parlay pays +535 odds (+4.01 Units)!',
-        learnedTakeaway: 'Pairing baseball home ML leverage with nearest Thursday NFL game and future Sunday dome chalk delivered maximum composite expected value.',
+        postGameAnalysis: 'All 3 legs hit: Seahawks covered -3.0 on Thursday (24-17), Ravens won ML outright on Sunday (28-14), and Lions covered -2.5 on Sunday (27-23). Multi-game NFL parlay pays +495 odds (+3.71 Units)!',
+        learnedTakeaway: 'Pairing Thursday TNF prime home spread leverage with Sunday divisional road favorite and indoor dome chalk delivered maximum composite expected value.',
         legs: [
           {
             ...b.legs[0],
             status: 'WON' as BetOutcome,
-            finalScore: 'LAD won 5-3 at Chavez Ravine',
+            finalScore: 'SEA 24, DEN 17 (Covered -3.0)',
           },
           {
             ...b.legs[1],
             status: 'WON' as BetOutcome,
-            finalScore: 'SEA 24, DEN 17 (Covered -3.0)',
+            finalScore: 'BAL 28, CLE 14 (ML Won)',
           },
           {
             ...b.legs[2],
