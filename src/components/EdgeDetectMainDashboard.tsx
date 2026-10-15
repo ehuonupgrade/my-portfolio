@@ -21,9 +21,12 @@ import { GameLineMovementView } from './GameLineMovementView';
 import { LiveVerificationModal } from './LiveVerificationModal';
 import { LiveOddsStreamBadge } from './LiveOddsStreamBadge';
 import { LiveOddsStreamModal } from './LiveOddsStreamModal';
+import { LiveRosterStreamBadge } from './LiveRosterStreamBadge';
+import { LiveRosterVerificationModal } from './LiveRosterVerificationModal';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { useLiveVerification } from '../utils/useLiveVerification';
 import { useLiveOddsStream } from '../utils/useLiveOddsStream';
+import { useLiveRosterVerification } from '../utils/useLiveRosterVerification';
 import { playKeyClick, playSuccessChime, playBeep, playChime } from '../utils/audio';
 
 interface EdgeDetectMainDashboardProps {
@@ -68,8 +71,10 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   const [inspectingLineMoveGame, setInspectingLineMoveGame] = useState<GameMarket | null>(null);
   const [showVerificationModal, setShowVerificationModal] = useState<boolean>(false);
   const [showOddsModal, setShowOddsModal] = useState<boolean>(false);
+  const [showRosterModal, setShowRosterModal] = useState<boolean>(false);
   const [showHurtsBreakingBanner, setShowHurtsBreakingBanner] = useState<boolean>(true);
   const oddsStreamState = useLiveOddsStream(games);
+  const rosterState = useLiveRosterVerification();
 
   // Live verification active state & timestamping
   const {
@@ -324,6 +329,11 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               <LiveOddsStreamBadge
                 oddsState={oddsStreamState}
                 onOpenModal={() => setShowOddsModal(true)}
+              />
+              {/* Active Player Roster & Depth Chart Verification Badge */}
+              <LiveRosterStreamBadge
+                rosterState={rosterState}
+                onOpenModal={() => setShowRosterModal(true)}
               />
               {/* Active Live Verification Badge with Real Timestamp */}
               <div className="flex items-center gap-1.5 flex-wrap">
@@ -1627,6 +1637,13 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
         onClose={() => setShowOddsModal(false)}
         oddsState={oddsStreamState}
         games={games}
+      />
+
+      {/* LIVE ACTIVE PLAYER ROSTER & DEPTH CHART VERIFICATION AUDIT MODAL */}
+      <LiveRosterVerificationModal
+        isOpen={showRosterModal}
+        onClose={() => setShowRosterModal(false)}
+        rosterState={rosterState}
       />
     </div>
   );

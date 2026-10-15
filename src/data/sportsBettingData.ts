@@ -179,7 +179,7 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
         { player: 'Lane Johnson', position: 'OT', status: 'ACTIVE', injury: 'Ankle', gameImpact: 'Starting RT cleared to protect McKee.' },
       ] as PlayerInjuryItem[],
       awayInjuries: [
-        { player: 'Myles Garrett', position: 'DE', status: 'ACTIVE', injury: 'Foot', gameImpact: 'All-Pro edge rusher cleared; primary pass rush threat against 1st-time starter McKee.' },
+        { player: 'Za\'Darius Smith', position: 'DE', status: 'ACTIVE', injury: 'None', gameImpact: 'Starting edge rusher cleared; primary pass rush threat against 1st-time starter McKee.' },
         { player: 'Nick Chubb', position: 'RB', status: 'QUESTIONABLE', injury: 'Knee', gameImpact: 'Practice window active.' },
       ] as PlayerInjuryItem[],
       lineImpactAnalysis: '🚨 CRITICAL EMERGENCY INJURY: Jalen Hurts ruled OUT due to blood clot hospitalization. Eagles line swung 7.0 points from PHI -4.5 to CLE -2.5, and total dropped 6.0 points to 40.5.',

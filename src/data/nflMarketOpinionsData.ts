@@ -30,7 +30,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceStars: 5,
       verdict: 'STRONG_BUY',
       selectionSummary: 'Lay -2.5 on Browns following 7.0-point swing from Jalen Hurts emergency hospitalization.',
-      rationale: 'Oddsmakers Reacted Instantly: Jalen Hurts represents a -6.8 point drop in offensive power rating relative to replacement backup Tanner McKee. McKee has 0 career NFL starts and faces Myles Garrett behind an Eagles interior line making blocking adjustments. Cleveland\'s defense ranks 4th in pressure rate (38.2%), which will overwhelm a first-time starter.',
+      rationale: 'Oddsmakers Reacted Instantly: Jalen Hurts represents a -6.8 point drop in offensive power rating relative to replacement backup Tanner McKee. McKee has 0 career NFL starts and faces Cleveland\'s elite front-seven pass rush behind an Eagles interior line making blocking adjustments. Cleveland\'s defense ranks 4th in pressure rate (38.2%), which will overwhelm a first-time starter.',
     },
     moneylineOpinion: {
       betType: 'MONEYLINE',
@@ -60,7 +60,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       weatherImpactFactor: 'Standard autumn afternoon conditions at Lincoln Financial Field (58°F).',
       injuryAdvantage: '🚨 CRITICAL MEDICAL EMERGENCY: Jalen Hurts OUT (blood clot hospitalization); Tanner McKee starting.',
       sharpMoneySignal: '89% of syndicate handle hammering Browns -2.5 and Under 40.5 following Adam Schefter breaking report.',
-      schemeEdge: 'Myles Garrett & Cleveland pass rush vs 1st-time starter Tanner McKee.',
+      schemeEdge: 'Cleveland elite front-seven pass rush vs 1st-time starter Tanner McKee.',
     },
   },
 
