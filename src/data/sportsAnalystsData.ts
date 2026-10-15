@@ -591,7 +591,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Cleveland Browns +4.5',
         confidenceRating: 5,
-        publishedTime: 'Oct 14 · 8:15 AM PST',
+        publishedTime: 'Oct 15 · 8:15 AM PST',
         rationale:
           'Classic situational trap. 18+ mph Lake Erie shoreline gusts eliminate Baltimore deep pass explosive rate. Jim Schwartz defensive line matches up well in short-yardage trench warfare.',
         isContrarianFadeTarget: true,
@@ -607,7 +607,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Baltimore Ravens -4.5',
         confidenceRating: 4,
-        publishedTime: 'Oct 14 · 7:30 AM PST',
+        publishedTime: 'Oct 15 · 7:30 AM PST',
         rationale:
           'Lamar Jackson and Derrick Henry zone-read mesh will tire out Cleveland front seven by the 4th quarter.',
         isContrarianFadeTarget: false,
@@ -623,7 +623,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         betType: 'SPREAD',
         selection: 'Baltimore Ravens -4.5',
         confidenceRating: 4,
-        publishedTime: 'Oct 14 · 6:45 AM PST',
+        publishedTime: 'Oct 15 · 6:45 AM PST',
         rationale:
           'Ravens offense is too balanced. Even in high winds, Derrick Henry gets 25 touches and controls the line of scrimmage.',
         isContrarianFadeTarget: false,

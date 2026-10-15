@@ -16,7 +16,7 @@ export const PUBLIC_SPORTSBOOKS = [
 /**
  * 100% NFL FOCUS - WEEK 6 (2026 REGULAR SEASON) & WEEK 5 VERIFIED SCORES
  * All team records, matchups, injury reports, weather forecasts, and game scores
- * are verified accurate through today (Wednesday, Oct 14, 2026).
+ * are verified accurate through today (Thursday, Oct 15, 2026).
  */
 const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
   // =========================================================================
@@ -1717,8 +1717,8 @@ export const MOCK_GAMES_MARKETS: GameMarket[] = BASE_MOCK_GAMES_MARKETS.map((g) 
 
 export const DAILY_SLATE_PORTFOLIOS: DailySlatePortfolio[] = [
   {
-    dateKey: '2026-10-14',
-    dateLabel: 'Today (Wednesday, Oct 14, 2026 · Verified NFL Slate)',
+    dateKey: '2026-10-15',
+    dateLabel: 'Today (Thursday, Oct 15, 2026 · Verified Live NFL Slate)',
     headline: 'NFL Week 6 Market Architecture: Thursday TNF Kickoff & Weekend Sharp Value Portfolio',
     singleGameBet: {
       id: 'daily-single-today',
@@ -1729,7 +1729,7 @@ export const DAILY_SLATE_PORTFOLIOS: DailySlatePortfolio[] = [
       payoutOdds: '-110 (Circa Sports / DraftKings)',
       expectedValue: 8.6,
       confidenceScore: 88,
-      daySpanNote: 'Nearest NFL Game: Thursday, Oct 15 · 5:15 PM PDT (Empower Field, Denver, CO)',
+      daySpanNote: 'Nearest NFL Game: Tonight (Thursday, Oct 15 · 5:15 PM PDT · Empower Field, Denver, CO)',
       keyDiscrepancy: 'Whale Handle Divergence (+33% money gap): 71% of total handle backed Seattle on only 38% of tickets. Recreational bettors are taking Bo Nix underdog points on 3 days rest, but Denver RT Alex Palczewski is OUT with high ankle sprain, leaving Nix exposed to Mike Macdonald simulated blitzes.',
       legs: [
         {

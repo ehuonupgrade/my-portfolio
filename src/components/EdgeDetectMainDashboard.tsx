@@ -18,7 +18,12 @@ import { calculatePerformanceSummary } from '../utils/bettingPatternEngine';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BettingPerformanceCharts } from './BettingPerformanceCharts';
 import { GameLineMovementView } from './GameLineMovementView';
+import { LiveVerificationModal } from './LiveVerificationModal';
+import { LiveOddsStreamBadge } from './LiveOddsStreamBadge';
+import { LiveOddsStreamModal } from './LiveOddsStreamModal';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
+import { useLiveVerification } from '../utils/useLiveVerification';
+import { useLiveOddsStream } from '../utils/useLiveOddsStream';
 import { playKeyClick, playSuccessChime, playBeep, playChime } from '../utils/audio';
 
 interface EdgeDetectMainDashboardProps {
@@ -58,6 +63,19 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   const [calculatorStake, setCalculatorStake] = useState<number>(100);
   const [isPerformanceChartExpanded, setIsPerformanceChartExpanded] = useState<boolean>(true);
   const [inspectingLineMoveGame, setInspectingLineMoveGame] = useState<GameMarket | null>(null);
+  const [showVerificationModal, setShowVerificationModal] = useState<boolean>(false);
+  const [showOddsModal, setShowOddsModal] = useState<boolean>(false);
+  const oddsStreamState = useLiveOddsStream(games);
+
+  // Live verification active state & timestamping
+  const {
+    lastVerifiedTime,
+    isVerifying,
+    secondsAgo,
+    formattedTime,
+    formattedDate,
+    reverify,
+  } = useLiveVerification();
 
   // Performance calculations
   const summary = useMemo(() => calculatePerformanceSummary(bets), [bets]);
@@ -298,13 +316,48 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
           {/* Main Title & Executive Subtext */}
           <div className="space-y-3">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-cyan-950/90 border border-cyan-500/50 text-cyan-300 font-mono text-xs font-semibold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                <span>DAILY INTELLIGENCE ENGINE &bull; 8 BOOKS SYNCED</span>
-              </span>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 font-mono text-xs font-semibold">
-                ✓ Verified Records Through Today (Oct 14, 2026)
-              </span>
+              {/* Live Multi-Book Odds Stream Badge */}
+              <LiveOddsStreamBadge
+                oddsState={oddsStreamState}
+                onOpenModal={() => setShowOddsModal(true)}
+              />
+              {/* Active Live Verification Badge with Real Timestamp */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  onClick={() => {
+                    playKeyClick();
+                    setShowVerificationModal(true);
+                  }}
+                  className="px-3 py-1 rounded-full bg-emerald-950/90 border border-emerald-500/60 hover:border-emerald-400 text-emerald-300 font-mono text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer group"
+                  title="Click to view full Live Score & Standings Verification Audit"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <span className="font-bold">✓ Live Verified</span>
+                  <span className="text-slate-400">·</span>
+                  <span className="text-white">Today ({formattedDate})</span>
+                  <span className="text-slate-400">·</span>
+                  <span className="text-cyan-300 font-bold">{formattedTime}</span>
+                  <span className="text-[10px] text-emerald-400 font-normal">
+                    ({secondsAgo === 0 ? 'just now' : `${secondsAgo}s ago`})
+                  </span>
+                  <span className="text-[10px] text-emerald-400 group-hover:translate-x-0.5 transition-transform">
+                    &rarr;
+                  </span>
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    reverify();
+                  }}
+                  disabled={isVerifying}
+                  title="Click to manually re-verify live official NFL scoreboard feed"
+                  className="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 hover:border-emerald-400 text-slate-300 hover:text-white font-mono text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+                >
+                  <span className={isVerifying ? 'animate-spin' : ''}>🔄</span>
+                  <span className="hidden sm:inline">{isVerifying ? 'Verifying...' : 'Re-verify Live'}</span>
+                </button>
+              </div>
             </div>
 
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -1419,6 +1472,23 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
           </div>
         </div>
       )}
+
+      {/* LIVE NFL DATA VERIFICATION AUDIT MODAL */}
+      <LiveVerificationModal
+        isOpen={showVerificationModal}
+        onClose={() => setShowVerificationModal(false)}
+        lastVerifiedTime={lastVerifiedTime}
+        onReverify={reverify}
+        isVerifying={isVerifying}
+      />
+
+      {/* LIVE ODDS STREAM & MULTI-BOOK TELEMETRY MODAL */}
+      <LiveOddsStreamModal
+        isOpen={showOddsModal}
+        onClose={() => setShowOddsModal(false)}
+        oddsState={oddsStreamState}
+        games={games}
+      />
     </div>
   );
 };
