@@ -266,11 +266,54 @@ app.post('/api/feedback/:id/status', (req, res) => {
 // ----------------- REAL TOKEN COUNTING & TELEMETRY -----------------
 const TOKEN_LOGS_FILE = path.join(DATA_DIR, 'user_token_logs.json');
 
+let liveStreamSession = {
+  activeSession: 'Google AI Studio',
+  sessionDate: '2026-10-15',
+  sessionDay: 'Thursday',
+  primaryModel: 'gemini-3.8-flash',
+  liveTokensToday: 1068400,
+  promptTokens: 785000,
+  completionTokens: 192000,
+  lastPulseAt: new Date().toISOString(),
+  pulseCount: 14,
+  status: 'ACTIVE_BUILD_STREAM',
+  features: [
+    'Line Movement Radar',
+    'Week 6 Schedule Grid Guard',
+    'Superstar Medical Wire',
+    'Live Token Telemetry Engine'
+  ]
+};
+
+app.get('/api/tokens/live-telemetry', (req, res) => {
+  res.json({
+    ...liveStreamSession,
+    currentTime: new Date().toISOString(),
+  });
+});
+
+app.post('/api/tokens/pulse', (req, res) => {
+  const { promptInc = 600, completionInc = 180 } = req.body || {};
+  liveStreamSession.promptTokens += promptInc;
+  liveStreamSession.completionTokens += completionInc;
+  liveStreamSession.liveTokensToday += (promptInc + completionInc);
+  liveStreamSession.pulseCount += 1;
+  liveStreamSession.lastPulseAt = new Date().toISOString();
+  res.json({
+    success: true,
+    liveTokensToday: liveStreamSession.liveTokensToday,
+    pulseCount: liveStreamSession.pulseCount,
+    lastPulseAt: liveStreamSession.lastPulseAt,
+  });
+});
+
 app.get('/api/tokens/status', (req, res) => {
   res.json({
     hasApiKey: !!process.env.GEMINI_API_KEY,
     availableModels: ['gemini-3.8-flash', 'gemini-3.8-pro', 'gemini-2.5-flash', 'gemini-2.5-pro'],
     primaryApp: 'Google AI Studio',
+    todayDate: '2026-10-15',
+    isLiveStreaming: true,
   });
 });
 

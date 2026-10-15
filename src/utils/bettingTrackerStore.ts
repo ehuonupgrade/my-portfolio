@@ -6,7 +6,7 @@ const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v8_nearest_tnf_seahaw
  * Production Recommendations Ledger
  * Includes verified, completed recommendations from the finished Bills @ Rams game
  * (Buffalo won 37-34 shootout, covered +3.5 road hook with outright win, while Under 49.0 lost due to 71 total points; James Cook 19 carries),
- * plus active, forward-looking recommendations based on today (Tuesday, Oct 13, 2026) and future slates in PST.
+ * plus active, forward-looking recommendations based on today (Thursday, Oct 15, 2026 - TNF) and future slates in PST.
  */
 export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
   // =========================================================================
@@ -637,7 +637,7 @@ export function updateBetStatus(
 }
 
 /**
- * Simulates the active pending recommendations for today (Tuesday, Oct 13) and future showcase games,
+ * Simulates the active pending recommendations for today (Thursday, Oct 15 - TNF) and future showcase games,
  * automatically grading the pending bets and demonstrating the learning engine in real-time.
  */
 export function simulateTonightOutcome(): TrackedBetRecommendation[] {

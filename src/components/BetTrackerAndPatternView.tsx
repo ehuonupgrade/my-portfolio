@@ -214,10 +214,10 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
           <span className="text-xl shrink-0">🎯</span>
           <div className="space-y-1">
             <strong className="font-mono text-cyan-300 uppercase block text-[11px]">
-              Live Tracking Baseline &bull; Nearest Upcoming Slate Priority (October 13, 2026 PST)
+              Live Tracking Baseline &bull; Nearest Upcoming Slate Priority (Thursday, October 15, 2026 PST)
             </strong>
             <p className="text-slate-300 leading-relaxed">
-              Active recommendations prioritize the nearest upcoming games: <strong>Seattle Seahawks -3.0</strong> on Thursday Night Football (Oct 15), <strong>Dodgers ML</strong> tonight (Oct 13), 3-Leg Value Parlay, and 7-day multi-day Teasers. Historical Bills @ Rams (37-34) bets are settled and logged in the performance ledger.
+              Active recommendations prioritize the nearest upcoming games: <strong>Seattle Seahawks -3.0</strong> on Thursday Night Football (Oct 15 tonight), <strong>Dodgers ML</strong> (NLCS Game 3), 3-Leg Value Parlay, and 7-day multi-day Teasers. Historical Bills @ Rams (37-34) bets are settled and logged in the performance ledger.
             </p>
           </div>
         </div>
