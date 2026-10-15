@@ -72,7 +72,6 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   const [showVerificationModal, setShowVerificationModal] = useState<boolean>(false);
   const [showOddsModal, setShowOddsModal] = useState<boolean>(false);
   const [showRosterModal, setShowRosterModal] = useState<boolean>(false);
-  const [showHurtsBreakingBanner, setShowHurtsBreakingBanner] = useState<boolean>(true);
   const oddsStreamState = useLiveOddsStream(games);
   const rosterState = useLiveRosterVerification();
 
@@ -474,61 +473,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
         </div>
       </div>
 
-      {/* EMERGENCY BREAKING BULLETIN (SLATE-SHATTERING NEWS NOTICE) */}
-      {showHurtsBreakingBanner && (
-        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-rose-950 via-slate-900 to-amber-950 border-2 border-rose-500 shadow-2xl shadow-rose-950/60 font-mono text-xs relative overflow-hidden animate-fadeIn">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1.5 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2.5 py-0.5 rounded-full bg-rose-500 text-white font-black uppercase text-[10px] tracking-wider animate-bounce flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-                  <span>🚨 CRITICAL SLATE-SHATTERING BULLETIN</span>
-                </span>
-                <span className="text-amber-300 font-bold text-[11px]">
-                  Verified Live: Oct 15, 2026 &bull; Adam Schefter / ESPN Medical Wire
-                </span>
-              </div>
-
-              <h3 className="text-base sm:text-lg font-black text-white font-sans tracking-tight">
-                Philadelphia Eagles QB Jalen Hurts Hospitalized with Blood Clot &mdash; Ruled OUT Indefinitely!
-              </h3>
-
-              <p className="text-slate-200 text-xs font-sans leading-relaxed max-w-4xl">
-                Eagles QB Jalen Hurts admitted for emergency blood clot treatment. Tanner McKee making 1st career NFL start vs. Carolina. Oddsmakers froze and swung line <strong>7.0 points</strong> (PHI -7.5 &rarr; CAR +0.5) and total collapsed to <strong>40.5</strong>.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <button
-                onClick={() => {
-                  playKeyClick();
-                  const targetGame = games.find((g) => g.id === 'nfl-car-phi-w6' || g.homeTeam.name.includes('Eagles') || g.awayTeam.name.includes('Eagles'));
-                  if (targetGame) {
-                    setInspectingLineMoveGame(targetGame);
-                  }
-                }}
-                className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-all cursor-pointer shadow-lg flex items-center gap-1.5"
-              >
-                <span>📈 Inspect 7.0-Pt Line Shift</span>
-                <span>&rarr;</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  playKeyClick();
-                  setShowHurtsBreakingBanner(false);
-                }}
-                className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors cursor-pointer text-xs font-bold"
-                title="Dismiss Banner"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ROLLING BREAKING SUPERSTAR MEDICAL WIRE & MOVEMENT RADAR (PLACED DIRECTLY UNDER EMERGENCY BULLETIN) */}
+      {/* UNIFIED CRITICAL LINE & MONEY MOVEMENT RADAR (TOP OF DASHBOARD) */}
       <LineMovementAlertBanner
         defaultCollapsed={false}
         onSelectGame={(gameId) => onSelectGameAndInspect(gameId, 'movement')}
