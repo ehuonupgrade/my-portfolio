@@ -657,7 +657,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
  * Real-time tracking of ongoing ticket counts, handle dollars, and pre-game volume swings.
  */
 export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> = {
-  'nfl-bal-was-w6': {
+  'nfl-bal-cle-w6': {
     lastUpdated: '1 min ago (Live Sync)',
     shiftVelocityRatePerMinute: {
       unitsPerMin: 310,
@@ -690,7 +690,7 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
         unitsUnder: 3250,
         dollarsOver: 180000,
         dollarsUnder: 835000,
-        dominantSide: 'Baltimore Ravens -6.5 & Under 51.5',
+        dominantSide: 'Baltimore Ravens -6.5 & Under 41.5',
         swingVelocity: 'HEAVY_STEAM',
         swingSummary: '+$885k handle on Ravens; $835k on Under across DraftKings & Circa',
       },
@@ -713,8 +713,8 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
       {
         id: 'pulse-bal-1',
         timestamp: 'Just now',
-        gameId: 'nfl-bal-was-w6',
-        matchup: 'BAL @ WAS',
+        gameId: 'nfl-bal-cle-w6',
+        matchup: 'BAL @ CLE',
         targetSelection: 'Baltimore Ravens -6.5',
         marketType: 'SPREAD',
         unitDelta: 450,
@@ -726,8 +726,8 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
       {
         id: 'pulse-bal-2',
         timestamp: '3m ago',
-        gameId: 'nfl-bal-was-w6',
-        matchup: 'BAL @ WAS',
+        gameId: 'nfl-bal-cle-w6',
+        matchup: 'BAL @ CLE',
         targetSelection: 'Under 51.5',
         marketType: 'TOTAL',
         unitDelta: 620,

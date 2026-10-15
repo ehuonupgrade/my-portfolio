@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
-import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, MovementAlertItem } from './LineMovementAlertBanner';
+import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, SUPERSTAR_BREAKING_MEDICAL_WIRE, MovementAlertItem } from './LineMovementAlertBanner';
 import {
   TrackedBetRecommendation,
   BetOutcome,
@@ -474,27 +474,27 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
         </div>
       </div>
 
-      {/* EMERGENCY BREAKING INJURY ALERT BANNER: JALEN HURTS BLOOD CLOT */}
+      {/* EMERGENCY BREAKING BULLETIN (SLATE-SHATTERING NEWS NOTICE) */}
       {showHurtsBreakingBanner && (
-        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-rose-950 via-slate-900 to-amber-950 border-2 border-rose-500 shadow-2xl shadow-rose-950/60 font-mono text-xs relative overflow-hidden animate-fadeIn">
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-rose-950 via-slate-900 to-amber-950 border-2 border-rose-500 shadow-2xl shadow-rose-950/60 font-mono text-xs relative overflow-hidden animate-fadeIn">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-2">
+            <div className="space-y-1.5 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-2.5 py-0.5 rounded-full bg-rose-500 text-white font-black uppercase text-[10px] tracking-wider animate-bounce flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-white animate-ping" />
-                  <span>🚨 EMERGENCY BREAKING MEDICAL INJURY</span>
+                  <span>🚨 CRITICAL SLATE-SHATTERING BULLETIN</span>
                 </span>
                 <span className="text-amber-300 font-bold text-[11px]">
                   Verified Live: Oct 15, 2026 &bull; Adam Schefter / ESPN Medical Wire
                 </span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-black text-white font-sans tracking-tight">
-                Philadelphia Eagles QB Jalen Hurts Hospitalized with Blood Clot &mdash; Ruled OUT for Week 6!
+              <h3 className="text-base sm:text-lg font-black text-white font-sans tracking-tight">
+                Philadelphia Eagles QB Jalen Hurts Hospitalized with Blood Clot &mdash; Ruled OUT Indefinitely!
               </h3>
 
-              <p className="text-slate-200 text-xs sm:text-sm font-sans leading-relaxed max-w-4xl">
-                Eagles QB Jalen Hurts was admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Backup QB Tanner McKee will make his 1st career start. Oddsmakers froze and swung the line <strong>7.0 points</strong> (PHI -4.5 &rarr; CLE -2.5) and total dropped from 46.5 to <strong>40.5</strong>.
+              <p className="text-slate-200 text-xs font-sans leading-relaxed max-w-4xl">
+                Eagles QB Jalen Hurts admitted for emergency blood clot treatment. Tanner McKee making 1st career NFL start vs. Carolina. Oddsmakers froze and swung line <strong>7.0 points</strong> (PHI -7.5 &rarr; CAR +0.5) and total collapsed to <strong>40.5</strong>.
               </p>
             </div>
 
@@ -502,20 +502,23 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               <button
                 onClick={() => {
                   playKeyClick();
-                  const eaglesGame = games.find((g) => g.id === 'nfl-phi-cle-w6' || g.homeTeam.abbr === 'PHI' || g.awayTeam.abbr === 'PHI');
-                  if (eaglesGame) {
-                    setInspectingLineMoveGame(eaglesGame);
+                  const targetGame = games.find((g) => g.id === 'nfl-car-phi-w6' || g.homeTeam.name.includes('Eagles') || g.awayTeam.name.includes('Eagles'));
+                  if (targetGame) {
+                    setInspectingLineMoveGame(targetGame);
                   }
                 }}
-                className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-all cursor-pointer shadow-lg flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-all cursor-pointer shadow-lg flex items-center gap-1.5"
               >
-                <span>📈 Inspect 7-Pt Line Shift</span>
+                <span>📈 Inspect 7.0-Pt Line Shift</span>
                 <span>&rarr;</span>
               </button>
 
               <button
-                onClick={() => setShowHurtsBreakingBanner(false)}
-                className="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors cursor-pointer text-xs font-bold"
+                onClick={() => {
+                  playKeyClick();
+                  setShowHurtsBreakingBanner(false);
+                }}
+                className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors cursor-pointer text-xs font-bold"
                 title="Dismiss Banner"
               >
                 ✕
@@ -524,6 +527,12 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
           </div>
         </div>
       )}
+
+      {/* ROLLING BREAKING SUPERSTAR MEDICAL WIRE & MOVEMENT RADAR (PLACED DIRECTLY UNDER EMERGENCY BULLETIN) */}
+      <LineMovementAlertBanner
+        defaultCollapsed={false}
+        onSelectGame={(gameId) => onSelectGameAndInspect(gameId, 'movement')}
+      />
 
       {/* =========================================================================
           SECTION 1: BET RECOMMENDATIONS OF THE DAY
@@ -993,11 +1002,6 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
           ========================================================================= */}
       {(activeMainSection === 'all' || activeMainSection === 'radar') && (
         <section className="space-y-6 pt-4">
-          {/* Real-time Line & Money Movement Alert Banner (Collapsed by default) */}
-          <LineMovementAlertBanner
-            defaultCollapsed={true}
-            onSelectGame={(gameId) => onSelectGameAndInspect(gameId, 'movement')}
-          />
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
             <div className="space-y-1">
