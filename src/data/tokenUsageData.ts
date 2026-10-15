@@ -911,7 +911,7 @@ export const SEED_DAILY_TOKEN_RECORDS: DailyTokenRecord[] = [
   },
 ];
 
-const STORAGE_KEY = 'linepulse_user_token_usage_tracker_v7_live_oct15_active';
+const STORAGE_KEY = 'linepulse_user_token_usage_tracker_v9_live_oct15_verified';
 const QUOTA_STORAGE_KEY = 'linepulse_user_daily_token_quota_v1';
 
 export function getDailyQuotaLimit(): number {
@@ -936,12 +936,11 @@ export function setDailyQuotaLimit(newLimit: number): void {
 export function forceResetTokenUsageRecords(): DailyTokenRecord[] {
   if (typeof window !== 'undefined') {
     try {
-      localStorage.removeItem('linepulse_user_token_usage_tracker_v1');
-      localStorage.removeItem('linepulse_user_token_usage_tracker_v2');
-      localStorage.removeItem('linepulse_user_token_usage_tracker_v3_with_apps_and_gemini_38');
-      localStorage.removeItem('linepulse_user_token_usage_tracker_v4');
-      localStorage.removeItem('linepulse_user_token_usage_tracker_v5_live_oct15_stream');
-      localStorage.removeItem('linepulse_user_token_usage_tracker_v6');
+      for (let i = 1; i <= 8; i++) {
+        localStorage.removeItem(`linepulse_user_token_usage_tracker_v${i}`);
+        localStorage.removeItem(`linepulse_user_token_usage_tracker_v${i}_live_oct15_stream`);
+        localStorage.removeItem(`linepulse_user_token_usage_tracker_v${i}_live_oct15_active`);
+      }
       localStorage.removeItem(STORAGE_KEY);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_DAILY_TOKEN_RECORDS));
     } catch (e) {
@@ -960,13 +959,12 @@ export function forceResetTokenUsageRecords(): DailyTokenRecord[] {
 export function getTokenUsageRecords(): DailyTokenRecord[] {
   if (typeof window === 'undefined') return SEED_DAILY_TOKEN_RECORDS;
   try {
-    // Purge outdated legacy caches
-    localStorage.removeItem('linepulse_user_token_usage_tracker_v1');
-    localStorage.removeItem('linepulse_user_token_usage_tracker_v2');
-    localStorage.removeItem('linepulse_user_token_usage_tracker_v3_with_apps_and_gemini_38');
-    localStorage.removeItem('linepulse_user_token_usage_tracker_v4');
-    localStorage.removeItem('linepulse_user_token_usage_tracker_v5_live_oct15_stream');
-    localStorage.removeItem('linepulse_user_token_usage_tracker_v6');
+    // Purge outdated legacy caches (v1 through v8)
+    for (let i = 1; i <= 8; i++) {
+      localStorage.removeItem(`linepulse_user_token_usage_tracker_v${i}`);
+      localStorage.removeItem(`linepulse_user_token_usage_tracker_v${i}_live_oct15_stream`);
+      localStorage.removeItem(`linepulse_user_token_usage_tracker_v${i}_live_oct15_active`);
+    }
 
     const raw = localStorage.getItem(STORAGE_KEY);
     const quota = getDailyQuotaLimit();

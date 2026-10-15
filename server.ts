@@ -804,134 +804,142 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
       const totalHandle = 14500000 + (idx * 2100000);
       const totalBets = 112000 + (idx * 16500);
 
-      return {
-        id: `live-espn-${event.id}`,
-        espnId: event.id,
-        league: 'NFL',
-        isLiveFeed: true,
-        source: 'ESPN Scoreboard & DraftKings Feed',
-        homeTeam: {
-          name: homeName,
-          city: homeCity,
-          abbr: homeAbbr,
-          record: homeRecord,
-          score: homeScore,
-          logoColor: homeColor,
-        },
-        awayTeam: {
-          name: awayName,
-          city: awayCity,
-          abbr: awayAbbr,
-          record: awayRecord,
-          score: awayScore,
-          logoColor: awayColor,
-        },
-        scheduledTime: statusDetail,
-        gameDate: event.date,
-        stadium: comp.venue?.fullName || 'NFL Stadium',
-        status: marketStatus,
-        scores: {
-          home: homeScore,
-          away: awayScore,
-        },
-        totalBetsPlaced: totalBets,
-        totalDollarsWagered: totalHandle,
-        splits: {
-          spread: {
-            home: {
-              side: `${homeName} ${spreadHome > 0 ? '+' : ''}${spreadHome}`,
-              ticketPercentage: ticketsPctHome,
-              moneyPercentage: dollarsPctHome,
-              totalTicketsCount: Math.round(totalBets * (ticketsPctHome / 100)),
-              totalHandleAmount: Math.round(totalHandle * (dollarsPctHome / 100)),
-              sharpSignal: dollarsPctHome > ticketsPctHome + 15 ? 'HEAVY_SHARP' : 'PUBLIC_HEAVY',
-              divergenceNotice: dollarsPctHome > ticketsPctHome + 15
-                ? `Whale Handle Inflow on ${homeName}`
-                : `Public tickets concentrated on ${homeName}`,
+        // Favorite-first consensus spread format (e.g., CAR -3.5, SEA -2.5, BAL -3.5, KC -8.5)
+        const consensusSpreadStr =
+          Math.abs(spreadHome) < 0.25
+            ? 'PK'
+            : spreadHome < 0
+            ? `${homeAbbr} ${spreadHome}`
+            : `${awayAbbr} ${spreadAway}`;
+
+        return {
+          id: `live-espn-${event.id}`,
+          espnId: event.id,
+          league: 'NFL',
+          isLiveFeed: true,
+          source: 'ESPN Scoreboard & DraftKings Feed',
+          homeTeam: {
+            name: homeName,
+            city: homeCity,
+            abbr: homeAbbr,
+            record: homeRecord,
+            score: homeScore,
+            logoColor: homeColor,
+          },
+          awayTeam: {
+            name: awayName,
+            city: awayCity,
+            abbr: awayAbbr,
+            record: awayRecord,
+            score: awayScore,
+            logoColor: awayColor,
+          },
+          scheduledTime: statusDetail,
+          gameDate: event.date,
+          stadium: comp.venue?.fullName || 'NFL Stadium',
+          status: marketStatus,
+          scores: {
+            home: homeScore,
+            away: awayScore,
+          },
+          totalBetsPlaced: totalBets,
+          totalDollarsWagered: totalHandle,
+          splits: {
+            spread: {
+              home: {
+                side: `${homeName} ${spreadHome > 0 ? '+' : ''}${spreadHome}`,
+                ticketPercentage: ticketsPctHome,
+                moneyPercentage: dollarsPctHome,
+                totalTicketsCount: Math.round(totalBets * (ticketsPctHome / 100)),
+                totalHandleAmount: Math.round(totalHandle * (dollarsPctHome / 100)),
+                sharpSignal: dollarsPctHome > ticketsPctHome + 15 ? 'HEAVY_SHARP' : 'PUBLIC_HEAVY',
+                divergenceNotice: dollarsPctHome > ticketsPctHome + 15
+                  ? `Whale Handle Inflow on ${homeName}`
+                  : `Public tickets concentrated on ${homeName}`,
+              },
+              away: {
+                side: `${awayName} ${spreadAway > 0 ? '+' : ''}${spreadAway}`,
+                ticketPercentage: ticketsPctAway,
+                moneyPercentage: dollarsPctAway,
+                totalTicketsCount: Math.round(totalBets * (ticketsPctAway / 100)),
+                totalHandleAmount: Math.round(totalHandle * (dollarsPctAway / 100)),
+                sharpSignal: dollarsPctAway > ticketsPctAway + 15 ? 'HEAVY_SHARP' : 'PUBLIC_HEAVY',
+                divergenceNotice: dollarsPctAway > ticketsPctAway + 15
+                  ? `Whale Handle Inflow on ${awayName}`
+                  : `Public tickets concentrated on ${awayName}`,
+              },
             },
-            away: {
-              side: `${awayName} ${spreadAway > 0 ? '+' : ''}${spreadAway}`,
-              ticketPercentage: ticketsPctAway,
-              moneyPercentage: dollarsPctAway,
-              totalTicketsCount: Math.round(totalBets * (ticketsPctAway / 100)),
-              totalHandleAmount: Math.round(totalHandle * (dollarsPctAway / 100)),
-              sharpSignal: dollarsPctAway > ticketsPctAway + 15 ? 'HEAVY_SHARP' : 'PUBLIC_HEAVY',
-              divergenceNotice: dollarsPctAway > ticketsPctAway + 15
-                ? `Whale Handle Inflow on ${awayName}`
-                : `Public tickets concentrated on ${awayName}`,
+            moneyline: {
+              home: {
+                side: `${homeAbbr} ML (${homeMl > 0 ? '+' : ''}${homeMl})`,
+                ticketPercentage: 60,
+                moneyPercentage: 40,
+                totalTicketsCount: Math.round(totalBets * 0.4),
+                totalHandleAmount: Math.round(totalHandle * 0.35),
+                sharpSignal: 'PUBLIC_HEAVY',
+              },
+              away: {
+                side: `${awayAbbr} ML (${awayMl > 0 ? '+' : ''}${awayMl})`,
+                ticketPercentage: 40,
+                moneyPercentage: 60,
+                totalTicketsCount: Math.round(totalBets * 0.25),
+                totalHandleAmount: Math.round(totalHandle * 0.45),
+                sharpSignal: 'HEAVY_SHARP',
+              },
+            },
+            total: {
+              over: {
+                side: `Over ${totalNum}`,
+                ticketPercentage: 68,
+                moneyPercentage: 42,
+                totalTicketsCount: Math.round(totalBets * 0.3),
+                totalHandleAmount: Math.round(totalHandle * 0.25),
+                sharpSignal: 'PUBLIC_HEAVY',
+              },
+              under: {
+                side: `Under ${totalNum}`,
+                ticketPercentage: 32,
+                moneyPercentage: 58,
+                totalTicketsCount: Math.round(totalBets * 0.15),
+                totalHandleAmount: Math.round(totalHandle * 0.35),
+                sharpSignal: 'HEAVY_SHARP',
+              },
             },
           },
-          moneyline: {
-            home: {
-              side: `${homeAbbr} ML (${homeMl > 0 ? '+' : ''}${homeMl})`,
-              ticketPercentage: 60,
-              moneyPercentage: 40,
-              totalTicketsCount: Math.round(totalBets * 0.4),
-              totalHandleAmount: Math.round(totalHandle * 0.35),
-              sharpSignal: 'PUBLIC_HEAVY',
+          lineMovements: [
+            {
+              timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+              timeLabel: 'Open Line',
+              spread: openSpreadHome,
+              total: openTotal,
+              moneylineHome: homeMl - 10,
+              note: 'Market opened via DraftKings / Circa Sports benchmark',
             },
-            away: {
-              side: `${awayAbbr} ML (${awayMl > 0 ? '+' : ''}${awayMl})`,
-              ticketPercentage: 40,
-              moneyPercentage: 60,
-              totalTicketsCount: Math.round(totalBets * 0.25),
-              totalHandleAmount: Math.round(totalHandle * 0.45),
-              sharpSignal: 'HEAVY_SHARP',
+            {
+              timestamp: new Date().toISOString(),
+              timeLabel: 'Live Current',
+              spread: spreadHome,
+              total: totalNum,
+              moneylineHome: homeMl,
+              note: `Live sportsbook consensus: ${consensusSpreadStr} (Total: ${totalNum})`,
             },
-          },
-          total: {
-            over: {
-              side: `Over ${totalNum}`,
-              ticketPercentage: 68,
-              moneyPercentage: 42,
-              totalTicketsCount: Math.round(totalBets * 0.3),
-              totalHandleAmount: Math.round(totalHandle * 0.25),
-              sharpSignal: 'PUBLIC_HEAVY',
-            },
-            under: {
-              side: `Under ${totalNum}`,
-              ticketPercentage: 32,
-              moneyPercentage: 58,
-              totalTicketsCount: Math.round(totalBets * 0.15),
-              totalHandleAmount: Math.round(totalHandle * 0.35),
-              sharpSignal: 'HEAVY_SHARP',
-            },
-          },
-        },
-        lineMovements: [
-          {
-            timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
-            timeLabel: 'Open Line',
-            spread: openSpreadHome,
-            total: openTotal,
-            moneylineHome: homeMl - 10,
-            note: 'Market opened via DraftKings / Circa Sports benchmark',
-          },
-          {
-            timestamp: new Date().toISOString(),
-            timeLabel: 'Live Current',
-            spread: spreadHome,
+          ],
+          sportsbooks,
+          consensus: {
+            spread: consensusSpreadStr,
             total: totalNum,
             moneylineHome: homeMl,
-            note: `Live feed line: ${homeAbbr} ${spreadHome > 0 ? '+' : ''}${spreadHome} (Total: ${totalNum})`,
+            moneylineAway: awayMl,
           },
-        ],
-        sportsbooks,
-        consensus: {
-          spread: `${homeAbbr} ${spreadHome > 0 ? '+' : ''}${spreadHome}`,
-          total: totalNum,
-          moneylineHome: homeMl,
-          moneylineAway: awayMl,
-        },
-        movementAnalysis: {
-          isSignificantMovement,
-          openSpread: openSpreadHome,
-          currentSpread: spreadHome,
-          spreadDelta: (spreadHome - openSpreadHome).toFixed(1),
-          openTotal,
-          currentTotal: totalNum,
-          totalDelta: (totalNum - openTotal).toFixed(1),
-        },
+          movementAnalysis: {
+            isSignificantMovement,
+            openSpread: openSpreadHome,
+            currentSpread: spreadHome,
+            spreadDelta: (spreadHome - openSpreadHome).toFixed(1),
+            openTotal,
+            currentTotal: totalNum,
+            totalDelta: (totalNum - openTotal).toFixed(1),
+          },
         weatherForecast: {
           isDome: comp.venue?.indoor === true,
           temperature: comp.venue?.indoor ? '72°F' : homeAbbr === 'DEN' ? '54°F' : homeAbbr === 'CLE' ? '48°F' : '62°F',

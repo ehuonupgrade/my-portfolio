@@ -48,11 +48,11 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
     stadium: 'Lincoln Financial Field, Philadelphia, PA',
     alertType: 'WHALE_STEAM',
     severity: 'CRITICAL',
-    headline: '🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 7.0 Points vs Panthers!',
+    headline: '🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 11.0 Points to Panthers -3.5!',
     spreadShift: {
       open: 'Eagles -7.5',
-      current: 'Panthers +0.5',
-      delta: '7.0 Point Swing (Eagles Fav to PK/Dog)',
+      current: 'Panthers -3.5',
+      delta: '11.0 Point Swing (Eagles -7.5 to Panthers -3.5 Fav)',
       favoredTeam: 'Carolina Panthers',
     },
     totalShift: {
@@ -66,7 +66,7 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
       ticketsPct: 22,
       divergenceMargin: 67,
       dollarVolume: '$21.8M Handle',
-      favoredSide: 'Panthers +0.5 / Under 40.5',
+      favoredSide: 'Panthers -3.5 / Under 40.5',
     },
     riskWarnings: [
       {
@@ -76,14 +76,14 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
         severityLevel: 'HIGH',
       },
       {
-        title: 'Immediate 7-Point Market Swing',
+        title: 'Massive 11-Point Market Swing Across Zero',
         description:
-          'Odds frozen and shifted 7 full points across DraftKings, FanDuel, Circa, and Pinnacle within 3 minutes of Adam Schefter breaking report.',
+          'Odds shifted 11 full points from Philadelphia -7.5 to Carolina -3.5 across DraftKings, FanDuel, Circa, and Pinnacle following Adam Schefter breaking report.',
         severityLevel: 'HIGH',
       },
     ],
     actionAdvice:
-      'CRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -6.8 points. Recommend taking Under 40.5 and Panthers +0.5.',
+      'CRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -11.0 points without Jalen Hurts. Recommend taking Under 40.5 and Panthers -3.5 as road favorites over backup Tanner McKee.',
   },
   {
     id: 'alert-sea-den-20261015',
@@ -273,8 +273,8 @@ export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
     position: 'QB #1',
     status: 'EMERGENCY_OUT',
     headline: '🚨 EMERGENCY HOSPITALIZATION: Jalen Hurts admitted for blood clot treatment; ruled OUT indefinitely.',
-    marketImpact: 'Offensive power rating downgraded by -6.8 pts. Backup Tanner McKee taking 1st team reps.',
-    lineMovementSummary: 'Spread swung 7.0 pts (PHI -7.5 -> CAR +0.5) / Total dropped 46.5 -> 40.5',
+    marketImpact: 'Offensive power rating downgraded by -11.0 pts. Backup Tanner McKee starts (0 career NFL starts).',
+    lineMovementSummary: 'Spread swung 11.0 pts (PHI -7.5 -> CAR -3.5) / Total dropped 46.5 -> 40.5',
     timeAgo: 'Just now (Oct 15, 2026)',
   },
   {
@@ -285,7 +285,7 @@ export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
     status: 'ACTIVE_CLEARED',
     headline: '⚡ GAME PLAN RECALIBRATION: Tanner McKee starts 1st career NFL game; Saquon Barkley targeted for 25+ touches.',
     marketImpact: 'Eagles deploying run-heavy 12-personnel package against Carolina front seven to protect 1st-time starting QB.',
-    lineMovementSummary: 'Carolina Panthers +0.5 sharp handle inflow (+67% divergence)',
+    lineMovementSummary: 'Carolina Panthers -3.5 sharp handle inflow (+67% divergence)',
     timeAgo: '12m ago',
   },
   {

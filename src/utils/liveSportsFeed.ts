@@ -365,7 +365,12 @@ export async function fetchLiveGamesWithFallback(): Promise<{
         lineMovements,
         sportsbooks,
         consensus: {
-          spread: `${homeAbbr} ${spreadHome > 0 ? '+' : ''}${spreadHome}`,
+          spread:
+            Math.abs(spreadHome) < 0.25
+              ? 'PK'
+              : spreadHome < 0
+              ? `${homeAbbr} ${spreadHome}`
+              : `${awayAbbr} ${spreadAway}`,
           total: totalNum,
           moneylineHome: homeMl,
           moneylineAway: awayMl,

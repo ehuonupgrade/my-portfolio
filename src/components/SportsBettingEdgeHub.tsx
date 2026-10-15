@@ -17,6 +17,7 @@ import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { useLiveVerification } from '../utils/useLiveVerification';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
+import { purifyAndRealignGame, auditAllGamesInSlate } from '../utils/gameAlignmentGuard';
 
 interface SportsBettingEdgeHubProps {
   onBack?: () => void;
@@ -108,38 +109,51 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
     return () => clearInterval(interval);
   }, [liveAutoSync, fetchLiveGames]);
 
-  // Merge live ESPN & DraftKings feed data into market games
+  // Merge live ESPN & DraftKings feed data into market games with Alignment Guard
   const allAvailableGames = useMemo(() => {
-    if (!liveGames.length) return MOCK_GAMES_MARKETS;
+    // 1. First purify each base game through the Alignment Guard
+    const purifiedBase = MOCK_GAMES_MARKETS.map(purifyAndRealignGame);
+    if (!liveGames.length) return purifiedBase;
 
-    const liveBillsRams = liveGames.find(
-      (g) =>
-        (g.homeTeam.abbr === 'LAR' && g.awayTeam.abbr === 'BUF') ||
-        g.homeTeam.name.toLowerCase().includes('ram')
-    );
+    // 2. Synchronize all games dynamically with live sportsbook feeds by team abbreviations
+    const updatedBase = purifiedBase.map((base) => {
+      // Guard: Keep recalibrated final games protected (do not overwrite with different opponents)
+      if (base.status === 'FINAL') {
+        return base;
+      }
 
-    const updatedBase = MOCK_GAMES_MARKETS.map((base) => {
-      if (base.id === 'nfl-lar-buf-today' && liveBillsRams) {
+      // Match live game strictly by team abbreviations
+      const matchingLiveGame = liveGames.find(
+        (lg) =>
+          (lg.homeTeam.abbr.toUpperCase() === base.homeTeam.abbr.toUpperCase() &&
+            lg.awayTeam.abbr.toUpperCase() === base.awayTeam.abbr.toUpperCase()) ||
+          (lg.homeTeam.abbr.toUpperCase() === base.awayTeam.abbr.toUpperCase() &&
+            lg.awayTeam.abbr.toUpperCase() === base.homeTeam.abbr.toUpperCase())
+      );
+
+      if (matchingLiveGame) {
         return {
           ...base,
-          status: liveBillsRams.status,
-          scheduledTime: liveBillsRams.scheduledTime,
-          sportsbooks: liveBillsRams.sportsbooks || base.sportsbooks,
-          consensus: liveBillsRams.consensus || base.consensus,
+          status: matchingLiveGame.status || base.status,
+          scheduledTime: matchingLiveGame.scheduledTime || base.scheduledTime,
+          sportsbooks: matchingLiveGame.sportsbooks?.length ? matchingLiveGame.sportsbooks : base.sportsbooks,
+          consensus: matchingLiveGame.consensus?.spread ? matchingLiveGame.consensus : base.consensus,
           isLiveFeed: true,
-          scores: (liveBillsRams as any).scores,
+          scores: (matchingLiveGame as any).scores || base.scores,
         };
       }
       return base;
     });
 
-    // Append extra games from live scoreboard feed
+    // 3. Append extra games from live scoreboard feed if they do not yet exist
     const extraLive = liveGames.filter(
       (lg) =>
         !updatedBase.some(
           (b) =>
-            b.homeTeam.abbr === lg.homeTeam.abbr &&
-            b.awayTeam.abbr === lg.awayTeam.abbr
+            (b.homeTeam.abbr.toUpperCase() === lg.homeTeam.abbr.toUpperCase() &&
+              b.awayTeam.abbr.toUpperCase() === lg.awayTeam.abbr.toUpperCase()) ||
+            (b.homeTeam.abbr.toUpperCase() === lg.awayTeam.abbr.toUpperCase() &&
+              b.awayTeam.abbr.toUpperCase() === lg.homeTeam.abbr.toUpperCase())
         )
     );
 
