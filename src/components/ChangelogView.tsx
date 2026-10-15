@@ -42,6 +42,8 @@ export const ChangelogView: React.FC = () => {
       case 'privacy':
       case 'cleanup':
         return 'text-amber-400 bg-amber-950/60 border-amber-800/60';
+      case 'roster':
+        return 'text-rose-400 bg-rose-950/60 border-rose-800/60';
       default:
         return 'text-slate-400 bg-slate-900 border-slate-800';
     }
@@ -51,10 +53,14 @@ export const ChangelogView: React.FC = () => {
     <div className="space-y-8 font-sans animate-fadeIn">
       {/* Header */}
       <div className="border-b border-slate-800/80 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-700/60 text-emerald-400 font-mono text-[10px] font-bold uppercase tracking-wider">
-              📜 RELEASE ARCHIVE &bull; {versions.length} RELEASES
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-700/60 text-emerald-400 font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>LIVE CURRENT BUILD &bull; {versions[0]?.version || 'v0.9.17'} ({versions[0]?.date || 'Oct 15, 2026'})</span>
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400 font-mono text-[10px]">
+              {versions.length} TOTAL RELEASES
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-2.5">

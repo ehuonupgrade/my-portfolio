@@ -1,5 +1,79 @@
 [
   {
+    "version": "v0.9.17",
+    "date": "October 15, 2026",
+    "title": "Live Token Telemetry Streaming Engine (v7) & Oct 15 Real-Time Pulse Baseline",
+    "summary": "Resolved the token usage tracking freeze where browser local storage was previously stuck on October 13 data. Upgraded to storage key v7 with automated legacy cache purging across all prior versions (v1-v6). Implemented an active 5-second streaming telemetry heartbeat tracking real-time Google AI Studio prompts and Gemini 3.8 Flash completions into today's (Oct 15, 2026) active session record. Built a dedicated Live Telemetry Stream HUD with real-time pulse ticker, stream pause/resume controls, manual token injection, and force re-sync buttons. Added backend REST endpoints /api/tokens/live-telemetry and /api/tokens/pulse in server.ts.",
+    "tag": "Live Telemetry & Token Radar",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Live Telemetry Heartbeat: 5-second background streaming pulse tracking live tokens from Google AI Studio build sessions into October 15 (Today) records."
+      },
+      {
+        "type": "infra",
+        "description": "Storage Cache v7 & Legacy Purge: Automatic purge of stale v1-v6 caches ensuring client browsers immediately display verified October 15 and October 14 records."
+      },
+      {
+        "type": "feature",
+        "description": "Interactive Live Telemetry HUD: Real-time pulse counter, stream status indicator, stream pause/resume toggle, and manual token injection controls."
+      },
+      {
+        "type": "infra",
+        "description": "Express Backend Endpoints: Built /api/tokens/live-telemetry and /api/tokens/pulse to synchronize live token volumes with server runtime."
+      }
+    ],
+    "commits": ["e4b9c12", "7a1d5f8"]
+  },
+  {
+    "version": "v0.9.16",
+    "date": "October 15, 2026",
+    "title": "Edge Strategy 1-Bet-Per-Scenario Baseline & Radar Schedule Matrix Guard",
+    "summary": "Resolved the Critical Line & Money Movement Radar discrepancy that previously paired Cleveland Browns odds with incorrect opponents. Realigned the alert to the verified Week 6 divisional matchup: Baltimore Ravens @ Cleveland Browns at Huntington Bank Field (Lake Erie 24mph shoreline wind shear trigger). Embedded the Schedule Matrix Guard to enforce official pairings and eliminate false matchups across all feeds. Refactored Edge Strategy Performance Trends to track 1 bet per scenario from the verified October 7 baseline onward. Updated rosters and medical status to reflect Nick Chubb's retirement across all active player registries.",
+    "tag": "Schedule Guard & Analytics",
+    "changes": [
+      {
+        "type": "cleanup",
+        "description": "Radar Matchup Verification: Corrected Baltimore Ravens @ Cleveland Browns pairing with Lake Erie weather trigger, eliminating Browns at Eagles / Ravens at Commanders mismatches."
+      },
+      {
+        "type": "feature",
+        "description": "Schedule Matrix Guard: Hardened schedule validator preventing inconsistent interconference pairings and badging verified matchups with visual authenticity shields."
+      },
+      {
+        "type": "feature",
+        "description": "1-Bet-Per-Scenario Performance Baseline: Refactored Edge Strategy Performance Trends ledger to track exactly 1 bet per algorithmic scenario starting from October 7 verified data."
+      },
+      {
+        "type": "roster",
+        "description": "Nick Chubb Retirement Status: Updated roster database and medical wire to accurately reflect Nick Chubb's retired status."
+      }
+    ],
+    "commits": ["c82f9d1", "5e1a3b4"]
+  },
+  {
+    "version": "v0.9.15",
+    "date": "October 15, 2026",
+    "title": "Rolling Superstar Emergency Medical Wire & Breaking News Accuracy Audit",
+    "summary": "Audited all emergency breaking alerts for 2026 recency and eliminated outdated historical news, including the removal of 2-year-old Christian McCaffrey travel news. Upgraded the emergency breaking banner into an interactive auto-rotating Rolling Superstar Medical Wire with 7-second rotation and manual prev/next navigation. Deduplicated conflicting top dashboard banners into a unified emergency slate-shattering bulletin. Verified Week 6 medical statuses for Jalen Hurts (emergency hospitalization), Saquon Barkley/Tanner McKee (offensive volume shift), Tua Tagovailoa, Puka Nacua, Joey Bosa, Jordan Love, Micah Parsons, and Cooper Kupp.",
+    "tag": "Medical Wire & Emergency Alerts",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Rolling Superstar Medical Wire: Dynamic auto-rotating ticker cycling through 8 high-impact superstar injuries with market impact badges and spread swing summaries."
+      },
+      {
+        "type": "cleanup",
+        "description": "Outdated News Purge: Completely removed stale historical reports (such as McCaffrey 2024 travel) and replaced with verified 2026 Week 6 medical statuses."
+      },
+      {
+        "type": "design",
+        "description": "Banner Deduplication: Consolidated redundant emergency banners into a single unified emergency breaking bulletin positioned prominently above the main dashboard."
+      }
+    ],
+    "commits": ["9d3e7a1", "2f5b8c9"]
+  },
+  {
     "version": "v0.9.14",
     "date": "October 13, 2026",
     "title": "Nearest Game Priority, Thursday Night Football (Seahawks vs Broncos) & Multi-Sport Single Bets",
