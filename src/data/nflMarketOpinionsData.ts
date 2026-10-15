@@ -12,58 +12,6 @@ import { GameMarketOpinions, ActiveGameVolumeShifts, VolumeTickPulse } from '../
  */
 export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   // =========================================================================
-  // EMERGENCY MEDICAL ALERT (JALEN HURTS BLOOD CLOT - 95% CONVICTION FADE/UNDER)
-  // =========================================================================
-  'nfl-phi-cle-w6': {
-    overallConfidenceRank: 1,
-    overallConfidenceScore: 95,
-    confidenceTier: 'MAX_LOCK',
-    primaryRecommendedBet: 'TOTAL',
-    executiveMatchupVerdict: '🚨 CRITICAL BREAKING INJURY ALERT: Eagles QB Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Line swung 7.0 points from PHI -4.5 to CLE -2.5, and game total collapsed from 46.5 to 40.5. Tanner McKee taking 1st team reps. Heavy syndicate money ($21.8M) hammering Under 40.5 and Cleveland -2.5.',
-    spreadOpinion: {
-      betType: 'SPREAD',
-      pick: 'Cleveland Browns -2.5',
-      odds: '-110',
-      bestSportsbook: 'Circa Sports',
-      modelEdge: 8.5,
-      confidenceRating: 95,
-      confidenceStars: 5,
-      verdict: 'STRONG_BUY',
-      selectionSummary: 'Lay -2.5 on Browns following 7.0-point swing from Jalen Hurts emergency hospitalization.',
-      rationale: 'Oddsmakers Reacted Instantly: Jalen Hurts represents a -6.8 point drop in offensive power rating relative to replacement backup Tanner McKee. McKee has 0 career NFL starts and faces Cleveland\'s elite front-seven pass rush behind an Eagles interior line making blocking adjustments. Cleveland\'s defense ranks 4th in pressure rate (38.2%), which will overwhelm a first-time starter.',
-    },
-    moneylineOpinion: {
-      betType: 'MONEYLINE',
-      pick: 'Cleveland Browns ML',
-      odds: '-155',
-      bestSportsbook: 'DraftKings',
-      modelEdge: 9.1,
-      confidenceRating: 96,
-      confidenceStars: 5,
-      verdict: 'STRONG_BUY',
-      selectionSummary: 'Outright win value on Cleveland with Philadelphia\'s offense severely compromised.',
-      rationale: 'With Hurts sidelined, Philadelphia\'s third-down conversion expectation drops from 46% to 29%. Saquon Barkley will face 8-man stacked boxes on 70%+ of early downs. At -155, Cleveland holds an estimated 68.5% outright win probability.',
-    },
-    totalOpinion: {
-      betType: 'TOTAL',
-      pick: 'Under 40.5',
-      odds: '-110',
-      bestSportsbook: 'FanDuel',
-      modelEdge: 9.8,
-      confidenceRating: 97,
-      confidenceStars: 5,
-      verdict: 'STRONG_BUY',
-      selectionSummary: 'Massive total drop from 46.5 to 40.5 as Eagles run conservative run-heavy script.',
-      rationale: 'Philadelphia head coach Nick Sirianni will deploy a conservative, ground-and-pound game plan centered on Saquon Barkley to protect backup QB Tanner McKee from turnovers. Clock will run continuously with minimal downfield deep passing attempts.',
-    },
-    keyFactors: {
-      weatherImpactFactor: 'Standard autumn afternoon conditions at Lincoln Financial Field (58°F).',
-      injuryAdvantage: '🚨 CRITICAL MEDICAL EMERGENCY: Jalen Hurts OUT (blood clot hospitalization); Tanner McKee starting.',
-      sharpMoneySignal: '89% of syndicate handle hammering Browns -2.5 and Under 40.5 following Adam Schefter breaking report.',
-      schemeEdge: 'Cleveland elite front-seven pass rush vs 1st-time starter Tanner McKee.',
-    },
-  },
-
   // =========================================================================
   // RANK #1 (96% CONFIDENCE · MAX CONVICTION LOCK)
   // =========================================================================
@@ -118,10 +66,119 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   },
 
   // =========================================================================
-  // RANK #2 (94% CONFIDENCE · MAX CONVICTION LOCK)
+  // RANK #2 (95% CONFIDENCE · EMERGENCY MEDICAL ALERT)
+  // =========================================================================
+  // =========================================================================
+  // RANK #2 (95% CONFIDENCE · EMERGENCY MEDICAL ALERT)
+  // =========================================================================
+  'nfl-car-phi-w6': {
+    overallConfidenceRank: 2,
+    overallConfidenceScore: 95,
+    confidenceTier: 'MAX_LOCK',
+    primaryRecommendedBet: 'TOTAL',
+    executiveMatchupVerdict: '🚨 CRITICAL BREAKING INJURY ALERT: Eagles QB Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Line swung 7.0 points from PHI -7.5 to PHI -0.5, and game total collapsed from 46.5 to 40.5. Tanner McKee taking 1st team reps.',
+    spreadOpinion: {
+      betType: 'SPREAD',
+      pick: 'Carolina Panthers +0.5',
+      odds: '-110',
+      bestSportsbook: 'Circa Sports',
+      modelEdge: 8.5,
+      confidenceRating: 95,
+      confidenceStars: 5,
+      verdict: 'STRONG_BUY',
+      selectionSummary: 'Grab points on Carolina following 7.0-point swing from Jalen Hurts emergency hospitalization.',
+      rationale: 'Oddsmakers Reacted Instantly: Jalen Hurts represents a -6.8 point drop in offensive power rating relative to replacement backup Tanner McKee. McKee has 0 career NFL starts.',
+    },
+    moneylineOpinion: {
+      betType: 'MONEYLINE',
+      pick: 'Carolina Panthers ML',
+      odds: '+105',
+      bestSportsbook: 'DraftKings',
+      modelEdge: 9.1,
+      confidenceRating: 96,
+      confidenceStars: 5,
+      verdict: 'STRONG_BUY',
+      selectionSummary: 'Outright win value on Carolina with Philadelphia\'s offense severely compromised.',
+      rationale: 'With Hurts sidelined, Philadelphia\'s third-down conversion expectation drops from 46% to 29%. Saquon Barkley will face 8-man stacked boxes on 70%+ of early downs.',
+    },
+    totalOpinion: {
+      betType: 'TOTAL',
+      pick: 'Under 40.5',
+      odds: '-110',
+      bestSportsbook: 'FanDuel',
+      modelEdge: 9.8,
+      confidenceRating: 97,
+      confidenceStars: 5,
+      verdict: 'STRONG_BUY',
+      selectionSummary: 'Massive total drop from 46.5 to 40.5 as Eagles run conservative run-heavy script.',
+      rationale: 'Philadelphia head coach Nick Sirianni will deploy a conservative, ground-and-pound game plan centered on Saquon Barkley to protect backup QB Tanner McKee from turnovers.',
+    },
+    keyFactors: {
+      weatherImpactFactor: 'Standard autumn afternoon conditions at Lincoln Financial Field (58°F).',
+      injuryAdvantage: '🚨 CRITICAL MEDICAL EMERGENCY: Jalen Hurts OUT (blood clot hospitalization); Tanner McKee starting.',
+      sharpMoneySignal: '89% of syndicate handle hammering Panthers +0.5 and Under 40.5 following Adam Schefter breaking report.',
+      schemeEdge: 'Panthers pass rush vs 1st-time starter Tanner McKee.',
+    },
+  },
+
+  // =========================================================================
+  // RANK #3 (92% CONFIDENCE · MAX CONVICTION LOCK)
+  // =========================================================================
+  'nfl-no-nyg-w6': {
+    overallConfidenceRank: 3,
+    overallConfidenceScore: 92,
+    confidenceTier: 'MAX_LOCK',
+    primaryRecommendedBet: 'SPREAD',
+    executiveMatchupVerdict: 'High-conviction NFC matchup at MetLife Stadium. New Orleans Saints defense matches up against New York Giants offensive line.',
+    spreadOpinion: {
+      betType: 'SPREAD',
+      pick: 'New Orleans Saints -3.0',
+      odds: '-110',
+      bestSportsbook: 'DraftKings',
+      modelEdge: 8.2,
+      confidenceRating: 92,
+      confidenceStars: 5,
+      verdict: 'STRONG_BUY',
+      selectionSummary: 'Laying the field goal key number with Alvin Kamara and Saints defense.',
+      rationale: 'Saints front seven pressures the pocket at a 36.8% rate while Giants struggle in third-and-long conversions.',
+    },
+    moneylineOpinion: {
+      betType: 'MONEYLINE',
+      pick: 'New Orleans Saints ML',
+      odds: '-165',
+      bestSportsbook: 'FanDuel',
+      modelEdge: 8.8,
+      confidenceRating: 93,
+      confidenceStars: 5,
+      verdict: 'STRONG_BUY',
+      selectionSummary: 'Clean moneyline value on Saints in road spot.',
+      rationale: 'New Orleans holds an estimated 62.5% win probability.',
+    },
+    totalOpinion: {
+      betType: 'TOTAL',
+      pick: 'Under 42.5',
+      odds: '-110',
+      bestSportsbook: 'Circa Sports',
+      modelEdge: 6.5,
+      confidenceRating: 88,
+      confidenceStars: 4,
+      verdict: 'BUY',
+      selectionSummary: 'Defensive battle at MetLife Stadium.',
+      rationale: 'Both offenses favor heavy ground work, keeping the clock moving continuously.',
+    },
+    keyFactors: {
+      weatherImpactFactor: 'MetLife Stadium autumn weather (56°F, 7 mph wind).',
+      injuryAdvantage: 'Saints defensive secondary healthy.',
+      sharpMoneySignal: 'Pro handle backing Saints -3.0 at open.',
+      schemeEdge: 'Dennis Allen blitz packages vs Giants interior blocking.',
+    },
+  },
+
+  // =========================================================================
+  // RANK #4 (94% CONFIDENCE · MAX CONVICTION LOCK)
   // =========================================================================
   'nfl-sea-den-tnf': {
-    overallConfidenceRank: 2,
+    overallConfidenceRank: 4,
     overallConfidenceScore: 94,
     confidenceTier: 'MAX_LOCK',
     primaryRecommendedBet: 'SPREAD',
@@ -171,10 +228,10 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   },
 
   // =========================================================================
-  // RANK #3 (91% CONFIDENCE · HIGH CONVICTION)
+  // RANK #5 (91% CONFIDENCE · HIGH CONVICTION)
   // =========================================================================
   'nfl-kc-lac-w6': {
-    overallConfidenceRank: 3,
+    overallConfidenceRank: 5,
     overallConfidenceScore: 91,
     confidenceTier: 'HIGH_CONVICTION',
     primaryRecommendedBet: 'SPREAD',
@@ -224,10 +281,10 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   },
 
   // =========================================================================
-  // RANK #4 (88% CONFIDENCE · HIGH CONVICTION)
+  // RANK #6 (88% CONFIDENCE · HIGH CONVICTION)
   // =========================================================================
   'nfl-buf-lv-w6': {
-    overallConfidenceRank: 4,
+    overallConfidenceRank: 6,
     overallConfidenceScore: 88,
     confidenceTier: 'HIGH_CONVICTION',
     primaryRecommendedBet: 'SPREAD',
@@ -277,10 +334,10 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   },
 
   // =========================================================================
-  // RANK #5 (85% CONFIDENCE · STRONG VALUE)
+  // RANK #7 (85% CONFIDENCE · STRONG VALUE)
   // =========================================================================
   'nfl-dal-gb-w6': {
-    overallConfidenceRank: 5,
+    overallConfidenceRank: 7,
     overallConfidenceScore: 85,
     confidenceTier: 'STRONG_VALUE',
     primaryRecommendedBet: 'SPREAD',
@@ -330,17 +387,17 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   },
 
   // =========================================================================
-  // RANK #6 (82% CONFIDENCE · STRONG VALUE)
+  // RANK #8 (82% CONFIDENCE · STRONG VALUE)
   // =========================================================================
-  'nfl-wsh-sf-w6': {
-    overallConfidenceRank: 6,
+  'nfl-ari-sf-w6': {
+    overallConfidenceRank: 8,
     overallConfidenceScore: 82,
     confidenceTier: 'STRONG_VALUE',
     primaryRecommendedBet: 'SPREAD',
-    executiveMatchupVerdict: 'Hook value on dynamic rookie Jayden Daniels. San Francisco has blown multiple double-digit leads in the 4th quarter and remains without Dre Greenlaw and Christian McCaffrey.',
+    executiveMatchupVerdict: 'Hook value on division rivalry. San Francisco has blown multiple double-digit leads in the 4th quarter and remains without Dre Greenlaw and Christian McCaffrey.',
     spreadOpinion: {
       betType: 'SPREAD',
-      pick: 'Washington Commanders +3.5',
+      pick: 'Arizona Cardinals +3.5',
       odds: '-110',
       bestSportsbook: 'FanDuel',
       modelEdge: 5.5,
@@ -348,11 +405,11 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceStars: 4,
       verdict: 'BUY',
       selectionSummary: 'Key +3.5 hook provides insurance against San Francisco\'s shaky fourth quarters.',
-      rationale: 'Jayden Daniels leads the NFL in completion percentage above expected (+8.4%) and EPA per dropback. San Francisco\'s defense has proven vulnerable against dual-threat quarterbacks who break containment. Getting +3.5 points gives bettors crucial hook protection past the key number of 3.',
+      rationale: 'Kyler Murray leads the NFL in off-script playmaking efficiency. San Francisco\'s defense has proven vulnerable against dual-threat quarterbacks who break containment. Getting +3.5 points gives bettors crucial hook protection past the key number of 3.',
     },
     moneylineOpinion: {
       betType: 'MONEYLINE',
-      pick: 'Washington Commanders ML',
+      pick: 'Arizona Cardinals ML',
       odds: '+160',
       bestSportsbook: 'DraftKings',
       modelEdge: 6.1,
@@ -360,7 +417,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceStars: 3,
       verdict: 'LEAN',
       selectionSummary: 'Live underdog with 44.6% modeled win equity against 38.5% implied odds.',
-      rationale: 'At +160, the market is discounting Kliff Kingsbury\'s offensive rhythm. If Washington creates one turnover off Brock Purdy, Daniels has the poise to orchestrate an upset drive.',
+      rationale: 'At +160, the market is discounting Arizona\'s offensive rhythm. If Arizona creates one turnover off Brock Purdy, Murray has the poise to orchestrate an upset drive.',
     },
     totalOpinion: {
       betType: 'TOTAL',
@@ -372,21 +429,21 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceStars: 4,
       verdict: 'BUY',
       selectionSummary: 'Pristine Santa Clara weather (68°F, 5 mph) between two top-6 offensive units.',
-      rationale: 'Both offenses rank in the top 6 in red zone scoring percentage and yards per play. With pristine Bay Area weather and zero wind, both Brock Purdy and Jayden Daniels will move the ball freely between the 20s.',
+      rationale: 'Both offenses rank in the top 6 in red zone scoring percentage and yards per play. With pristine Bay Area weather and zero wind, both Brock Purdy and Kyler Murray will move the ball freely between the 20s.',
     },
     keyFactors: {
       weatherImpactFactor: '68°F autumn sunshine in Santa Clara with negligible 5 mph breeze; perfect throwing weather.',
       injuryAdvantage: '49ers still without Christian McCaffrey (Achilles) and Dre Greenlaw (suspension/rehab).',
-      sharpMoneySignal: 'Dog money taking +3.5 hook on Washington; public handle split 54% Washington.',
-      schemeEdge: 'Kliff Kingsbury RPO spread spreading 49ers linebackers laterally.',
+      sharpMoneySignal: 'Dog money taking +3.5 hook on Arizona; public handle split 54% Arizona.',
+      schemeEdge: 'Kyler Murray RPO spread spreading 49ers linebackers laterally.',
     },
   },
 
   // =========================================================================
-  // RANK #7 (78% CONFIDENCE · MODERATE EDGE)
+  // RANK #9 (78% CONFIDENCE · MODERATE EDGE)
   // =========================================================================
   'nfl-hou-jax-w6': {
-    overallConfidenceRank: 7,
+    overallConfidenceRank: 9,
     overallConfidenceScore: 78,
     confidenceTier: 'MODERATE_EDGE',
     primaryRecommendedBet: 'SPREAD',
@@ -436,10 +493,10 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   },
 
   // =========================================================================
-  // RANK #8 (75% CONFIDENCE · MODERATE EDGE)
+  // RANK #10 (75% CONFIDENCE · MODERATE EDGE)
   // =========================================================================
   'nfl-pit-tb-w6': {
-    overallConfidenceRank: 8,
+    overallConfidenceRank: 10,
     overallConfidenceScore: 75,
     confidenceTier: 'MODERATE_EDGE',
     primaryRecommendedBet: 'TOTAL',
@@ -489,10 +546,10 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   },
 
   // =========================================================================
-  // RANK #9 (71% CONFIDENCE · VOLATILE LEAN)
+  // RANK #10 (71% CONFIDENCE · VOLATILE LEAN)
   // =========================================================================
   'nfl-chi-atl-w6': {
-    overallConfidenceRank: 9,
+    overallConfidenceRank: 10,
     overallConfidenceScore: 71,
     confidenceTier: 'VOLATILE_LEAN',
     primaryRecommendedBet: 'TOTAL',
@@ -600,7 +657,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
  * Real-time tracking of ongoing ticket counts, handle dollars, and pre-game volume swings.
  */
 export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> = {
-  'nfl-bal-cle-w6': {
+  'nfl-bal-was-w6': {
     lastUpdated: '1 min ago (Live Sync)',
     shiftVelocityRatePerMinute: {
       unitsPerMin: 310,
@@ -621,7 +678,7 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
         dollarsUnder: 278000,
         dominantSide: 'Baltimore Ravens -6.5',
         swingVelocity: 'HEAVY_STEAM',
-        swingSummary: '+$295k / +1,140 units on Ravens in last 5m (Lake Erie wind reaction)',
+        swingSummary: '+$295k / +1,140 units on Ravens in last 5m (Rushing attack reaction)',
       },
       fifteenMin: {
         window: '15M',
@@ -633,7 +690,7 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
         unitsUnder: 3250,
         dollarsOver: 180000,
         dollarsUnder: 835000,
-        dominantSide: 'Baltimore Ravens -6.5 & Under 41.5',
+        dominantSide: 'Baltimore Ravens -6.5 & Under 51.5',
         swingVelocity: 'HEAVY_STEAM',
         swingSummary: '+$885k handle on Ravens; $835k on Under across DraftKings & Circa',
       },
@@ -656,8 +713,8 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
       {
         id: 'pulse-bal-1',
         timestamp: 'Just now',
-        gameId: 'nfl-bal-cle-w6',
-        matchup: 'BAL @ CLE',
+        gameId: 'nfl-bal-was-w6',
+        matchup: 'BAL @ WAS',
         targetSelection: 'Baltimore Ravens -6.5',
         marketType: 'SPREAD',
         unitDelta: 450,
@@ -669,9 +726,9 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
       {
         id: 'pulse-bal-2',
         timestamp: '3m ago',
-        gameId: 'nfl-bal-cle-w6',
-        matchup: 'BAL @ CLE',
-        targetSelection: 'Under 41.5',
+        gameId: 'nfl-bal-was-w6',
+        matchup: 'BAL @ WAS',
+        targetSelection: 'Under 51.5',
         marketType: 'TOTAL',
         unitDelta: 620,
         dollarDelta: 95000,

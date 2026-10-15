@@ -531,13 +531,13 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
   },
 
   // ==========================================
-  // SUNDAY DIVISIONAL: Ravens @ Browns (Cleveland Shoreline Winds)
+  // SUNDAY INTERCONFERENCE: Ravens @ Commanders
   // ==========================================
-  'nfl-bal-cle-w6': {
-    gameId: 'nfl-bal-cle-w6',
-    gameMatchup: 'Baltimore Ravens @ Cleveland Browns',
+  'nfl-bal-was-w6': {
+    gameId: 'nfl-bal-was-w6',
+    gameMatchup: 'Baltimore Ravens @ Washington Commanders',
     league: 'NFL',
-    homeTeamName: 'Cleveland Browns',
+    homeTeamName: 'Washington Commanders',
     awayTeamName: 'Baltimore Ravens',
     totalAnalystsTracked: 9,
     spread: {
