@@ -21,7 +21,7 @@ export const OFFICIAL_ACTIVE_PLAYER_TEAM_MAP: Record<string, { teamName: string;
   'Jalen Hurts': { teamName: 'Philadelphia Eagles', teamAbbr: 'PHI', position: 'QB' },
   'Tanner McKee': { teamName: 'Philadelphia Eagles', teamAbbr: 'PHI', position: 'QB' },
   'Saquon Barkley': { teamName: 'Philadelphia Eagles', teamAbbr: 'PHI', position: 'RB' },
-  'Nick Chubb': { teamName: 'Cleveland Browns', teamAbbr: 'CLE', position: 'RB' },
+  'Jerome Ford': { teamName: 'Cleveland Browns', teamAbbr: 'CLE', position: 'RB' },
   'Deshaun Watson': { teamName: 'Cleveland Browns', teamAbbr: 'CLE', position: 'QB' },
   'Za\'Darius Smith': { teamName: 'Cleveland Browns', teamAbbr: 'CLE', position: 'DE' },
   'Lamar Jackson': { teamName: 'Baltimore Ravens', teamAbbr: 'BAL', position: 'QB' },

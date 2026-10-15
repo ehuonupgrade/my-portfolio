@@ -173,7 +173,7 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
     },
     injuries: {
       homeInjuries: [
-        { player: 'Nick Chubb', position: 'RB', status: 'QUESTIONABLE', injury: 'Knee', gameImpact: 'Practice window active; limited reps expected.' },
+        { player: 'Jerome Ford', position: 'RB', status: 'ACTIVE', injury: 'None', gameImpact: 'Starting running back handling primary rushing workload (18+ touches).' },
         { player: 'Deshaun Watson', position: 'QB', status: 'ACTIVE', injury: 'Ankle', gameImpact: 'Starting QB active; 11.2% sack rate under heavy pass rush.' },
       ] as PlayerInjuryItem[],
       awayInjuries: [
@@ -751,11 +751,11 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
       humidity: '65%',
       precipitationChance: '40% scattered cold drizzle',
       impactLevel: 'HIGH',
-      impactSummary: 'CRITICAL WEATHER IMPACT ALERT: Sustained winds exceeding 17 mph along Lake Erie historically decrease passing depth of target by 2.4 yards and reduce 45+ yard field goal conversion rates to 54%. Sharp syndicates have aggressively hammered Under 42.5 down to 41.5, expecting Derrick Henry and Nick Chubb to run between the tackles on 70%+ of snaps.',
+      impactSummary: 'CRITICAL WEATHER IMPACT ALERT: Sustained winds exceeding 17 mph along Lake Erie historically decrease passing depth of target by 2.4 yards and reduce 45+ yard field goal conversion rates to 54%. Sharp syndicates have aggressively hammered Under 42.5 down to 41.5, expecting Derrick Henry and Jerome Ford to run between the tackles on 70%+ of snaps.',
     },
     injuries: {
       homeInjuries: [
-        { player: 'Nick Chubb', position: 'RB', status: 'QUESTIONABLE', injury: 'Knee (Practice Window Open)', gameImpact: 'Participating in team drills; decision on active roster spot Friday.' },
+        { player: 'Jerome Ford', position: 'RB', status: 'ACTIVE', injury: 'None', gameImpact: 'Feature back handling first/second down carries and passing downs.' },
         { player: 'Deshaun Watson', position: 'QB', status: 'ACTIVE', injury: 'Ankle soreness', gameImpact: 'Cleared to start; game plan focused on quick slants and zone-read handoffs.' },
         { player: 'David Njoku', position: 'TE', status: 'ACTIVE', injury: 'Knee', gameImpact: 'Full practice participant; primary intermediate safety valve in high winds.' },
         { player: 'Wyatt Teller', position: 'OG', status: 'IR', injury: 'Knee', gameImpact: 'Zak Zinter starting at right guard.' },
