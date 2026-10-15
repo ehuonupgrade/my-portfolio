@@ -40,6 +40,52 @@ export interface MovementAlertItem {
 
 export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
   {
+    id: 'alert-phi-hurts-blood-clot-20261015',
+    gameId: 'nfl-phi-cle-w6',
+    matchup: 'Cleveland Browns @ Philadelphia Eagles',
+    league: 'NFL',
+    scheduledTime: 'Sunday, Oct 18 · 10:00 AM PDT (1:00 PM EDT)',
+    stadium: 'Lincoln Financial Field, Philadelphia, PA',
+    alertType: 'WHALE_STEAM',
+    severity: 'CRITICAL',
+    headline: '🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 7.0 Points!',
+    spreadShift: {
+      open: 'Eagles -4.5',
+      current: 'Browns -2.5',
+      delta: '7.0 Point Swing (Eagles Fav to Dog)',
+      favoredTeam: 'Cleveland Browns',
+    },
+    totalShift: {
+      open: '46.5 O/U',
+      current: '40.5 O/U',
+      delta: '-6.0 Points Drop',
+      direction: 'UNDER',
+    },
+    moneyDivergence: {
+      dollarsPct: 89,
+      ticketsPct: 22,
+      divergenceMargin: 67,
+      dollarVolume: '$21.8M Handle',
+      favoredSide: 'Browns -2.5 / Under 40.5',
+    },
+    riskWarnings: [
+      {
+        title: 'Emergency Medical Hospitalization',
+        description:
+          'Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Tanner McKee will make his 1st NFL start.',
+        severityLevel: 'HIGH',
+      },
+      {
+        title: 'Immediate 7-Point Market Swing',
+        description:
+          'Odds frozen and shifted 7 full points across DraftKings, FanDuel, Circa, and Pinnacle within 3 minutes of Adam Schefter breaking report.',
+        severityLevel: 'HIGH',
+      },
+    ],
+    actionAdvice:
+      'CRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -6.8 points. Recommend taking Under 40.5 and Browns -2.5.',
+  },
+  {
     id: 'alert-sea-den-20261015',
     gameId: 'nfl-sea-den-tnf',
     matchup: 'Denver Broncos @ Seattle Seahawks (TNF)',

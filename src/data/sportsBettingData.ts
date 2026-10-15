@@ -1,4 +1,4 @@
-import { GameMarket, DailySlatePortfolio } from '../types/sportsBetting';
+import { GameMarket, DailySlatePortfolio, PlayerInjuryItem } from '../types/sportsBetting';
 import { MOCK_ANALYST_CONSENSUS_DATA } from './sportsAnalystsData';
 import { NFL_MARKET_OPINIONS_MAP, NFL_LIVE_VOLUME_SHIFTS_MAP } from './nflMarketOpinionsData';
 
@@ -19,6 +19,192 @@ export const PUBLIC_SPORTSBOOKS = [
  * are verified accurate through today (Thursday, Oct 15, 2026).
  */
 const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
+  // =========================================================================
+  // GAME 0: PHILADELPHIA EAGLES (EMERGENCY QB INJURY ALERT - JALEN HURTS OUT)
+  // =========================================================================
+  {
+    id: 'nfl-phi-cle-w6',
+    league: 'NFL',
+    homeTeam: {
+      name: 'Eagles',
+      city: 'Philadelphia',
+      abbr: 'PHI',
+      record: '4-1',
+      logoColor: '#004c54',
+    },
+    awayTeam: {
+      name: 'Browns',
+      city: 'Cleveland',
+      abbr: 'CLE',
+      record: '2-3',
+      logoColor: '#311d00',
+    },
+    scheduledTime: 'Sunday, Oct 18 · 1:00 PM EDT (10:00 AM PDT)',
+    stadium: 'Lincoln Financial Field, Philadelphia, PA',
+    weatherCondition: '58°F, 9 mph East wind, Partly cloudy',
+    status: 'UPCOMING',
+    totalBetsPlaced: 184000,
+    totalDollarsWagered: 24500000,
+    splits: {
+      spread: {
+        home: {
+          side: 'Philadelphia Eagles +2.5',
+          ticketPercentage: 22,
+          moneyPercentage: 11,
+          totalTicketsCount: 40480,
+          totalHandleAmount: 2695000,
+          sharpSignal: 'PUBLIC_HEAVY',
+          divergenceNotice: 'EMERGENCY LINE SHIFT: Jalen Hurts ruled OUT (hospitalized with blood clot). Public and sharps fading Eagles; Tanner McKee starting.',
+        },
+        away: {
+          side: 'Cleveland Browns -2.5',
+          ticketPercentage: 78,
+          moneyPercentage: 89,
+          totalTicketsCount: 143520,
+          totalHandleAmount: 21805000,
+          sharpSignal: 'HEAVY_SHARP',
+          divergenceNotice: 'Syndicate Steam (+67% divergence): 89% of handle hammering Browns -2.5 following Jalen Hurts medical emergency.',
+        },
+      },
+      moneyline: {
+        home: {
+          side: 'Eagles ML (+135)',
+          ticketPercentage: 28,
+          moneyPercentage: 16,
+          totalTicketsCount: 22000,
+          totalHandleAmount: 1400000,
+          sharpSignal: 'PUBLIC_HEAVY',
+        },
+        away: {
+          side: 'Browns ML (-155)',
+          ticketPercentage: 72,
+          moneyPercentage: 84,
+          totalTicketsCount: 56600,
+          totalHandleAmount: 7350000,
+          sharpSignal: 'HEAVY_SHARP',
+        },
+      },
+      total: {
+        over: {
+          side: 'Over 40.5',
+          ticketPercentage: 25,
+          moneyPercentage: 14,
+          totalTicketsCount: 18000,
+          totalHandleAmount: 980000,
+          sharpSignal: 'PUBLIC_HEAVY',
+        },
+        under: {
+          side: 'Under 40.5',
+          ticketPercentage: 75,
+          moneyPercentage: 86,
+          totalTicketsCount: 54000,
+          totalHandleAmount: 6020000,
+          sharpSignal: 'HEAVY_SHARP',
+          divergenceNotice: 'Massive Under steam: Total collapsed from 46.5 to 40.5 with Hurts sidelined and Tanner McKee managing offense.',
+        },
+      },
+    },
+    lineMovements: [
+      { timestamp: '2026-10-11T18:00:00Z', timeLabel: 'Sunday Open', spread: -7.5, total: 46.5, moneylineHome: -360, note: 'Opened PHI -7.5 prior to injury news' },
+      { timestamp: '2026-10-14T12:00:00Z', timeLabel: 'Mid-Week', spread: -4.5, total: 44.5, moneylineHome: -210, note: 'Pre-existing line adjustment' },
+      { timestamp: '2026-10-15T10:10:00Z', timeLabel: 'EMERGENCY INJURY ALERT', spread: +2.5, total: 40.5, moneylineHome: +135, note: '🚨 Jalen Hurts hospitalized for emergency blood clot treatment. Line flipped 7.0 pts to CLE -2.5.' },
+    ],
+    sportsbooks: [
+      {
+        bookName: 'DraftKings',
+        spreadHome: 2.5,
+        spreadHomeOdds: -110,
+        spreadAway: -2.5,
+        spreadAwayOdds: -110,
+        totalOver: 40.5,
+        totalOverOdds: -110,
+        totalUnder: 40.5,
+        totalUnderOdds: -110,
+        moneylineHome: +135,
+        moneylineAway: -155,
+        lastUpdated: 'Just now',
+      },
+      {
+        bookName: 'FanDuel',
+        spreadHome: 2.5,
+        spreadHomeOdds: -108,
+        spreadAway: -2.5,
+        spreadAwayOdds: -112,
+        totalOver: 40.5,
+        totalOverOdds: -108,
+        totalUnder: 40.5,
+        totalUnderOdds: -112,
+        moneylineHome: +138,
+        moneylineAway: -160,
+        isBestMoneylineHome: true,
+        lastUpdated: '1 min ago',
+      },
+      {
+        bookName: 'Circa Sports',
+        spreadHome: 2.5,
+        spreadHomeOdds: -105,
+        spreadAway: -2.5,
+        spreadAwayOdds: -115,
+        totalOver: 40.5,
+        totalOverOdds: -110,
+        totalUnder: 40.5,
+        totalUnderOdds: -110,
+        moneylineHome: +135,
+        moneylineAway: -150,
+        isBestSpreadHome: true,
+        lastUpdated: 'Just now',
+      },
+    ],
+    consensus: {
+      spread: 'CLE -2.5 (-111)',
+      total: 40.5,
+      moneylineHome: +135,
+      moneylineAway: -155,
+    },
+    weatherForecast: {
+      isDome: false,
+      temperature: '58°F',
+      conditions: 'Partly cloudy, crisp East Coast autumn day',
+      wind: '9 mph East',
+      humidity: '52%',
+      precipitationChance: '10%',
+      impactLevel: 'LOW',
+      impactSummary: 'Pleasant mid-October conditions at Lincoln Financial Field.',
+    },
+    injuries: {
+      homeInjuries: [
+        { player: 'Jalen Hurts', position: 'QB', status: 'OUT', injury: 'Blood Clot (Emergency Hospitalization)', gameImpact: 'CRITICAL EMERGENCY: Jalen Hurts hospitalized for emergency blood clot treatment; ruled OUT. Backup QB Tanner McKee starting. Line shifted 7.0 points against Philadelphia.' },
+        { player: 'A.J. Brown', position: 'WR', status: 'ACTIVE', injury: 'Hamstring', gameImpact: 'Cleared to start; target volume expected to tilt heavily toward short slant routes with backup QB McKee.' },
+        { player: 'Saquon Barkley', position: 'RB', status: 'ACTIVE', injury: 'None', gameImpact: 'Expected to handle 25+ touches to shield backup QB McKee.' },
+        { player: 'Lane Johnson', position: 'OT', status: 'ACTIVE', injury: 'Ankle', gameImpact: 'Starting RT cleared to protect McKee.' },
+      ] as PlayerInjuryItem[],
+      awayInjuries: [
+        { player: 'Myles Garrett', position: 'DE', status: 'ACTIVE', injury: 'Foot', gameImpact: 'All-Pro edge rusher cleared; primary pass rush threat against 1st-time starter McKee.' },
+        { player: 'Nick Chubb', position: 'RB', status: 'QUESTIONABLE', injury: 'Knee', gameImpact: 'Practice window active.' },
+      ] as PlayerInjuryItem[],
+      lineImpactAnalysis: '🚨 CRITICAL EMERGENCY INJURY: Jalen Hurts ruled OUT due to blood clot hospitalization. Eagles line swung 7.0 points from PHI -4.5 to CLE -2.5, and total dropped 6.0 points to 40.5.',
+      totalImpactRating: 'GAME_CHANGING',
+    },
+    latestNews: [
+      {
+        id: 'news-hurts-blood-clot-1',
+        headline: '🚨 BREAKING: Eagles QB Jalen Hurts hospitalized with blood clot, ruled OUT for Sunday',
+        source: 'Adam Schefter / ESPN Breaking News',
+        timeAgo: 'Just now (Oct 15)',
+        summary: 'Philadelphia Eagles QB Jalen Hurts has been admitted to the hospital for emergency blood clot treatment. He has been ruled out for Week 6. Tanner McKee will make his 1st NFL start.',
+        relevance: 'MARKET_FLOW',
+      },
+      {
+        id: 'news-hurts-blood-clot-2',
+        headline: 'Sportsbooks freeze and re-open Eagles line from -4.5 to +2.5 following Hurts emergency news',
+        source: 'Circa Sports / DraftKings Oddsmakers',
+        timeAgo: '5m ago',
+        summary: 'Vegas and offshore oddsmakers reacted instantly to Jalen Hurts blood clot hospitalization, swinging the line 7 full points and dropping the total from 46.5 to 40.5.',
+        relevance: 'MARKET_FLOW',
+      },
+    ],
+  },
+
   // =========================================================================
   // GAME 1: THURSDAY NIGHT FOOTBALL (Denver Broncos vs. Seattle Seahawks)
   // =========================================================================

@@ -62,9 +62,13 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   const [copiedCsv, setCopiedCsv] = useState<boolean>(false);
   const [calculatorStake, setCalculatorStake] = useState<number>(100);
   const [isPerformanceChartExpanded, setIsPerformanceChartExpanded] = useState<boolean>(true);
+  const [isLedgerSectionExpanded, setIsLedgerSectionExpanded] = useState<boolean>(false);
+  const [isCompactViewMode, setIsCompactViewMode] = useState<boolean>(true);
+  const [expandedGameIds, setExpandedGameIds] = useState<Record<string, boolean>>({});
   const [inspectingLineMoveGame, setInspectingLineMoveGame] = useState<GameMarket | null>(null);
   const [showVerificationModal, setShowVerificationModal] = useState<boolean>(false);
   const [showOddsModal, setShowOddsModal] = useState<boolean>(false);
+  const [showHurtsBreakingBanner, setShowHurtsBreakingBanner] = useState<boolean>(true);
   const oddsStreamState = useLiveOddsStream(games);
 
   // Live verification active state & timestamping
@@ -460,6 +464,57 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
         </div>
       </div>
 
+      {/* EMERGENCY BREAKING INJURY ALERT BANNER: JALEN HURTS BLOOD CLOT */}
+      {showHurtsBreakingBanner && (
+        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-rose-950 via-slate-900 to-amber-950 border-2 border-rose-500 shadow-2xl shadow-rose-950/60 font-mono text-xs relative overflow-hidden animate-fadeIn">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-full bg-rose-500 text-white font-black uppercase text-[10px] tracking-wider animate-bounce flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  <span>🚨 EMERGENCY BREAKING MEDICAL INJURY</span>
+                </span>
+                <span className="text-amber-300 font-bold text-[11px]">
+                  Verified Live: Oct 15, 2026 &bull; Adam Schefter / ESPN Medical Wire
+                </span>
+              </div>
+
+              <h3 className="text-lg sm:text-xl font-black text-white font-sans tracking-tight">
+                Philadelphia Eagles QB Jalen Hurts Hospitalized with Blood Clot &mdash; Ruled OUT for Week 6!
+              </h3>
+
+              <p className="text-slate-200 text-xs sm:text-sm font-sans leading-relaxed max-w-4xl">
+                Eagles QB Jalen Hurts was admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Backup QB Tanner McKee will make his 1st career start. Oddsmakers froze and swung the line <strong>7.0 points</strong> (PHI -4.5 &rarr; CLE -2.5) and total dropped from 46.5 to <strong>40.5</strong>.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  const eaglesGame = games.find((g) => g.id === 'nfl-phi-cle-w6' || g.homeTeam.abbr === 'PHI' || g.awayTeam.abbr === 'PHI');
+                  if (eaglesGame) {
+                    setInspectingLineMoveGame(eaglesGame);
+                  }
+                }}
+                className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-all cursor-pointer shadow-lg flex items-center gap-1.5"
+              >
+                <span>📈 Inspect 7-Pt Line Shift</span>
+                <span>&rarr;</span>
+              </button>
+
+              <button
+                onClick={() => setShowHurtsBreakingBanner(false)}
+                className="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-400 hover:text-white transition-colors cursor-pointer text-xs font-bold"
+                title="Dismiss Banner"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* =========================================================================
           SECTION 1: BET RECOMMENDATIONS OF THE DAY
           ========================================================================= */}
@@ -562,32 +617,49 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                   ))}
                 </div>
 
-                <div className="relative min-w-[200px]">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Filter by team or city..."
-                    className="w-full px-3 py-1.5 pl-8 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
-                  />
-                  <span className="absolute left-2.5 top-2 text-slate-500 text-xs">🔍</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      playKeyClick();
+                      setIsCompactViewMode(!isCompactViewMode);
+                    }}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer border ${
+                      isCompactViewMode
+                        ? 'bg-cyan-950 border-cyan-500 text-cyan-300'
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>{isCompactViewMode ? '⚡ Compact Shorthand View' : '📖 Full Rationale View'}</span>
+                  </button>
+
+                  <div className="relative min-w-[180px]">
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="Filter by team..."
+                      className="w-full px-3 py-1.5 pl-8 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                    />
+                    <span className="absolute left-2.5 top-2 text-slate-500 text-xs">🔍</span>
+                  </div>
                 </div>
               </div>
 
               {/* Slate Ranked Cards Grid */}
-              <div className="space-y-5">
+              <div className="space-y-4">
                 {rankedGames.map((game) => {
                   const opinions = game.marketOpinions;
                   if (!opinions) return null;
 
                   const isLock = opinions.confidenceTier === 'MAX_LOCK';
                   const isHigh = opinions.confidenceTier === 'HIGH_CONVICTION';
-                  const isTop3 = opinions.overallConfidenceRank <= 3;
+                  const isCardExpanded = expandedGameIds[game.id] || !isCompactViewMode;
+                  const lineAnalysis = analyzeGameLineMovement(game);
 
                   return (
                     <div
                       key={game.id}
-                      className={`p-5 sm:p-6 rounded-3xl border transition-all duration-200 space-y-5 ${
+                      className={`p-4 sm:p-5 rounded-3xl border transition-all duration-200 space-y-4 ${
                         isLock
                           ? 'bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-950 border-emerald-500/80 shadow-xl shadow-emerald-950/20 ring-1 ring-emerald-500/30'
                           : isHigh
@@ -596,285 +668,305 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                       }`}
                     >
                       {/* Game Header & Rank Badge */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
                         <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center font-mono font-black border ${
+                          <div className={`w-11 h-11 rounded-2xl flex flex-col items-center justify-center font-mono font-black border ${
                             isLock
                               ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
                               : isHigh
                               ? 'bg-cyan-500 text-slate-950 border-cyan-400'
                               : 'bg-slate-800 text-white border-slate-700'
                           }`}>
-                            <span className="text-[10px] uppercase font-bold leading-none">Rank</span>
-                            <span className="text-lg leading-tight">#{opinions.overallConfidenceRank}</span>
+                            <span className="text-[9px] uppercase font-bold leading-none">Rank</span>
+                            <span className="text-base leading-tight">#{opinions.overallConfidenceRank}</span>
                           </div>
 
                           <div>
                             <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="text-xl font-bold text-white tracking-tight">
+                              <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
                                 {game.awayTeam.city} {game.awayTeam.name} ({game.awayTeam.record}) @ {game.homeTeam.city} {game.homeTeam.name} ({game.homeTeam.record})
                               </h3>
                               <span className="text-xs font-mono text-slate-400">
                                 &bull; {game.scheduledTime}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 pt-1 font-mono text-xs flex-wrap">
-                              <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] uppercase ${
-                                opinions.confidenceTier === 'MAX_LOCK'
-                                  ? 'bg-emerald-950 border border-emerald-500 text-emerald-300'
-                                  : opinions.confidenceTier === 'HIGH_CONVICTION'
-                                  ? 'bg-cyan-950 border border-cyan-500 text-cyan-300'
-                                  : 'bg-slate-800 text-slate-300'
-                              }`}>
-                                {opinions.confidenceTier.replace('_', ' ')} &bull; {opinions.overallConfidenceScore}% Conviction
-                              </span>
-                              <span className="text-slate-400 text-[11px]">
-                                Stadium: <span className="text-slate-200">{game.stadium}</span>
-                              </span>
-                            </div>
+
+                            {/* MATERIAL LINE MOVEMENT ALERT CALLOUT BADGE */}
+                            {lineAnalysis.hasMaterialMovement && (
+                              <div className="pt-1">
+                                <button
+                                  onClick={() => {
+                                    playKeyClick();
+                                    setInspectingLineMoveGame(game);
+                                  }}
+                                  className="px-2.5 py-0.5 rounded-full bg-rose-950/90 border border-rose-500 text-rose-300 font-mono text-[10px] font-bold flex items-center gap-1.5 hover:border-rose-400 transition-colors cursor-pointer"
+                                >
+                                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping shrink-0" />
+                                  <span>🚨 MATERIAL LINE MOVE:</span>
+                                  <span className="text-white">{lineAnalysis.openingPoint.spread ? `${lineAnalysis.openingPoint.spread > 0 ? '+' : ''}${lineAnalysis.openingPoint.spread}` : 'Open'} &rarr; {lineAnalysis.currentPoint.spread ? `${lineAnalysis.currentPoint.spread > 0 ? '+' : ''}${lineAnalysis.currentPoint.spread}` : 'Curr'}</span>
+                                  {lineAnalysis.crossedKeyNumbers.length > 0 && (
+                                    <span className="text-amber-300">({lineAnalysis.crossedKeyNumbers.map((k: number) => `Crossed #${k}`).join(', ')})</span>
+                                  )}
+                                  <span className="text-slate-400 hover:text-white">&rarr; Inspect</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
 
-                        {/* Quick Jump Buttons */}
+                        {/* Quick Action Buttons */}
                         <div className="flex flex-wrap items-center gap-2 font-mono text-xs shrink-0 self-start sm:self-auto">
                           <button
                             onClick={() => {
                               playKeyClick();
                               setInspectingLineMoveGame(game);
                             }}
-                            className="px-3.5 py-2 rounded-xl bg-amber-950/80 border border-amber-500/60 hover:border-amber-400 text-amber-300 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                            className="px-3 py-1.5 rounded-xl bg-amber-950/80 border border-amber-500/60 hover:border-amber-400 text-amber-300 font-bold transition-all cursor-pointer flex items-center gap-1 shadow-sm"
                           >
-                            <span>📈 Line Movement History</span>
+                            <span>📈 Lines &amp; Shifts</span>
                           </button>
 
                           <button
                             onClick={() => {
                               playKeyClick();
-                              onSelectGameAndInspect(game.id, 'opinions');
+                              setExpandedGameIds((prev) => ({
+                                ...prev,
+                                [game.id]: !prev[game.id],
+                              }));
                             }}
-                            className="px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 hover:border-cyan-500 text-cyan-300 hover:text-white font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                            className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 hover:border-cyan-500 text-cyan-300 hover:text-white font-bold transition-all cursor-pointer flex items-center gap-1 shadow-sm"
                           >
-                            <span>🏈 NFL Hub</span>
-                            <span>&rarr;</span>
+                            <span>{isCardExpanded ? '▲ Collapse Details' : '▼ Expand Rationale'}</span>
                           </button>
                         </div>
                       </div>
 
+                      {/* SHORTHAND STAT BADGES RIBBON */}
+                      <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+                        <div className="px-2.5 py-1 rounded-xl bg-slate-950 border border-cyan-500/60 text-cyan-300 font-bold flex items-center gap-1.5">
+                          <span>🎯 BEST PICK:</span>
+                          <span className="text-white">
+                            {opinions.primaryRecommendedBet === 'SPREAD'
+                              ? `${opinions.spreadOpinion.pick} (${opinions.spreadOpinion.odds})`
+                              : opinions.primaryRecommendedBet === 'MONEYLINE'
+                              ? `${opinions.moneylineOpinion.pick} (${opinions.moneylineOpinion.odds})`
+                              : `${opinions.totalOpinion.pick} (${opinions.totalOpinion.odds})`}
+                          </span>
+                          <span className="text-emerald-400">
+                            +{opinions.primaryRecommendedBet === 'SPREAD' ? opinions.spreadOpinion.modelEdge : opinions.primaryRecommendedBet === 'MONEYLINE' ? opinions.moneylineOpinion.modelEdge : opinions.totalOpinion.modelEdge}% EV
+                          </span>
+                        </div>
+
+                        <div className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-amber-300 font-bold flex items-center gap-1">
+                          <span>🔒</span>
+                          <span>{opinions.overallConfidenceScore}% Conviction</span>
+                        </div>
+
+                        {opinions.keyFactors?.sharpMoneySignal && (
+                          <div className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-purple-300 font-bold flex items-center gap-1">
+                            <span>🐋</span>
+                            <span>{opinions.keyFactors.sharpMoneySignal}</span>
+                          </div>
+                        )}
+
+                        {opinions.keyFactors?.weatherImpactFactor && (
+                          <div className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 flex items-center gap-1">
+                            <span>🌦️</span>
+                            <span>{opinions.keyFactors.weatherImpactFactor}</span>
+                          </div>
+                        )}
+
+                        {opinions.keyFactors?.injuryAdvantage && (
+                          <div className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 flex items-center gap-1">
+                            <span>🏥</span>
+                            <span>{opinions.keyFactors.injuryAdvantage}</span>
+                          </div>
+                        )}
+                      </div>
+
                       {/* Executive Matchup Verdict */}
-                      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 font-sans text-xs space-y-1">
+                      <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800/80 font-sans text-xs space-y-1">
                         <span className="text-[10px] font-mono text-amber-400 uppercase font-bold tracking-wider flex items-center gap-1">
                           <span>💡</span>
-                          <span>Executive Tactical Verdict:</span>
+                          <span>Executive Verdict:</span>
                         </span>
                         <p className="text-slate-200 leading-relaxed font-medium">
                           {opinions.executiveMatchupVerdict}
                         </p>
                       </div>
 
-                      {/* 3-WAY BET OPINIONS GRID: SPREAD, MONEYLINE, OVER/UNDER */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {/* OPINION 1: SPREAD BET */}
-                        <div className={`p-4 rounded-2xl border space-y-3 font-sans transition-all ${
-                          opinions.primaryRecommendedBet === 'SPREAD'
-                            ? 'bg-gradient-to-b from-cyan-950/60 to-slate-950 border-cyan-500/80 shadow-md ring-1 ring-cyan-500/20'
-                            : 'bg-slate-950/50 border-slate-800/90'
-                        }`}>
-                          <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-sm font-mono font-bold text-slate-300">SPREAD OPINION</span>
-                              {opinions.primaryRecommendedBet === 'SPREAD' && (
-                                <span className="px-1.5 py-0.2 rounded bg-cyan-500 text-slate-950 text-[9px] font-mono font-black">
-                                  BEST BET
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-amber-400 text-xs">
-                              {'★'.repeat(opinions.spreadOpinion.confidenceStars)}
-                            </span>
-                          </div>
-
-                          <div className="space-y-1">
-                            <div className="flex items-baseline justify-between">
-                              <div className="text-base font-extrabold text-white">
-                                {opinions.spreadOpinion.pick}
-                              </div>
-                              <div className="font-mono text-xs font-bold text-cyan-300">
-                                {opinions.spreadOpinion.odds}
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
-                              <span>Book: <span className="text-emerald-400 font-bold">{opinions.spreadOpinion.bestSportsbook}</span></span>
-                              <span className="text-emerald-400 font-bold">+{opinions.spreadOpinion.modelEdge}% EV Edge</span>
-                            </div>
-                          </div>
-
-                          {/* Verdict Badge */}
-                          <div className="flex items-center justify-between pt-1 font-mono text-[11px]">
-                            <span className={`px-2 py-0.5 rounded font-bold uppercase ${
-                              opinions.spreadOpinion.verdict === 'STRONG_BUY'
-                                ? 'bg-emerald-950 border border-emerald-600 text-emerald-300'
-                                : opinions.spreadOpinion.verdict === 'BUY'
-                                ? 'bg-cyan-950 border border-cyan-600 text-cyan-300'
-                                : 'bg-slate-800 text-slate-400'
+                      {/* EXPANDABLE 3-WAY BET OPINIONS GRID */}
+                      {isCardExpanded && (
+                        <div className="space-y-4 pt-2 border-t border-slate-800/80 animate-fadeIn">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* OPINION 1: SPREAD BET */}
+                            <div className={`p-4 rounded-2xl border space-y-3 font-sans transition-all ${
+                              opinions.primaryRecommendedBet === 'SPREAD'
+                                ? 'bg-gradient-to-b from-cyan-950/60 to-slate-950 border-cyan-500/80 shadow-md ring-1 ring-cyan-500/20'
+                                : 'bg-slate-950/50 border-slate-800/90'
                             }`}>
-                              {opinions.spreadOpinion.verdict.replace('_', ' ')}
-                            </span>
-                            <span className="text-slate-400 text-[10px]">
-                              {opinions.spreadOpinion.confidenceRating}% Conviction
-                            </span>
-                          </div>
-
-                          {/* Rationale: Why we picked this */}
-                          <div className="pt-1 border-t border-slate-800/60 text-xs text-slate-300 leading-relaxed font-normal">
-                            <strong className="text-slate-400 font-mono text-[10px] block uppercase">Why We Picked Spread:</strong>
-                            {opinions.spreadOpinion.rationale}
-                          </div>
-                        </div>
-
-                        {/* OPINION 2: MONEYLINE (ML) BET */}
-                        <div className={`p-4 rounded-2xl border space-y-3 font-sans transition-all ${
-                          opinions.primaryRecommendedBet === 'MONEYLINE'
-                            ? 'bg-gradient-to-b from-purple-950/60 to-slate-950 border-purple-500/80 shadow-md ring-1 ring-purple-500/20'
-                            : 'bg-slate-950/50 border-slate-800/90'
-                        }`}>
-                          <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-sm font-mono font-bold text-slate-300">MONEYLINE (ML) OPINION</span>
-                              {opinions.primaryRecommendedBet === 'MONEYLINE' && (
-                                <span className="px-1.5 py-0.2 rounded bg-purple-500 text-white text-[9px] font-mono font-black">
-                                  BEST BET
+                              <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm font-mono font-bold text-slate-300">SPREAD OPINION</span>
+                                  {opinions.primaryRecommendedBet === 'SPREAD' && (
+                                    <span className="px-1.5 py-0.2 rounded bg-cyan-500 text-slate-950 text-[9px] font-mono font-black">
+                                      BEST BET
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-amber-400 text-xs">
+                                  {'★'.repeat(opinions.spreadOpinion.confidenceStars)}
                                 </span>
-                              )}
-                            </div>
-                            <span className="text-amber-400 text-xs">
-                              {'★'.repeat(opinions.moneylineOpinion.confidenceStars)}
-                            </span>
-                          </div>
-
-                          <div className="space-y-1">
-                            <div className="flex items-baseline justify-between">
-                              <div className="text-base font-extrabold text-white">
-                                {opinions.moneylineOpinion.pick}
                               </div>
-                              <div className="font-mono text-xs font-bold text-purple-300">
-                                {opinions.moneylineOpinion.odds}
+
+                              <div className="space-y-1">
+                                <div className="flex items-baseline justify-between">
+                                  <div className="text-base font-extrabold text-white">
+                                    {opinions.spreadOpinion.pick}
+                                  </div>
+                                  <div className="font-mono text-xs font-bold text-cyan-300">
+                                    {opinions.spreadOpinion.odds}
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                                  <span>Book: <span className="text-emerald-400 font-bold">{opinions.spreadOpinion.bestSportsbook}</span></span>
+                                  <span className="text-emerald-400 font-bold">+{opinions.spreadOpinion.modelEdge}% EV Edge</span>
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
-                              <span>Book: <span className="text-emerald-400 font-bold">{opinions.moneylineOpinion.bestSportsbook}</span></span>
-                              <span className="text-emerald-400 font-bold">+{opinions.moneylineOpinion.modelEdge}% EV Edge</span>
-                            </div>
-                          </div>
 
-                          {/* Verdict Badge */}
-                          <div className="flex items-center justify-between pt-1 font-mono text-[11px]">
-                            <span className={`px-2 py-0.5 rounded font-bold uppercase ${
-                              opinions.moneylineOpinion.verdict === 'STRONG_BUY'
-                                ? 'bg-emerald-950 border border-emerald-600 text-emerald-300'
-                                : opinions.moneylineOpinion.verdict === 'BUY'
-                                ? 'bg-cyan-950 border border-cyan-600 text-cyan-300'
-                                : 'bg-slate-800 text-slate-400'
-                            }`}>
-                              {opinions.moneylineOpinion.verdict.replace('_', ' ')}
-                            </span>
-                            <span className="text-slate-400 text-[10px]">
-                              {opinions.moneylineOpinion.confidenceRating}% Conviction
-                            </span>
-                          </div>
-
-                          {/* Rationale: Why we picked this */}
-                          <div className="pt-1 border-t border-slate-800/60 text-xs text-slate-300 leading-relaxed font-normal">
-                            <strong className="text-slate-400 font-mono text-[10px] block uppercase">Why We Picked Moneyline:</strong>
-                            {opinions.moneylineOpinion.rationale}
-                          </div>
-                        </div>
-
-                        {/* OPINION 3: OVER / UNDER TOTAL BET */}
-                        <div className={`p-4 rounded-2xl border space-y-3 font-sans transition-all ${
-                          opinions.primaryRecommendedBet === 'TOTAL'
-                            ? 'bg-gradient-to-b from-amber-950/60 to-slate-950 border-amber-500/80 shadow-md ring-1 ring-amber-500/20'
-                            : 'bg-slate-950/50 border-slate-800/90'
-                        }`}>
-                          <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-sm font-mono font-bold text-slate-300">OVER / UNDER OPINION</span>
-                              {opinions.primaryRecommendedBet === 'TOTAL' && (
-                                <span className="px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 text-[9px] font-mono font-black">
-                                  BEST BET
+                              <div className="flex items-center justify-between pt-1 font-mono text-[11px]">
+                                <span className={`px-2 py-0.5 rounded font-bold uppercase ${
+                                  opinions.spreadOpinion.verdict === 'STRONG_BUY'
+                                    ? 'bg-emerald-950 border border-emerald-600 text-emerald-300'
+                                    : opinions.spreadOpinion.verdict === 'BUY'
+                                    ? 'bg-cyan-950 border border-cyan-600 text-cyan-300'
+                                    : 'bg-slate-800 text-slate-400'
+                                }`}>
+                                  {opinions.spreadOpinion.verdict.replace('_', ' ')}
                                 </span>
-                              )}
-                            </div>
-                            <span className="text-amber-400 text-xs">
-                              {'★'.repeat(opinions.totalOpinion.confidenceStars)}
-                            </span>
-                          </div>
-
-                          <div className="space-y-1">
-                            <div className="flex items-baseline justify-between">
-                              <div className="text-base font-extrabold text-white">
-                                {opinions.totalOpinion.pick}
+                                <span className="text-slate-400 text-[10px]">
+                                  {opinions.spreadOpinion.confidenceRating}% Conviction
+                                </span>
                               </div>
-                              <div className="font-mono text-xs font-bold text-amber-300">
-                                {opinions.totalOpinion.odds}
+
+                              <div className="pt-1 border-t border-slate-800/60 text-xs text-slate-300 leading-relaxed font-normal">
+                                <strong className="text-slate-400 font-mono text-[10px] block uppercase">Why We Picked Spread:</strong>
+                                {opinions.spreadOpinion.rationale}
                               </div>
                             </div>
-                            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
-                              <span>Book: <span className="text-emerald-400 font-bold">{opinions.totalOpinion.bestSportsbook}</span></span>
-                              <span className="text-emerald-400 font-bold">+{opinions.totalOpinion.modelEdge}% EV Edge</span>
-                            </div>
-                          </div>
 
-                          {/* Verdict Badge */}
-                          <div className="flex items-center justify-between pt-1 font-mono text-[11px]">
-                            <span className={`px-2 py-0.5 rounded font-bold uppercase ${
-                              opinions.totalOpinion.verdict === 'STRONG_BUY'
-                                ? 'bg-emerald-950 border border-emerald-600 text-emerald-300'
-                                : opinions.totalOpinion.verdict === 'BUY'
-                                ? 'bg-cyan-950 border border-cyan-600 text-cyan-300'
-                                : 'bg-slate-800 text-slate-400'
+                            {/* OPINION 2: MONEYLINE (ML) BET */}
+                            <div className={`p-4 rounded-2xl border space-y-3 font-sans transition-all ${
+                              opinions.primaryRecommendedBet === 'MONEYLINE'
+                                ? 'bg-gradient-to-b from-purple-950/60 to-slate-950 border-purple-500/80 shadow-md ring-1 ring-purple-500/20'
+                                : 'bg-slate-950/50 border-slate-800/90'
                             }`}>
-                              {opinions.totalOpinion.verdict.replace('_', ' ')}
-                            </span>
-                            <span className="text-slate-400 text-[10px]">
-                              {opinions.totalOpinion.confidenceRating}% Conviction
-                            </span>
-                          </div>
+                              <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm font-mono font-bold text-slate-300">MONEYLINE (ML) OPINION</span>
+                                  {opinions.primaryRecommendedBet === 'MONEYLINE' && (
+                                    <span className="px-1.5 py-0.2 rounded bg-purple-500 text-white text-[9px] font-mono font-black">
+                                      BEST BET
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-amber-400 text-xs">
+                                  {'★'.repeat(opinions.moneylineOpinion.confidenceStars)}
+                                </span>
+                              </div>
 
-                          {/* Rationale: Why we picked this */}
-                          <div className="pt-1 border-t border-slate-800/60 text-xs text-slate-300 leading-relaxed font-normal">
-                            <strong className="text-slate-400 font-mono text-[10px] block uppercase">Why We Picked Total:</strong>
-                            {opinions.totalOpinion.rationale}
-                          </div>
-                        </div>
-                      </div>
+                              <div className="space-y-1">
+                                <div className="flex items-baseline justify-between">
+                                  <div className="text-base font-extrabold text-white">
+                                    {opinions.moneylineOpinion.pick}
+                                  </div>
+                                  <div className="font-mono text-xs font-bold text-purple-300">
+                                    {opinions.moneylineOpinion.odds}
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                                  <span>Book: <span className="text-emerald-400 font-bold">{opinions.moneylineOpinion.bestSportsbook}</span></span>
+                                  <span className="text-emerald-400 font-bold">+{opinions.moneylineOpinion.modelEdge}% EV Edge</span>
+                                </div>
+                              </div>
 
-                      {/* Key Grounding Factors Footer */}
-                      {opinions.keyFactors && (
-                        <div className="flex flex-wrap items-center gap-2 pt-1 font-mono text-[11px] text-slate-400">
-                          {opinions.keyFactors.weatherImpactFactor && (
-                            <span className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1">
-                              <span>🌦️</span>
-                              <span>{opinions.keyFactors.weatherImpactFactor}</span>
-                            </span>
-                          )}
-                          {opinions.keyFactors.injuryAdvantage && (
-                            <span className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1">
-                              <span>🏥</span>
-                              <span>{opinions.keyFactors.injuryAdvantage}</span>
-                            </span>
-                          )}
-                          {opinions.keyFactors.sharpMoneySignal && (
-                            <span className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1 text-cyan-300">
-                              <span>🐋</span>
-                              <span>{opinions.keyFactors.sharpMoneySignal}</span>
-                            </span>
-                          )}
-                          {opinions.keyFactors.schemeEdge && (
-                            <span className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-1 text-amber-300">
-                              <span>📐</span>
-                              <span>{opinions.keyFactors.schemeEdge}</span>
-                            </span>
-                          )}
+                              <div className="flex items-center justify-between pt-1 font-mono text-[11px]">
+                                <span className={`px-2 py-0.5 rounded font-bold uppercase ${
+                                  opinions.moneylineOpinion.verdict === 'STRONG_BUY'
+                                    ? 'bg-emerald-950 border border-emerald-600 text-emerald-300'
+                                    : opinions.moneylineOpinion.verdict === 'BUY'
+                                    ? 'bg-cyan-950 border border-cyan-600 text-cyan-300'
+                                    : 'bg-slate-800 text-slate-400'
+                                }`}>
+                                  {opinions.moneylineOpinion.verdict.replace('_', ' ')}
+                                </span>
+                                <span className="text-slate-400 text-[10px]">
+                                  {opinions.moneylineOpinion.confidenceRating}% Conviction
+                                </span>
+                              </div>
+
+                              <div className="pt-1 border-t border-slate-800/60 text-xs text-slate-300 leading-relaxed font-normal">
+                                <strong className="text-slate-400 font-mono text-[10px] block uppercase">Why We Picked Moneyline:</strong>
+                                {opinions.moneylineOpinion.rationale}
+                              </div>
+                            </div>
+
+                            {/* OPINION 3: OVER / UNDER TOTAL BET */}
+                            <div className={`p-4 rounded-2xl border space-y-3 font-sans transition-all ${
+                              opinions.primaryRecommendedBet === 'TOTAL'
+                                ? 'bg-gradient-to-b from-amber-950/60 to-slate-950 border-amber-500/80 shadow-md ring-1 ring-amber-500/20'
+                                : 'bg-slate-950/50 border-slate-800/90'
+                            }`}>
+                              <div className="flex items-center justify-between border-b border-slate-800/60 pb-2">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm font-mono font-bold text-slate-300">OVER / UNDER OPINION</span>
+                                  {opinions.primaryRecommendedBet === 'TOTAL' && (
+                                    <span className="px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 text-[9px] font-mono font-black">
+                                      BEST BET
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-amber-400 text-xs">
+                                  {'★'.repeat(opinions.totalOpinion.confidenceStars)}
+                                </span>
+                              </div>
+
+                              <div className="space-y-1">
+                                <div className="flex items-baseline justify-between">
+                                  <div className="text-base font-extrabold text-white">
+                                    {opinions.totalOpinion.pick}
+                                  </div>
+                                  <div className="font-mono text-xs font-bold text-amber-300">
+                                    {opinions.totalOpinion.odds}
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                                  <span>Book: <span className="text-emerald-400 font-bold">{opinions.totalOpinion.bestSportsbook}</span></span>
+                                  <span className="text-emerald-400 font-bold">+{opinions.totalOpinion.modelEdge}% EV Edge</span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between pt-1 font-mono text-[11px]">
+                                <span className={`px-2 py-0.5 rounded font-bold uppercase ${
+                                  opinions.totalOpinion.verdict === 'STRONG_BUY'
+                                    ? 'bg-emerald-950 border border-emerald-600 text-emerald-300'
+                                    : opinions.totalOpinion.verdict === 'BUY'
+                                    ? 'bg-cyan-950 border border-cyan-600 text-cyan-300'
+                                    : 'bg-slate-800 text-slate-400'
+                                }`}>
+                                  {opinions.totalOpinion.verdict.replace('_', ' ')}
+                                </span>
+                                <span className="text-slate-400 text-[10px]">
+                                  {opinions.totalOpinion.confidenceRating}% Conviction
+                                </span>
+                              </div>
+
+                              <div className="pt-1 border-t border-slate-800/60 text-xs text-slate-300 leading-relaxed font-normal">
+                                <strong className="text-slate-400 font-mono text-[10px] block uppercase">Why We Picked Total:</strong>
+                                {opinions.totalOpinion.rationale}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1202,40 +1294,54 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               <button
                 onClick={() => {
                   playKeyClick();
-                  setIsPerformanceChartExpanded(!isPerformanceChartExpanded);
+                  setIsLedgerSectionExpanded(!isLedgerSectionExpanded);
                 }}
-                className={`px-3.5 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 border shadow ${
-                  isPerformanceChartExpanded
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/60'
-                    : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white'
-                }`}
+                className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow"
               >
-                <span>📈</span>
-                <span>{isPerformanceChartExpanded ? 'Hide Trends Chart' : 'Show Performance Trends Chart'}</span>
+                <span>{isLedgerSectionExpanded ? '▲ Collapse Ledger & Trends' : '▼ Expand Bet Ledger & Performance Trends'}</span>
               </button>
 
-              <button
-                onClick={handleSimulateTonight}
-                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow"
-              >
-                <span>🎲 Simulate Tonight (TNF)</span>
-              </button>
+              {isLedgerSectionExpanded && (
+                <>
+                  <button
+                    onClick={() => {
+                      playKeyClick();
+                      setIsPerformanceChartExpanded(!isPerformanceChartExpanded);
+                    }}
+                    className={`px-3 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1 border shadow ${
+                      isPerformanceChartExpanded
+                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/60'
+                        : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    <span>📈</span>
+                    <span>{isPerformanceChartExpanded ? 'Hide Trends' : 'Show Trends'}</span>
+                  </button>
 
-              <button
-                onClick={handleExportCSV}
-                className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white font-bold transition-all cursor-pointer flex items-center gap-1"
-              >
-                <span>{copiedCsv ? '✓' : '📥'}</span>
-                <span>{copiedCsv ? 'Copied' : 'Export CSV'}</span>
-              </button>
+                  <button
+                    onClick={handleSimulateTonight}
+                    className="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 font-bold transition-all cursor-pointer flex items-center gap-1 shadow"
+                  >
+                    <span>🎲 Simulate Tonight (TNF)</span>
+                  </button>
 
-              <button
-                onClick={handleReset}
-                className="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-red-500/50 text-slate-400 hover:text-red-400 font-bold transition-colors cursor-pointer"
-                title="Reset ledger to default"
-              >
-                <span>↺</span>
-              </button>
+                  <button
+                    onClick={handleExportCSV}
+                    className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white font-bold transition-all cursor-pointer flex items-center gap-1"
+                  >
+                    <span>{copiedCsv ? '✓' : '📥'}</span>
+                    <span>{copiedCsv ? 'Copied' : 'Export CSV'}</span>
+                  </button>
+
+                  <button
+                    onClick={handleReset}
+                    className="px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-red-500/50 text-slate-400 hover:text-red-400 font-bold transition-colors cursor-pointer"
+                    title="Reset ledger to default"
+                  >
+                    <span>↺</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -1280,6 +1386,37 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               <div className="text-amber-300 font-bold text-lg">{ongoingBets.length} Pending</div>
             </div>
           </div>
+
+          {/* COLLAPSED SUMMARY CARD FOR SECTION 3 */}
+          {!isLedgerSectionExpanded ? (
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/30 via-slate-900 to-slate-950 border border-emerald-500/40 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg font-mono text-xs">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Historical Ledger Summary:</span>
+                  </span>
+                  <span className="text-sm font-bold text-white">
+                    {summary.wins} Wins &bull; {summary.losses} Losses &bull; +{summary.netUnitsWon} Units ({summary.winRate}% ATS)
+                  </span>
+                </div>
+                <p className="text-slate-300 text-xs">
+                  Detailed wager audit tracking all 15 settled historical slates, Closing Line Value (CLV), adaptive model pattern adjustments, and real performance trends chart.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  setIsLedgerSectionExpanded(true);
+                }}
+                className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold cursor-pointer shrink-0 shadow-md flex items-center gap-2"
+              >
+                <span>▼ Expand Full Bet Ledger &amp; Trends Chart</span>
+                <span className="bg-slate-950 text-emerald-300 px-1.5 py-0.5 rounded text-[10px]">15 Wagers</span>
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-6 animate-fadeIn">
 
           {/* RECHARTS PERFORMANCE TRENDS CHART */}
           {isPerformanceChartExpanded && (
@@ -1458,6 +1595,8 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               })}
             </div>
           </div>
+        </div>
+      )}
         </section>
       )}
 

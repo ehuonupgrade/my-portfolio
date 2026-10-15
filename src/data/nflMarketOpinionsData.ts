@@ -12,6 +12,59 @@ import { GameMarketOpinions, ActiveGameVolumeShifts, VolumeTickPulse } from '../
  */
 export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
   // =========================================================================
+  // EMERGENCY MEDICAL ALERT (JALEN HURTS BLOOD CLOT - 95% CONVICTION FADE/UNDER)
+  // =========================================================================
+  'nfl-phi-cle-w6': {
+    overallConfidenceRank: 1,
+    overallConfidenceScore: 95,
+    confidenceTier: 'MAX_LOCK',
+    primaryRecommendedBet: 'TOTAL',
+    executiveMatchupVerdict: '🚨 CRITICAL BREAKING INJURY ALERT: Eagles QB Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Line swung 7.0 points from PHI -4.5 to CLE -2.5, and game total collapsed from 46.5 to 40.5. Tanner McKee taking 1st team reps. Heavy syndicate money ($21.8M) hammering Under 40.5 and Cleveland -2.5.',
+    spreadOpinion: {
+      betType: 'SPREAD',
+      pick: 'Cleveland Browns -2.5',
+      odds: '-110',
+      bestSportsbook: 'Circa Sports',
+      modelEdge: 8.5,
+      confidenceRating: 95,
+      confidenceStars: 5,
+      verdict: 'STRONG_BUY',
+      selectionSummary: 'Lay -2.5 on Browns following 7.0-point swing from Jalen Hurts emergency hospitalization.',
+      rationale: 'Oddsmakers Reacted Instantly: Jalen Hurts represents a -6.8 point drop in offensive power rating relative to replacement backup Tanner McKee. McKee has 0 career NFL starts and faces Myles Garrett behind an Eagles interior line making blocking adjustments. Cleveland\'s defense ranks 4th in pressure rate (38.2%), which will overwhelm a first-time starter.',
+    },
+    moneylineOpinion: {
+      betType: 'MONEYLINE',
+      pick: 'Cleveland Browns ML',
+      odds: '-155',
+      bestSportsbook: 'DraftKings',
+      modelEdge: 9.1,
+      confidenceRating: 96,
+      confidenceStars: 5,
+      verdict: 'STRONG_BUY',
+      selectionSummary: 'Outright win value on Cleveland with Philadelphia\'s offense severely compromised.',
+      rationale: 'With Hurts sidelined, Philadelphia\'s third-down conversion expectation drops from 46% to 29%. Saquon Barkley will face 8-man stacked boxes on 70%+ of early downs. At -155, Cleveland holds an estimated 68.5% outright win probability.',
+    },
+    totalOpinion: {
+      betType: 'TOTAL',
+      pick: 'Under 40.5',
+      odds: '-110',
+      bestSportsbook: 'FanDuel',
+      modelEdge: 9.8,
+      confidenceRating: 97,
+      confidenceStars: 5,
+      verdict: 'STRONG_BUY',
+      selectionSummary: 'Massive total drop from 46.5 to 40.5 as Eagles run conservative run-heavy script.',
+      rationale: 'Philadelphia head coach Nick Sirianni will deploy a conservative, ground-and-pound game plan centered on Saquon Barkley to protect backup QB Tanner McKee from turnovers. Clock will run continuously with minimal downfield deep passing attempts.',
+    },
+    keyFactors: {
+      weatherImpactFactor: 'Standard autumn afternoon conditions at Lincoln Financial Field (58°F).',
+      injuryAdvantage: '🚨 CRITICAL MEDICAL EMERGENCY: Jalen Hurts OUT (blood clot hospitalization); Tanner McKee starting.',
+      sharpMoneySignal: '89% of syndicate handle hammering Browns -2.5 and Under 40.5 following Adam Schefter breaking report.',
+      schemeEdge: 'Myles Garrett & Cleveland pass rush vs 1st-time starter Tanner McKee.',
+    },
+  },
+
+  // =========================================================================
   // RANK #1 (96% CONFIDENCE · MAX CONVICTION LOCK)
   // =========================================================================
   'nfl-bal-cle-w6': {
