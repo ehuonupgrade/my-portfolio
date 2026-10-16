@@ -149,9 +149,9 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
       sharpMoneyPct: 71.0,
       echoChamberScore: 88,
       gamblingTheoryRule:
-        'Contrarian Gambling Axiom #3 (The Short-Week Crowd Trap): On Thursday Night Football, recreational public bettors and mainstream TV pundits habitually back road underdogs catching points (+3.0), assuming low-scoring parity. However, the extreme fatigue of traveling across time zones on 3 days rest severely punishes visiting offenses, especially against the hostile 12th Man crowd noise at Lumen Field. High-limit syndicates have pushed 71% of total handle onto Seattle -3.0. Fading 60%+ public/media underdog sentiment on Thursday home favorites has historically hit at a 61.2% ATS clip over the last 6 seasons.',
+        'Contrarian Gambling Axiom #3 (The Short-Week Crowd Trap): On Thursday Night Football, recreational public bettors and mainstream TV pundits habitually back road underdogs catching points (+3.0), assuming low-scoring parity. High-limit syndicates pushed 71% of total handle onto Seattle -3.0 at Empower Field at Mile High. However, Denver defense held Seattle to 14 points in a 17-14 Broncos victory.',
       recommendedAction:
-        'EXECUTE CONTRARIAN FADE: Back Seattle Seahawks -3.0 (or tease to +7.0 in multi-day teasers). Syndicate money advantage (+33% handle divergence) at Lumen Field provides supreme mathematical edge over the recreational public herd.',
+        'EXECUTE CONTRARIAN FADE: Denver Broncos defeated Seahawks 17-14 at Empower Field at Mile High; Under 43.5 total covered.',
     },
     picks: [
       {
@@ -167,7 +167,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         confidenceRating: 5,
         publishedTime: 'Oct 13 · 7:30 AM PST',
         rationale:
-          'Massive whale handle divergence (+33% money advantage). Casual public is falling for Bo Nix underdog hype on 3 days rest, but Lumen Field crowd noise causes pre-snap penalties on short weeks. Seattle early-down success rate is top-5.',
+          'Massive whale handle divergence (+33% money advantage). Denver defense held Seattle to 14 points in a 17-14 Broncos win at Empower Field at Mile High.',
         isContrarianFadeTarget: true,
       },
       {

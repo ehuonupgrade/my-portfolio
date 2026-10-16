@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, SportsLeague } from '../types/sportsBetting';
 import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
+import { NFL_MARKET_OPINIONS_MAP } from '../data/nflMarketOpinionsData';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BetTrackerAndPatternView } from './BetTrackerAndPatternView';
 import { AnalystConsensusTracker } from './AnalystConsensusTracker';
@@ -18,6 +19,7 @@ import { useLiveVerification } from '../utils/useLiveVerification';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
 import { purifyAndRealignGame, auditAllGamesInSlate } from '../utils/gameAlignmentGuard';
+import { useSportsData } from '../context/SportsDataContext';
 
 interface SportsBettingEdgeHubProps {
   onBack?: () => void;
@@ -109,10 +111,12 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
     return () => clearInterval(interval);
   }, [liveAutoSync, fetchLiveGames]);
 
+  const { games: contextGames } = useSportsData();
+
   // Merge live ESPN & DraftKings feed data into market games with Alignment Guard
   const allAvailableGames = useMemo(() => {
     // 1. First purify each base game through the Alignment Guard
-    const purifiedBase = MOCK_GAMES_MARKETS.map(purifyAndRealignGame);
+    const purifiedBase = contextGames.map(purifyAndRealignGame);
     if (!liveGames.length) return purifiedBase;
 
     // 2. Synchronize all games dynamically with live sportsbook feeds by team abbreviations
@@ -157,8 +161,11 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
         )
     );
 
-    return [...updatedBase, ...extraLive];
-  }, [liveGames]);
+    return [...updatedBase, ...extraLive].map((g) => ({
+      ...g,
+      marketOpinions: g.marketOpinions || NFL_MARKET_OPINIONS_MAP[g.id],
+    }));
+  }, [liveGames, contextGames]);
 
   // Filter games with Closest Upcoming Slate Priority
   const filteredGames = useMemo(() => {

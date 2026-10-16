@@ -69,7 +69,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
     playSuccessChime();
     const updated = simulateTonightOutcome();
     setBets(updated);
-    showToast('Upcoming slate simulated! Seahawks covered -3.0 on Thursday TNF (24-17), Dodgers ML won, and model updated weights.');
+    showToast('Upcoming slate simulated! Broncos won 17-14 on Thursday TNF (DEN 17, SEA 14), Dodgers ML won, and model updated weights.');
   };
 
   // Handle reset to defaults
@@ -141,9 +141,10 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
             <button
               onClick={handleSimulateTonight}
               className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-lg active:scale-95"
+              title="Grade finished games (TNF DEN 17, SEA 14) and re-calculate AI strategy weights"
             >
-              <span>🎲</span>
-              <span>Simulate Tonight &amp; Learn</span>
+              <span>⚡</span>
+              <span>Sync Completed Results &amp; Learn</span>
             </button>
             <button
               onClick={handleExportCSV}
@@ -214,10 +215,10 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
           <span className="text-xl shrink-0">🎯</span>
           <div className="space-y-1">
             <strong className="font-mono text-cyan-300 uppercase block text-[11px]">
-              Live Tracking Baseline &bull; Nearest Upcoming Slate Priority (Thursday, October 15, 2026 PST)
+              Live Tracking Baseline &bull; Nearest Upcoming Slate Priority (Sunday, October 18, 2026 Board)
             </strong>
             <p className="text-slate-300 leading-relaxed">
-              Active recommendations prioritize the nearest upcoming games: <strong>Seattle Seahawks -3.0</strong> on Thursday Night Football (Oct 15 tonight), <strong>Dodgers ML</strong> (NLCS Game 3), 3-Leg Value Parlay, and 7-day multi-day Teasers. Historical Bills @ Rams (37-34) bets are settled and logged in the performance ledger.
+              Active recommendations prioritize nearest upcoming unplayed games: <strong>Baltimore Ravens -3.5</strong> @ Cleveland Browns (Sun Oct 18), <strong>Detroit Lions -2.5</strong> vs Chiefs, <strong>Dodgers ML</strong> (World Series), 3-Leg Value Parlay, and 7-day multi-day Teasers. Completed Thursday Night Football (Denver 17, Seattle 14) and Bills @ Rams (37-34) bets are settled and logged in the historical performance ledger.
             </p>
           </div>
         </div>
@@ -755,7 +756,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                 </div>
                 <div className="text-white font-bold text-sm">Broncos @ Seahawks</div>
                 <div className="text-[11px] text-slate-300 font-sans">
-                  Lumen Field &bull; 5:15 PM PST (TNF)
+                  Empower Field at Mile High &bull; 5:15 PM PST (TNF)
                 </div>
                 <div className="p-2 rounded bg-slate-950 border border-purple-800/80 text-[10px] text-emerald-300">
                   +10 Teased: <strong>Seahawks +7.0</strong> &amp; <strong>Under 53.5</strong>

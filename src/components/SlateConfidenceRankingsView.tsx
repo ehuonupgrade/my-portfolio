@@ -17,16 +17,18 @@ export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewPr
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [expandedGameId, setExpandedGameId] = useState<string | null>(null);
 
-  // Sort games strictly by overallConfidenceRank (1 = Most Confident to 10 = Least Confident)
+  // Sort upcoming to-be-played games strictly by model confidence and re-index sequentially 1..N
   const rankedGames = useMemo(() => {
-    const list = [...games].filter((g) => g.marketOpinions);
+    // 1. Exclude completed/FINAL games so this view strictly represents TO-BE-PLAYED games
+    const list = games.filter((g) => g.status !== 'FINAL' && g.marketOpinions);
+
     list.sort((a, b) => {
       const rankA = a.marketOpinions?.overallConfidenceRank ?? 999;
       const rankB = b.marketOpinions?.overallConfidenceRank ?? 999;
       return rankA - rankB;
     });
 
-    return list.filter((g) => {
+    const filtered = list.filter((g) => {
       if (filterType === 'TOP_5' && (g.marketOpinions?.overallConfidenceRank ?? 99) > 5) return false;
       if (filterType === 'SPREADS' && g.marketOpinions?.spreadOpinion.verdict !== 'STRONG_BUY' && g.marketOpinions?.spreadOpinion.verdict !== 'BUY') return false;
       if (filterType === 'MONEYLINE' && g.marketOpinions?.moneylineOpinion.verdict !== 'STRONG_BUY' && g.marketOpinions?.moneylineOpinion.verdict !== 'BUY') return false;
@@ -39,6 +41,12 @@ export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewPr
       }
       return true;
     });
+
+    // 2. Assign dynamic contiguous displayRank so no rank numbers are skipped
+    return filtered.map((g, idx) => ({
+      ...g,
+      displayRank: idx + 1,
+    }));
   }, [games, filterType, searchQuery]);
 
   const maxLockCount = useMemo(() => {
@@ -205,7 +213,7 @@ export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewPr
           if (!ops) return null;
 
           const isExpanded = expandedGameId === game.id;
-          const rankNum = ops.overallConfidenceRank;
+          const rankNum = (game as any).displayRank || ops.overallConfidenceRank;
 
           return (
             <div

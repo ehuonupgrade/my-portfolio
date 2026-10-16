@@ -27,6 +27,7 @@ import {
   StrategyKey,
   VerifiedSlateRecord,
 } from '../data/realHistoricalPerformanceData';
+import { useLiveTelemetryEngine } from '../utils/useLiveTelemetryEngine';
 import { getTrackedBets } from '../utils/bettingTrackerStore';
 
 export type { StrategyKey, SlateHistoricalDataPoint, StrategyBenchmarkMeta, VerifiedSlateRecord };
@@ -87,18 +88,22 @@ export const BettingPerformanceCharts: React.FC<BettingPerformanceChartsProps> =
   const [showLedgerModal, setShowLedgerModal] = useState<boolean>(false);
   const [ledgerSearch, setLedgerSearch] = useState<string>('');
 
-  // Re-sync with store dynamically on storage events and live interval
+  const { lastSyncTimestamp } = useLiveTelemetryEngine(3000);
+
+  // Re-sync with store dynamically on storage events, custom sync events, and live engine interval
   React.useEffect(() => {
-    const handleStorage = () => {
+    const handleSync = () => {
       setTrackedBets(getTrackedBets());
     };
-    window.addEventListener('storage', handleStorage);
-    const interval = setInterval(() => {
-      setTrackedBets(getTrackedBets());
-    }, 2500);
+
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('linepulse_live_sync', handleSync);
+    window.addEventListener('linepulse_bets_updated', handleSync);
+
     return () => {
-      window.removeEventListener('storage', handleStorage);
-      clearInterval(interval);
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('linepulse_live_sync', handleSync);
+      window.removeEventListener('linepulse_bets_updated', handleSync);
     };
   }, []);
 
@@ -161,9 +166,13 @@ export const BettingPerformanceCharts: React.FC<BettingPerformanceChartsProps> =
                   <span>Back to Live Board</span>
                 </button>
               )}
-              <span className="text-xs text-emerald-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
+              <span className="text-xs text-emerald-400 uppercase tracking-wider font-semibold flex items-center gap-1.5 flex-wrap">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span>100% REAL HISTORICAL &amp; LIVE TELEMETRY DATA &bull; ZERO SYNTHETIC SLATES</span>
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-cyan-700/80 text-cyan-300 font-mono text-[11px] font-bold flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                <span>LIVE STREAM ACTIVE ({lastSyncTimestamp}) &bull; TNF DEN 17, SEA 14 SETTLED</span>
               </span>
             </div>
 

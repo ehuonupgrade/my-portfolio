@@ -119,6 +119,7 @@ export interface GameMarket {
   stadium: string;
   weatherCondition?: string;
   status: 'UPCOMING' | 'LIVE' | 'FINAL';
+  scores?: { home: number; away: number };
   
   // Public Wagering Volume
   totalBetsPlaced: number;
@@ -252,7 +253,7 @@ export interface GameMarketOpinions {
 export interface PlayerInjuryItem {
   player: string;
   position: string;
-  status: 'OUT' | 'DOUBTFUL' | 'QUESTIONABLE' | 'IR' | 'ACTIVE';
+  status: 'OUT' | 'DOUBTFUL' | 'QUESTIONABLE' | 'IR' | 'ACTIVE' | 'RETIRED';
   injury: string; // e.g. "Concussion", "Hamstring", "Ankle", "Knee"
   gameImpact: string; // Tactical description of impact on the game/line
 }

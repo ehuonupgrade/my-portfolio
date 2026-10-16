@@ -19,6 +19,7 @@ import { RocketLogo } from './components/RocketLogo';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { playKeyClick } from './utils/audio';
 import { recordPageView, recordDwellTime } from './utils/trafficTracker';
+import { SportsDataProvider } from './context/SportsDataContext';
 
 type Tab = 'home' | 'projects' | 'games' | 'tokens' | 'changelog' | 'feedback' | 'about';
 
@@ -149,7 +150,7 @@ const getStateForPath = (pathname: string): RouteState => {
   return { tab: 'home', project: null };
 };
 
-export default function App() {
+function AppContent() {
   const initial = getStateForPath(typeof window !== 'undefined' ? window.location.pathname : '/');
   const [activeTab, setActiveTab] = useState<Tab>(initial.tab);
   const [activeProject, setActiveProject] = useState<string | null>(initial.project);
@@ -893,5 +894,13 @@ export default function App() {
         </span>
       </footer>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <SportsDataProvider>
+      <AppContent />
+    </SportsDataProvider>
   );
 }

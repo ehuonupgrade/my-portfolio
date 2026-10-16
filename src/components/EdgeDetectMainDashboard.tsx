@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
+import { NFL_MARKET_OPINIONS_MAP } from '../data/nflMarketOpinionsData';
 import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, SUPERSTAR_BREAKING_MEDICAL_WIRE, MovementAlertItem } from './LineMovementAlertBanner';
 import {
   TrackedBetRecommendation,
@@ -23,6 +24,7 @@ import { LiveOddsStreamBadge } from './LiveOddsStreamBadge';
 import { LiveOddsStreamModal } from './LiveOddsStreamModal';
 import { LiveRosterStreamBadge } from './LiveRosterStreamBadge';
 import { LiveRosterVerificationModal } from './LiveRosterVerificationModal';
+import { MonteCarloSimulationModal } from './MonteCarloSimulationModal';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { useLiveVerification } from '../utils/useLiveVerification';
 import { useLiveOddsStream } from '../utils/useLiveOddsStream';
@@ -87,6 +89,8 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
 
   // Performance calculations
   const summary = useMemo(() => calculatePerformanceSummary(bets), [bets]);
+
+  const [isMonteCarloModalOpen, setIsMonteCarloModalOpen] = useState<boolean>(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -174,7 +178,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
     playSuccessChime();
     const updated = simulateTonightOutcome();
     setBets(updated);
-    showToast('Simulation Complete: Seahawks covered -3.0 on TNF (24-17), Dodgers ML won, ledger updated!');
+    showToast('Simulation Complete: Broncos won 17-14 on TNF (DEN 17, SEA 14), Dodgers ML won, ledger updated!');
   };
 
   // Handle reset to defaults
@@ -197,9 +201,17 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
     setTimeout(() => setCopiedCsv(false), 3000);
   };
 
-  // Games ranked by confidence
+  // Games ranked by confidence (#1 to #10) - TO-BE-PLAYED games ONLY
   const rankedGames = useMemo(() => {
-    const list = games.filter((g) => g.marketOpinions);
+    // 1. Strictly filter to upcoming/to-be-played games only (excluding completed games like TNF)
+    const upcomingList = games.filter((g) => g.status !== 'FINAL');
+
+    // 2. Map marketOpinions if missing on any game
+    const list = upcomingList.map((g) => ({
+      ...g,
+      marketOpinions: g.marketOpinions || NFL_MARKET_OPINIONS_MAP[g.id],
+    })).filter((g) => g.marketOpinions);
+
     let filtered = list;
 
     if (confidenceFilter === 'TOP_3') {
@@ -226,11 +238,17 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
       );
     }
 
-    return filtered.sort((a, b) => {
+    const sorted = filtered.sort((a, b) => {
       const rankA = a.marketOpinions?.overallConfidenceRank || 99;
       const rankB = b.marketOpinions?.overallConfidenceRank || 99;
       return rankA - rankB;
     });
+
+    // 3. Re-index sequentially 1 to N so no ranks are EVER skipped in the active view
+    return sorted.map((g, idx) => ({
+      ...g,
+      displayRank: idx + 1,
+    }));
   }, [games, confidenceFilter, searchTerm]);
 
   // Movement alerts filter
@@ -642,7 +660,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                               : 'bg-slate-800 text-white border-slate-700'
                           }`}>
                             <span className="text-[9px] uppercase font-bold leading-none">Rank</span>
-                            <span className="text-base leading-tight">#{opinions.overallConfidenceRank}</span>
+                            <span className="text-base leading-tight">#{(game as any).displayRank || opinions.overallConfidenceRank}</span>
                           </div>
 
                           <div>
@@ -1280,8 +1298,20 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                   <button
                     onClick={handleSimulateTonight}
                     className="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-400 text-slate-950 font-bold transition-all cursor-pointer flex items-center gap-1 shadow"
+                    title="Grade finished games (TNF DEN 17, SEA 14) and re-calculate AI strategy weights"
                   >
-                    <span>🎲 Simulate Tonight (TNF)</span>
+                    <span>⚡ Sync Completed Results</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      playKeyClick();
+                      setIsMonteCarloModalOpen(true);
+                    }}
+                    className="px-3 py-2 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-600/80 text-purple-300 font-bold transition-all cursor-pointer flex items-center gap-1 shadow"
+                    title="Run 10,000 Monte Carlo AI projections on upcoming games using weather, injuries & whale volume"
+                  >
+                    <span>🔮 Monte Carlo Score Simulations</span>
                   </button>
 
                   <button
@@ -1593,6 +1623,13 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
         isOpen={showRosterModal}
         onClose={() => setShowRosterModal(false)}
         rosterState={rosterState}
+      />
+
+      {/* MONTE CARLO AI SCENARIO SIMULATOR MODAL */}
+      <MonteCarloSimulationModal
+        isOpen={isMonteCarloModalOpen}
+        onClose={() => setIsMonteCarloModalOpen(false)}
+        games={games}
       />
     </div>
   );

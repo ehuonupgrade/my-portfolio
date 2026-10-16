@@ -655,7 +655,7 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
                   <span>3. The Pros vs. Joes Divergence</span>
                 </div>
                 <p className="text-xs text-slate-300 font-sans leading-relaxed">
-                  The ideal contrarian wager is when <strong>Ticket %</strong> is on one side, but <strong>Dollar Handle %</strong> is on the opposite. In Thursday&rsquo;s Broncos vs Seahawks game, 62% of public tickets are on Denver, but 71% of the money is on Seattle at Lumen Field. The syndicates are already executing the contrarian fade.
+                  The ideal contrarian wager is when <strong>Ticket %</strong> is on one side, but <strong>Dollar Handle %</strong> is on the opposite. In Thursday&rsquo;s Broncos vs Seahawks game, 62% of public tickets were on Denver, but 71% of the sharp money backed Seattle at Empower Field at Mile High. The syndicates executed the contrarian fade.
                 </p>
               </div>
 

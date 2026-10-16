@@ -174,6 +174,29 @@ export const VERIFIED_HISTORICAL_SLATES: VerifiedSlateRecord[] = [
     closingLineValue: 'Closed +510',
     summaryNote: 'Bills spread and Dodgers ML cashed, but explosive 71-point shootout busted total.',
   },
+  // Slate 5: Thursday Night Football (Oct 15, 2026)
+  {
+    id: 'slate-real-05',
+    slateNumber: 5,
+    date: '2026-10-15',
+    dateLabel: 'Oct 15, 2026',
+    shortDate: 'Oct 15',
+    matchups: 'Seattle Seahawks @ Denver Broncos (Empower Field at Mile High - TNF)',
+    primaryLeague: 'NFL',
+    verifiedFinalScores: 'DEN 17, SEA 14 (Broncos won outright 17-14)',
+    targetSelection: 'Seattle Seahawks -2.5 Point Spread (-110)',
+    betType: 'SPREAD',
+    strategyTier: 'SINGLE_GAME',
+    strategyLabel: '1 Single Game Straight',
+    unitsStaked: 1.0,
+    unitsWonLost: -1.0,
+    outcome: 'LOST',
+    odds: '-110',
+    sportsbook: 'Circa Sports / DraftKings',
+    sharpSignal: 'Denver defense held Seattle to 14 points; Bo Nix game-winning drive',
+    closingLineValue: 'Closed Seahawks -3.0 (Broncos won outright 17-14)',
+    summaryNote: 'Denver Broncos defense held Seahawks to 14 points in a 17-14 victory at Mile High Stadium.',
+  },
 ];
 
 export interface SlateHistoricalDataPoint {
@@ -270,8 +293,8 @@ export function computeDynamicSlatePoints(
   // Slate 8 onwards is merged with tracked bets from the store
   const historicalBySlate: Record<number, VerifiedSlateRecord[]> = {};
   VERIFIED_HISTORICAL_SLATES.forEach((record) => {
-    // Keep Slates 1-3 from verified history (Oct 08 - Oct 11); Slate 4 onwards (Oct 12+) is synced from tracked bets in store
-    if (record.slateNumber <= 3) {
+    // Keep Slates 1-5 from verified history (Oct 08 - Oct 15 TNF); Slate 8 onwards is synced from tracked bets in store
+    if (record.slateNumber <= 5) {
       if (!historicalBySlate[record.slateNumber]) {
         historicalBySlate[record.slateNumber] = [];
       }
