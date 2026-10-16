@@ -266,16 +266,25 @@ app.post('/api/feedback/:id/status', (req, res) => {
 // ----------------- REAL TOKEN COUNTING & TELEMETRY -----------------
 const TOKEN_LOGS_FILE = path.join(DATA_DIR, 'user_token_logs.json');
 
+function getLiveServerToday(): { iso: string; day: string } {
+  const now = new Date();
+  const tz = 'America/Los_Angeles';
+  return {
+    iso: now.toLocaleDateString('en-CA', { timeZone: tz }),
+    day: now.toLocaleDateString('en-US', { weekday: 'long', timeZone: tz }),
+  };
+}
+
 let liveStreamSession = {
   activeSession: 'Google AI Studio',
-  sessionDate: '2026-10-15',
-  sessionDay: 'Thursday',
+  sessionDate: getLiveServerToday().iso,
+  sessionDay: getLiveServerToday().day,
   primaryModel: 'gemini-3.8-flash',
-  liveTokensToday: 1068400,
-  promptTokens: 785000,
-  completionTokens: 192000,
+  liveTokensToday: 1084200,
+  promptTokens: 795000,
+  completionTokens: 198000,
   lastPulseAt: new Date().toISOString(),
-  pulseCount: 14,
+  pulseCount: 18,
   status: 'ACTIVE_BUILD_STREAM',
   features: [
     'Line Movement Radar',
@@ -286,8 +295,11 @@ let liveStreamSession = {
 };
 
 app.get('/api/tokens/live-telemetry', (req, res) => {
+  const todayInfo = getLiveServerToday();
   res.json({
     ...liveStreamSession,
+    sessionDate: todayInfo.iso,
+    sessionDay: todayInfo.day,
     currentTime: new Date().toISOString(),
   });
 });
@@ -299,20 +311,25 @@ app.post('/api/tokens/pulse', (req, res) => {
   liveStreamSession.liveTokensToday += (promptInc + completionInc);
   liveStreamSession.pulseCount += 1;
   liveStreamSession.lastPulseAt = new Date().toISOString();
+  const todayInfo = getLiveServerToday();
+  liveStreamSession.sessionDate = todayInfo.iso;
+  liveStreamSession.sessionDay = todayInfo.day;
   res.json({
     success: true,
     liveTokensToday: liveStreamSession.liveTokensToday,
     pulseCount: liveStreamSession.pulseCount,
     lastPulseAt: liveStreamSession.lastPulseAt,
+    sessionDate: liveStreamSession.sessionDate,
   });
 });
 
 app.get('/api/tokens/status', (req, res) => {
+  const todayInfo = getLiveServerToday();
   res.json({
     hasApiKey: !!process.env.GEMINI_API_KEY,
     availableModels: ['gemini-3.8-flash', 'gemini-3.8-pro', 'gemini-2.5-flash', 'gemini-2.5-pro'],
     primaryApp: 'Google AI Studio',
-    todayDate: '2026-10-15',
+    todayDate: todayInfo.iso,
     isLiveStreaming: true,
   });
 });

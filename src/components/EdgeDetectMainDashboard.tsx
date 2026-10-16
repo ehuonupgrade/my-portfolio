@@ -114,7 +114,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   // Initial pulses from games
   useEffect(() => {
     const initial: VolumeTickPulse[] = [];
-    games.forEach((g) => {
+    games.filter((g) => g.status === 'UPCOMING').forEach((g) => {
       if (g.liveVolumeShifts?.recentPulses) {
         initial.push(...g.liveVolumeShifts.recentPulses);
       }

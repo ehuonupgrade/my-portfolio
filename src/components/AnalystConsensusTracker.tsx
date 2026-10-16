@@ -16,23 +16,35 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
   onSelectGame,
   onOpenBetTracker,
 }) => {
-  const [activeTab, setActiveTab] = useState<'radar' | 'roster' | 'theory'>('radar');
-  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-sea-den-tnf');
+  const [activeTab, setActiveTab] = useState<'radar' | 'history' | 'roster' | 'theory'>('radar');
+  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-bal-cle-w6');
   const [networkFilter, setNetworkFilter] = useState<string>('ALL');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const allConsensusList = useMemo(() => {
-    return Object.values(MOCK_ANALYST_CONSENSUS_DATA);
+  const upcomingConsensusList = useMemo(() => {
+    return Object.values(MOCK_ANALYST_CONSENSUS_DATA).filter(
+      (c) => c.gameId !== 'nfl-sea-den-tnf' && c.gameId !== 'nfl-lar-buf-today'
+    );
   }, []);
+
+  const completedConsensusList = useMemo(() => {
+    return Object.values(MOCK_ANALYST_CONSENSUS_DATA).filter(
+      (c) => c.gameId === 'nfl-sea-den-tnf' || c.gameId === 'nfl-lar-buf-today'
+    );
+  }, []);
+
+  const activeConsensusList = useMemo(() => {
+    return activeTab === 'history' ? completedConsensusList : upcomingConsensusList;
+  }, [activeTab, completedConsensusList, upcomingConsensusList]);
 
   const activeConsensus = useMemo(() => {
-    return MOCK_ANALYST_CONSENSUS_DATA[selectedGameId] || allConsensusList[0];
-  }, [selectedGameId, allConsensusList]);
+    return MOCK_ANALYST_CONSENSUS_DATA[selectedGameId] || activeConsensusList[0];
+  }, [selectedGameId, activeConsensusList]);
 
   const triggeredFades = useMemo(() => {
-    return getTriggeredContrarianFades();
-  }, []);
+    return upcomingConsensusList.filter((c) => c.contrarianFadeSignal.triggered);
+  }, [upcomingConsensusList]);
 
   const filteredPicks = useMemo(() => {
     if (!activeConsensus) return [];
@@ -117,11 +129,14 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
 
       {/* Main Tab Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-2">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => {
               playKeyClick();
               setActiveTab('radar');
+              if (completedConsensusList.some((c) => c.gameId === selectedGameId)) {
+                setSelectedGameId(upcomingConsensusList[0]?.gameId || 'nfl-bal-cle-w6');
+              }
             }}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'radar'
@@ -129,8 +144,26 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
                 : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
             }`}
           >
-            📡 Contrarian Fade Radar ({allConsensusList.length} Games)
+            📡 Active Contrarian Radar ({upcomingConsensusList.length} Future Games)
           </button>
+
+          <button
+            onClick={() => {
+              playKeyClick();
+              setActiveTab('history');
+              if (upcomingConsensusList.some((c) => c.gameId === selectedGameId)) {
+                setSelectedGameId(completedConsensusList[0]?.gameId || 'nfl-sea-den-tnf');
+              }
+            }}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTab === 'history'
+                ? 'bg-amber-600 text-slate-950 font-black shadow-lg shadow-amber-600/30'
+                : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+            }`}
+          >
+            📜 Historical Fade Log ({completedConsensusList.length} Settled Games)
+          </button>
+
           <button
             onClick={() => {
               playKeyClick();
@@ -144,6 +177,7 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
           >
             🎙️ Analyst Roster &amp; Track Records ({TRACKED_SPORTS_ANALYSTS.length})
           </button>
+
           <button
             onClick={() => {
               playKeyClick();
@@ -159,9 +193,11 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
           </button>
         </div>
 
-        {activeTab === 'radar' && (
+        {(activeTab === 'radar' || activeTab === 'history') && (
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-400 text-[11px]">Select Game:</span>
+            <span className="text-slate-400 text-[11px]">
+              {activeTab === 'history' ? 'Archived Game:' : 'Active Future Game:'}
+            </span>
             <select
               value={selectedGameId}
               onChange={(e) => {
@@ -170,7 +206,7 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
               }}
               className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-500"
             >
-              {allConsensusList.map((c) => (
+              {activeConsensusList.map((c) => (
                 <option key={c.gameId} value={c.gameId}>
                   {c.gameMatchup} ({c.league})
                 </option>
@@ -180,9 +216,22 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
         )}
       </div>
 
-      {/* TAB 1: CONTRARIAN FADE RADAR */}
-      {activeTab === 'radar' && activeConsensus && (
+      {/* TAB 1: CONTRARIAN FADE RADAR & HISTORICAL FADE LOG */}
+      {(activeTab === 'radar' || activeTab === 'history') && activeConsensus && (
         <div className="space-y-6">
+          {/* Historical Banner if viewing past completed game */}
+          {activeTab === 'history' && (
+            <div className="p-3.5 rounded-xl bg-amber-950/80 border border-amber-500/80 flex items-center justify-between text-xs font-mono text-amber-200">
+              <span className="flex items-center gap-2 font-bold">
+                <span>📜</span>
+                <span>HISTORICAL FADE ARCHIVE: {activeConsensus.gameMatchup} is a COMPLETED game stored for model audit reference.</span>
+              </span>
+              <span className="px-2 py-0.5 rounded bg-amber-900 border border-amber-600 text-amber-100 font-bold text-[10px]">
+                SETTLED
+              </span>
+            </div>
+          )}
+
           {/* Active Game Feature Card */}
           <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
@@ -503,12 +552,12 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
           {/* Quick List of Other Games on the Slate */}
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
             <h4 className="text-sm font-bold text-white flex items-center justify-between">
-              <span>All Games on Slate with Contrarian Analysis</span>
-              <span className="text-xs text-slate-400 font-mono">{allConsensusList.length} matchups</span>
+              <span>{activeTab === 'history' ? 'Archived Completed Games' : 'Active Future Games with Contrarian Analysis'}</span>
+              <span className="text-xs text-slate-400 font-mono">{activeConsensusList.length} matchups</span>
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {allConsensusList.map((c) => {
+              {activeConsensusList.map((c) => {
                 const isSelected = c.gameId === selectedGameId;
                 const isTriggered = c.contrarianFadeSignal.triggered;
                 return (

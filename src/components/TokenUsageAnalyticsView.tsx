@@ -20,6 +20,7 @@ import {
   addOrUpdateDailyTokenRecord,
   pulseLiveTokenUsage,
   forceResetTokenUsageRecords,
+  getLiveTodayDate,
   DEFAULT_DAILY_QUOTA_LIMIT,
 } from '../data/tokenUsageData';
 import {
@@ -48,6 +49,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
   const [showLogModal, setShowLogModal] = useState<boolean>(false);
   const [showLiveTester, setShowLiveTester] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const todayInfo = useMemo(() => getLiveTodayDate(), []);
 
   // Live Telemetry Streaming State
   const [isLiveStreaming, setIsLiveStreaming] = useState<boolean>(true);
@@ -56,18 +58,21 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
     time: string;
     model: string;
     app: string;
-  } | null>({
-    tokens: 1550,
-    time: 'Live Stream Active (Oct 15, 2026)',
-    model: 'Gemini 3.8 Flash',
-    app: 'Google AI Studio',
+  } | null>(() => {
+    const t = getLiveTodayDate();
+    return {
+      tokens: 1550,
+      time: `Live Stream Active (${t.shortFormatted})`,
+      model: 'Gemini 3.8 Flash',
+      app: 'Google AI Studio',
+    };
   });
   const [lastSyncTime, setLastSyncTime] = useState<string>('Just now');
   const [pulseCount, setPulseCount] = useState<number>(1);
 
   // Live Token Counter Tool State
   const [testPrompt, setTestPrompt] = useState<string>(
-    'Analyze sharp money handle divergence for Denver Broncos @ Seattle Seahawks (Thursday Night Football) and calculate positive expected value.'
+    'Analyze sharp money handle divergence for Baltimore Ravens @ Cleveland Browns (Tyler Huntley starting QB & Lake Erie crosswinds) and calculate positive expected value.'
   );
   const [testModel, setTestModel] = useState<string>('gemini-3.8-flash');
   const [testApp, setTestApp] = useState<string>('google-ai-studio');
@@ -97,7 +102,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
 
   // Heartbeat Effect: Actively tracks live session tokens and streams real-time updates
   React.useEffect(() => {
-    // 1. Initial re-sync to ensure Oct 15 is current and loaded
+    // 1. Initial re-sync to ensure current live daily ledger is loaded
     const initial = getTokenUsageRecords();
     setRecords(initial);
 
@@ -177,7 +182,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
       app: 'Google AI Studio',
     });
     setLastSyncTime(nowStr);
-    showToast(`⚡ Injected +${totalInc.toLocaleString()} tokens into Oct 15 Live Session!`);
+    showToast(`⚡ Injected +${totalInc.toLocaleString()} tokens into ${todayInfo.dateLabel} Live Session!`);
   };
 
   // Handler: Force cache purge and fresh re-sync
@@ -192,7 +197,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
       second: '2-digit',
     }) + ' PDT';
     setLastSyncTime(nowStr);
-    showToast('Cache purged & successfully synced with Oct 15 (Today) live stream!');
+    showToast(`Cache purged & successfully synced with ${todayInfo.dateLabel} live stream!`);
   };
 
   // Quota Limit Modifier
@@ -728,7 +733,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
           <div className="flex flex-wrap items-center gap-2 font-mono text-xs shrink-0">
             <button
               onClick={handleForceResetAndResync}
-              title="Purge legacy local caches and force re-sync with verified Oct 15 live telemetry"
+              title={`Purge legacy local caches and force re-sync with verified ${todayInfo.dateLabel} live telemetry`}
               className="px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-300 hover:text-white font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-lg active:scale-95"
             >
               <span>🔄</span>
@@ -774,7 +779,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
                 <span>{isLiveStreaming ? 'LIVE TELEMETRY STREAM ACTIVE' : 'STREAM PAUSED'}</span>
               </span>
               <span className="px-2 py-0.5 rounded-full bg-blue-950/80 border border-blue-700/80 text-blue-300 text-[10px] font-bold">
-                📅 DATE: OCT 15, 2026 (TODAY)
+                📅 {todayInfo.badgeFormatted}
               </span>
               <span className="text-[10px] text-slate-400 font-mono">
                 Session Pulses: <strong className="text-white">#{pulseCount}</strong> &bull; Synced: <strong className="text-slate-200">{lastSyncTime}</strong>
@@ -782,7 +787,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
             </div>
 
             <p className="text-xs text-slate-300 font-sans leading-relaxed">
-              Real-time token telemetry is actively streaming for <strong>Thursday, Oct 15, 2026</strong>. Capturing inline prompts, completions, and build iterations across Google AI Studio with <strong>Gemini 3.8 Flash</strong>.
+              Real-time token telemetry is actively streaming for <strong>{todayInfo.fullFormatted}</strong>. Capturing inline prompts, completions, and build iterations across Google AI Studio with <strong>Gemini 3.8 Flash</strong>.
             </p>
 
             {livePulseFeedback && (
@@ -826,12 +831,12 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
                 <strong className="text-cyan-300">Gemini 3.8 Flash</strong>.
               </span>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Live stream pulses directly reflect ongoing session build activity. All data points through <strong>Oct 15, 2026</strong> are verified and actively updating.
+                Live stream pulses directly reflect ongoing session build activity. All data points through <strong>{todayInfo.shortFormatted}</strong> are verified and actively updating.
               </p>
             </div>
           </div>
           <span className="shrink-0 px-2 py-1 rounded bg-blue-950/80 border border-blue-800 text-blue-300 font-mono text-[10px] font-bold self-start sm:self-auto">
-            ⚡ GEMINI 3.8 ACTIVE (OCT 15)
+            ⚡ GEMINI 3.8 ACTIVE ({todayInfo.shortFormatted.toUpperCase()})
           </span>
         </div>
 

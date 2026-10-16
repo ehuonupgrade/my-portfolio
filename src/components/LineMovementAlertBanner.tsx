@@ -116,6 +116,12 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
     },
     riskWarnings: [
       {
+        title: '🚨 BREAKING: Lamar Jackson (Sprained Ankle) Ruled OUT; Tyler Huntley Starts',
+        description:
+          'Lamar Jackson did not practice all week due to a sprained left ankle and is officially OUT for Week 6 at Cleveland. Tyler Huntley makes his second straight start, with Todd Monken shifting the offensive load to Derrick Henry and power-run game in 18-24 mph Lake Erie crosswinds.',
+        severityLevel: 'HIGH',
+      },
+      {
         title: 'Key Number Threshold Warning',
         description:
           'Line is holding on the crucial 3.5-point hook. Grab BAL -3.5 (-110) at DraftKings/Circa before books shade to -4.0.',
@@ -320,6 +326,17 @@ export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
     marketImpact: 'Packers passing DVOA restored to top-5 caliber against Dallas defense missing Micah Parsons.',
     lineMovementSummary: 'Packers spread favored -4.5 vs Dallas',
     timeAgo: '1h ago',
+  },
+  {
+    id: 'med-lamar-7',
+    playerName: 'Lamar Jackson',
+    team: 'Baltimore Ravens (BAL)',
+    position: 'QB #8',
+    status: 'EMERGENCY_OUT',
+    headline: '🚨 BREAKING: Lamar Jackson (Sprained Ankle) Officially Ruled OUT for Week 6 at Cleveland; Tyler Huntley Starts',
+    marketImpact: 'Tyler Huntley starts at QB. Line adjusted from -6.5 to -3.5 as Baltimore leans heavily into Derrick Henry and ground power in 18-24 mph lake winds.',
+    lineMovementSummary: 'Ravens spread adjusted to -3.5 / Total down to 41.5',
+    timeAgo: '15m ago',
   },
   {
     id: 'med-parsons-6',

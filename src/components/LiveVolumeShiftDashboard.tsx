@@ -20,24 +20,35 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
   const [livePulses, setLivePulses] = useState<VolumeTickPulse[]>([]);
   const [volumeDeltas, setVolumeDeltas] = useState<Record<string, { units: number; dollars: number }>>({});
   const [audioAlertsEnabled, setAudioAlertsEnabled] = useState<boolean>(true);
+  const [showSettledArchive, setShowSettledArchive] = useState<boolean>(false);
 
-  // Initialize pulses from game data
+  // Active upcoming games only (strictly excluding completed games like TNF & Bills)
+  const activeUpcomingGames = useMemo(() => {
+    return games.filter((g) => g.status !== 'FINAL');
+  }, [games]);
+
+  const settledGames = useMemo(() => {
+    return games.filter((g) => g.status === 'FINAL');
+  }, [games]);
+
+  const displayedGames = showSettledArchive ? games : activeUpcomingGames;
+
+  // Initialize pulses from upcoming active game data only
   useEffect(() => {
     const initialPulses: VolumeTickPulse[] = [];
-    games.forEach((g) => {
+    activeUpcomingGames.forEach((g) => {
       if (g.liveVolumeShifts?.recentPulses) {
         initialPulses.push(...g.liveVolumeShifts.recentPulses);
       }
     });
     setLivePulses(initialPulses.slice(0, 10));
-  }, [games]);
+  }, [activeUpcomingGames]);
 
-  // Live Tick Simulation: incrementally shifts betting volume (Units & Dollars) in real-time
+  // Live Tick Simulation: incrementally shifts betting volume (Units & Dollars) strictly for TO-BE-PLAYED games
   const handleLiveTick = useCallback(() => {
-    const activeUpcomingGames = games.filter((g) => g.status === 'UPCOMING');
     if (!activeUpcomingGames.length) return;
 
-    // Pick random game to simulate active bettor volume shift
+    // Pick random upcoming game to simulate active bettor volume shift
     const randomGame = activeUpcomingGames[Math.floor(Math.random() * activeUpcomingGames.length)];
     const isWhale = Math.random() > 0.65;
     const isUnderOrOver = Math.random() > 0.5;
@@ -83,7 +94,7 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
     if (isWhale && audioAlertsEnabled) {
       playChime();
     }
-  }, [games, audioAlertsEnabled]);
+  }, [activeUpcomingGames, audioAlertsEnabled]);
 
   // Periodic live ticks
   useEffect(() => {
@@ -95,14 +106,14 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
     return () => clearInterval(interval);
   }, [isLiveStreaming, tickSpeedSeconds, handleLiveTick]);
 
-  // Aggregate totals
+  // Aggregate totals (Upcoming games only)
   const totalSlateUnits = useMemo(() => {
-    return games.reduce((acc, g) => acc + g.totalBetsPlaced + (volumeDeltas[g.id]?.units || 0), 0);
-  }, [games, volumeDeltas]);
+    return activeUpcomingGames.reduce((acc, g) => acc + g.totalBetsPlaced + (volumeDeltas[g.id]?.units || 0), 0);
+  }, [activeUpcomingGames, volumeDeltas]);
 
   const totalSlateDollars = useMemo(() => {
-    return games.reduce((acc, g) => acc + g.totalDollarsWagered + (volumeDeltas[g.id]?.dollars || 0), 0);
-  }, [games, volumeDeltas]);
+    return activeUpcomingGames.reduce((acc, g) => acc + g.totalDollarsWagered + (volumeDeltas[g.id]?.dollars || 0), 0);
+  }, [activeUpcomingGames, volumeDeltas]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -219,7 +230,7 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
               Heavy Away Steam
             </div>
             <span className="text-[10px] text-amber-400/90 truncate">
-              Seattle -2.5 &bull; Baltimore -6.5
+              Baltimore -3.5 (Huntley) &bull; Detroit -3.0
             </span>
           </div>
         </div>
@@ -279,16 +290,30 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Matchup Swing Radar Cards (8 Cols) */}
         <div className="lg:col-span-8 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
               <span>⚡</span>
               <span>Active Volume Swings By Matchup ({selectedTimeframe} Window)</span>
+              <span className="text-xs font-normal text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-700">
+                {activeUpcomingGames.length} To-Be-Played Games
+              </span>
             </h3>
-            <span className="text-xs text-slate-400">Real-time handle &amp; ticket migration</span>
+            {settledGames.length > 0 && (
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  setShowSettledArchive(!showSettledArchive);
+                }}
+                className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800"
+              >
+                <span>📜</span>
+                <span>{showSettledArchive ? 'Hide Completed Games Archive' : `Show Archived Final Games (${settledGames.length})`}</span>
+              </button>
+            )}
           </div>
 
           <div className="space-y-3.5">
-            {games.map((game) => {
+            {displayedGames.map((game) => {
               const shifts = game.liveVolumeShifts;
               const sessionDelta = volumeDeltas[game.id] || { units: 0, dollars: 0 };
 

@@ -140,7 +140,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
       sharpHandleDifference: 33, // +33% on Seahawks
     },
     contrarianFadeSignal: {
-      triggered: true,
+      triggered: false, // Completed TNF Game (Historical Record Only)
       severity: 'HIGH',
       fadeTarget: 'Seattle Seahawks -3.0 (Home Favorite with 71% Sharp Dollars)',
       crowdFavorite: 'Denver Broncos +3.0 (Media Pundits & Public Ticket Herd)',
@@ -353,7 +353,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
       sharpHandleDifference: 26, // +26% on Bills
     },
     contrarianFadeSignal: {
-      triggered: true,
+      triggered: false, // Completed Game (Historical Record Only)
       severity: 'EXTREME',
       fadeTarget: 'Buffalo Bills +3.5 (Road Underdog) [WON: Final BUF 37, LAR 34]',
       crowdFavorite: 'Los Angeles Rams -3.5 (Home Favorite Chalk)',
@@ -754,7 +754,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
  */
 export function getTriggeredContrarianFades(): AnalystMarketConsensus[] {
   return Object.values(MOCK_ANALYST_CONSENSUS_DATA).filter(
-    (c) => c.contrarianFadeSignal.triggered
+    (c) => c.contrarianFadeSignal.triggered && c.gameId !== 'nfl-sea-den-tnf' && c.gameId !== 'nfl-lar-buf-today'
   );
 }
 
