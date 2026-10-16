@@ -1,6 +1,6 @@
 import { TrackedBetRecommendation, BetOutcome } from '../types/sportsBettingTracker';
 
-const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v15_sunday_pending_push_fix';
+const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v16_settled_tnf_parlay_loss';
 
 /**
  * Production Recommendations Ledger
@@ -271,15 +271,15 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     slateTitle: 'NFL Week 6 Multi-Game Value Parlay',
     tier: 'PARLAY_3LEG',
     title: '1 3-Leg All-NFL Value Parlay: Thursday TNF + Sunday Showcase',
-    subtitle: 'IN PROGRESS: Thursday TNF leg pushed (3-pt margin); Ravens & Lions legs pending Sunday Oct 18',
-    badge: '3-LEG ALL-NFL PARLAY • IN PROGRESS',
+    subtitle: 'SETTLED LOSS: Thursday TNF leg Seahawks -3.0 lost (DEN 17, SEA 14); parlay resolved as Lost.',
+    badge: '3-LEG ALL-NFL PARLAY • LOST',
     targetMatchup: 'Seahawks -3.0 (Thursday) + Ravens ML (Sunday) + Lions -2.5 (Sunday)',
     payoutOdds: '+495 (FanDuel / DraftKings)',
     unitsStaked: 0.75,
-    unitsWonLost: 0,
-    status: 'PENDING',
-    postGameAnalysis: 'Thursday TNF leg finished in exact 3-point margin (PUSH). Remaining 2 legs (Ravens ML & Lions -2.5) are scheduled for Sunday, Oct 18.',
-    learnedTakeaway: 'Multi-day parlays stay active until all scheduled leg kickoffs conclude.',
+    unitsWonLost: -0.75,
+    status: 'LOST',
+    postGameAnalysis: 'Thursday TNF leg Seahawks -3.0 failed to cover in Denver 17, Seattle 14 finish. In traditional parlays, a lost leg settles the parlay as a Loss.',
+    learnedTakeaway: 'Multi-leg parlays require 100% win rate across all legs; a single lost leg settles the wager immediately.',
     legs: [
       {
         id: 'leg-20261013-parlay-1',
@@ -291,9 +291,9 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         originalLine: 'Seahawks -3.0 (-106)',
         bestOdds: '-106',
         bestSportsbook: 'Circa Sports / DraftKings',
-        status: 'PUSH',
-        finalScore: 'PUSH (Exact 3-Pt Margin · DEN 17, SEA 14)',
-        rationale: 'Exact 3-point final margin results in a Push. Reduces parlay to remaining active Sunday legs.',
+        status: 'LOST',
+        finalScore: 'DEN 17, SEA 14 (Lost by 3 pts)',
+        rationale: 'Seattle lost 14-17 outright, failing to cover -3.0 point spread.',
       },
       {
         id: 'leg-20261013-parlay-2',

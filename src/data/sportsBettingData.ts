@@ -478,6 +478,7 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
     stadium: 'SoFi Stadium, Inglewood, CA',
     weatherCondition: 'SoFi Stadium Canopy (72°F Climate-Controlled, Fast Artificial Turf)',
     status: 'FINAL',
+    scores: { home: 34, away: 37 },
     totalBetsPlaced: 172600,
     totalDollarsWagered: 24100000,
     splits: {
@@ -562,7 +563,7 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
       },
     ],
     consensus: {
-      spread: 'BUF +3.5 (Won Straight Up 37-34 in OT)',
+      spread: 'BUF +3.5',
       total: 48.5,
       moneylineHome: -170,
       moneylineAway: +145,

@@ -875,23 +875,27 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                       )}
                     </span>
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {game.marketOpinions && (
+                      {isFinal ? (
+                        <span className="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-slate-950 border border-slate-700 text-slate-400">
+                          SETTLED &bull; FINAL
+                        </span>
+                      ) : game.marketOpinions ? (
                         <span
                           className={`px-2 py-0.5 rounded font-black text-[10px] flex items-center gap-1 ${
-                            game.marketOpinions.overallConfidenceRank === 1
+                            (game as any).displayRank === 1 || game.marketOpinions.overallConfidenceRank === 1
                               ? 'bg-cyan-500 text-slate-950 shadow-sm'
-                              : game.marketOpinions.overallConfidenceRank === 2
+                              : (game as any).displayRank === 2 || game.marketOpinions.overallConfidenceRank === 2
                               ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                              : game.marketOpinions.overallConfidenceRank <= 4
+                              : ((game as any).displayRank || game.marketOpinions.overallConfidenceRank) <= 4
                               ? 'bg-indigo-600 text-white'
                               : 'bg-slate-950 border border-slate-700 text-slate-300'
                           }`}
                         >
-                          <span>{game.marketOpinions.overallConfidenceRank === 1 ? '🏆' : '#'}</span>
-                          <span>Rank #{game.marketOpinions.overallConfidenceRank} ({game.marketOpinions.overallConfidenceScore}%)</span>
+                          <span>{((game as any).displayRank || game.marketOpinions.overallConfidenceRank) === 1 ? '🏆' : '#'}</span>
+                          <span>Rank #{(game as any).displayRank || game.marketOpinions.overallConfidenceRank} ({game.marketOpinions.overallConfidenceScore}%)</span>
                         </span>
-                      )}
-                      {game.isPrimeOpportunity && (
+                      ) : null}
+                      {game.isPrimeOpportunity && !isFinal && (
                         <span className="px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold text-[10px] animate-pulse">
                           ★ PRIME
                         </span>
@@ -973,7 +977,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                   {/* Line summary & Handle split preview */}
                   <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
                     <div>
-                      <span className="text-slate-500 text-[10px] uppercase">Spread / ML:</span>{' '}
+                      <span className="text-slate-500 text-[10px] uppercase">{isFinal ? 'Consensus Line:' : 'Spread / ML:'}</span>{' '}
                       <span className="text-emerald-400 font-bold">{game.consensus.spread}</span>
                     </div>
 
