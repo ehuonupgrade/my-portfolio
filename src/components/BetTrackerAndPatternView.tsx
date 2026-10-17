@@ -354,23 +354,86 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
             </div>
           </div>
 
+          {/* Bet Lifecycle & Pending Preservation Rule Banner */}
+          <div className="p-3.5 rounded-xl bg-slate-950 border border-purple-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono shadow-sm">
+            <div className="flex items-start sm:items-center gap-2.5">
+              <span className="text-lg shrink-0">🛡️</span>
+              <div className="space-y-0.5">
+                <div className="font-bold text-white flex items-center gap-2">
+                  <span>Bet Lifecycle &amp; Settlement Architecture</span>
+                  <span className="px-2 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-700 text-[10px] font-bold">
+                    ACTIVE RULE
+                  </span>
+                </div>
+                <p className="text-slate-300 font-sans text-[11px] leading-relaxed">
+                  Games that have passed are strictly excluded from future bet recommendations. However, when part of active multi-leg wagers (such as teasers or parlays placed prior to kickoff), <strong>completed games stay intact as part of the pending slip</strong> as long as all legs of the bet have not lost.
+                </p>
+              </div>
+            </div>
+            <span className="text-[10px] text-emerald-400 font-bold shrink-0 bg-emerald-950/80 px-2 py-1 rounded border border-emerald-700/60">
+              ✓ Multi-Leg Protection Active
+            </span>
+          </div>
+
           {/* Bet Cards Grid */}
           <div className="space-y-4">
-            {filteredBets.map((bet) => (
-              <div
-                key={bet.id}
-                className={`p-5 rounded-2xl border transition-all space-y-3.5 relative overflow-hidden ${
-                  bet.status === 'WON'
-                    ? 'bg-slate-900/90 border-emerald-500/40 shadow-emerald-500/5'
-                    : bet.status === 'LOST'
-                    ? 'bg-slate-900/90 border-red-500/40 shadow-red-500/5'
-                    : bet.status === 'PENDING'
-                    ? 'bg-slate-900/90 border-amber-500/50 shadow-amber-500/5 ring-1 ring-amber-500/20'
-                    : 'bg-slate-900/90 border-slate-800'
-                }`}
-              >
-                {/* Card Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            {filteredBets.map((bet) => {
+              const wonLegs = bet.legs.filter((l) => l.status === 'WON').length;
+              const pushLegs = bet.legs.filter((l) => l.status === 'PUSH').length;
+              const lostLegs = bet.legs.filter((l) => l.status === 'LOST').length;
+              const pendingLegs = bet.legs.filter((l) => l.status === 'PENDING').length;
+              const isMultiLeg = bet.legs.length > 1;
+              const isAlivePending =
+                bet.status === 'PENDING' && isMultiLeg && (wonLegs > 0 || pushLegs > 0) && lostLegs === 0;
+
+              return (
+                <div
+                  key={bet.id}
+                  className={`p-5 rounded-2xl border transition-all space-y-3.5 relative overflow-hidden ${
+                    bet.status === 'WON'
+                      ? 'bg-slate-900/90 border-emerald-500/40 shadow-emerald-500/5'
+                      : bet.status === 'LOST'
+                      ? 'bg-slate-900/90 border-red-500/40 shadow-red-500/5'
+                      : isAlivePending
+                      ? 'bg-slate-900/90 border-emerald-500/60 shadow-emerald-500/10 ring-1 ring-emerald-500/30'
+                      : bet.status === 'PENDING'
+                      ? 'bg-slate-900/90 border-amber-500/50 shadow-amber-500/5 ring-1 ring-amber-500/20'
+                      : 'bg-slate-900/90 border-slate-800'
+                  }`}
+                >
+                  {/* Intact Pending Multi-Leg Progress Header */}
+                  {isAlivePending && (
+                    <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-emerald-950/40 border border-emerald-500/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs font-mono">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span className="font-bold text-emerald-300">
+                          PENDING SLIP INTACT &bull; {wonLegs} of {bet.legs.length} Legs Cashed
+                        </span>
+                        <span className="text-slate-400 font-sans text-[11px]">
+                          (Passed legs won; {pendingLegs} {pendingLegs === 1 ? 'leg' : 'legs'} pending upcoming kickoff)
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="w-24 bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                          <div
+                            className="bg-emerald-400 h-full rounded-full transition-all"
+                            style={{
+                              width: `${Math.round(((wonLegs + pushLegs) / bet.legs.length) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="text-[11px] font-bold text-emerald-300">
+                          {Math.round(((wonLegs + pushLegs) / bet.legs.length) * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Card Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-950 border border-slate-700 text-cyan-300">
@@ -504,15 +567,23 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                             LEG #{idx + 1} &bull; {leg.betType}
                           </span>
                           <span
-                            className={`px-1.5 py-0.5 rounded font-bold ${
+                            className={`px-2 py-0.5 rounded font-bold text-[9px] flex items-center gap-1 ${
                               leg.status === 'WON'
-                                ? 'bg-emerald-950 text-emerald-400'
+                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-700/80'
                                 : leg.status === 'LOST'
-                                ? 'bg-red-950 text-red-400'
-                                : 'bg-slate-900 text-slate-400'
+                                ? 'bg-red-950 text-red-400 border border-red-700'
+                                : leg.status === 'PUSH'
+                                ? 'bg-slate-800 text-slate-300 border border-slate-700'
+                                : 'bg-amber-950/80 text-amber-300 border border-amber-700/80'
                             }`}
                           >
-                            {leg.status}
+                            {leg.status === 'WON'
+                              ? '✓ CASHED (Game Passed)'
+                              : leg.status === 'LOST'
+                              ? '✗ LOST'
+                              : leg.status === 'PUSH'
+                              ? 'PUSH'
+                              : '⏳ PENDING (Upcoming)'}
                           </span>
                         </div>
 
@@ -579,7 +650,8 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                   </div>
                 )}
               </div>
-            ))}
+            );
+          })}
           </div>
         </div>
       )}
@@ -746,90 +818,188 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                 </div>
               </div>
 
-              {/* Day 3: Oct 15 (Thursday Night) - SELECTED AS TEASER DAY 1 */}
-              <div className="p-4 rounded-xl bg-purple-950/30 border-2 border-purple-500 shadow-lg space-y-2 relative">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-purple-400">THU &bull; OCT 15</span>
-                  <span className="px-2 py-0.5 rounded-full bg-purple-900 text-purple-200 font-bold text-[9px]">
-                    ★ TEASER DAY 1 OF 2
-                  </span>
-                </div>
-                <div className="text-white font-bold text-sm">Broncos @ Seahawks</div>
-                <div className="text-[11px] text-slate-300 font-sans">
-                  Empower Field at Mile High &bull; 5:15 PM PST (TNF)
-                </div>
-                <div className="p-2 rounded bg-slate-950 border border-purple-800/80 text-[10px] text-emerald-300">
-                  +10 Teased: <strong>Seahawks +7.0</strong> &amp; <strong>Under 53.5</strong>
-                </div>
-              </div>
-
-              {/* Day 5: Oct 17 (Saturday) */}
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2 opacity-70">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-slate-400">SAT &bull; OCT 17</span>
-                  <span className="text-[10px] text-slate-500">College &amp; MLB</span>
-                </div>
-                <div className="text-white font-bold text-sm">Georgia @ Texas</div>
-                <div className="text-[11px] text-slate-400 font-sans">NCAA Football Showcase</div>
-                <div className="text-[10px] text-slate-500">
-                  Teased Line Option: Longhorns +4.5
-                </div>
-              </div>
-
-              {/* Day 6: Oct 18 (Sunday) - SELECTED AS TEASER DAY 2 */}
+              {/* Day 1: Oct 18 (Sunday Early Window 1:00 PM EDT) - SELECTED AS TEASER DAY 1 */}
               <div className="p-4 rounded-xl bg-purple-950/30 border-2 border-purple-500 shadow-lg space-y-2 relative">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-purple-400">SUN &bull; OCT 18</span>
                   <span className="px-2 py-0.5 rounded-full bg-purple-900 text-purple-200 font-bold text-[9px]">
+                    ★ TEASER DAY 1 OF 2
+                  </span>
+                </div>
+                <div className="text-white font-bold text-sm">Ravens @ Browns</div>
+                <div className="text-[11px] text-slate-300 font-sans">
+                  Huntington Bank Field &bull; 1:00 PM EDT (Sunday)
+                </div>
+                <div className="p-2 rounded bg-slate-950 border border-purple-800/80 text-[10px] text-emerald-300">
+                  +10 Teased: <strong>Ravens +6.5</strong> &amp; <strong>Under 50.5</strong>
+                </div>
+              </div>
+
+              {/* Day 2: Oct 18 (Sunday Afternoon 4:25 PM EDT) */}
+              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-slate-400">SUN &bull; OCT 18</span>
+                  <span className="text-[10px] text-emerald-400 font-semibold">Active Board</span>
+                </div>
+                <div className="text-white font-bold text-sm">Panthers @ Eagles</div>
+                <div className="text-[11px] text-slate-400 font-sans">Lincoln Financial Field &bull; 1:00 PM EDT</div>
+                <div className="text-[10px] text-slate-300">
+                  Teased Line Option: <strong>Panthers +6.5</strong> (Hurts Out)
+                </div>
+              </div>
+
+              {/* Day 3: Oct 19 (Monday Night Football) - SELECTED AS TEASER DAY 2 */}
+              <div className="p-4 rounded-xl bg-purple-950/30 border-2 border-purple-500 shadow-lg space-y-2 relative">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-purple-400">MON &bull; OCT 19</span>
+                  <span className="px-2 py-0.5 rounded-full bg-purple-900 text-purple-200 font-bold text-[9px]">
                     ★ TEASER DAY 2 OF 2
                   </span>
                 </div>
-                <div className="text-white font-bold text-sm">Chiefs @ Lions</div>
+                <div className="text-white font-bold text-sm">Commanders @ 49ers</div>
                 <div className="text-[11px] text-slate-300 font-sans">
-                  Ford Field Showcase &bull; 1:25 PM PST
+                  Levi&apos;s Stadium Showcase &bull; 8:15 PM EDT (MNF)
                 </div>
                 <div className="p-2 rounded bg-slate-950 border border-purple-800/80 text-[10px] text-emerald-300">
-                  +10 Teased: <strong>Lions +7.5</strong> &amp; <strong>Under 64.5</strong>
+                  +10 Teased: <strong>49ers +2.5</strong> &amp; <strong>Under 61.5</strong>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Active 7-Day Teasers in Live Deck */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 rounded-2xl bg-slate-900 border border-amber-500/40 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-800 text-amber-300 font-bold">
-                  1 3-TEAM +10 TEASER (ACTIVE)
-                </span>
-                <span className="text-emerald-400 font-bold">+15.2% EV</span>
-              </div>
-              <h4 className="text-base font-bold text-white">
-                Thursday TNF Oct 15 (Day 1) + Sunday Oct 18 (Day 2)
-              </h4>
-              <p className="text-slate-300 text-xs font-sans leading-relaxed">
-                Legs: (1) Seahawks +7.0 (Thursday TNF), (2) Under 53.5 (Thursday TNF), (3) Lions +7.5 (Sunday Oct 18).
-              </p>
-              <div className="text-[11px] text-slate-400">
-                Payout: -120 at DraftKings / Circa Sports. Risk 1.5u to win 1.25u.
-              </div>
+          {/* Active In-Progress Multi-Day Teasers Preserving Won Legs */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span>Live Pending Teaser Tickets In Progress (All Legs Still Alive):</span>
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                Preserved as Pending (0 Legs Lost)
+              </span>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-900 border border-purple-500/40 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full bg-purple-950 border border-purple-800 text-purple-300 font-bold">
-                  1 4-TEAM +13 MONSTER TEASER (ACTIVE)
-                </span>
-                <span className="text-emerald-400 font-bold">+16.8% EV</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* In-Progress 3-Team Teaser */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-emerald-950/30 border-2 border-emerald-500/70 shadow-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold text-xs flex items-center gap-1.5">
+                    <span>✓</span>
+                    <span>3-TEAM +10 TEASER &bull; 2/3 LEGS CASHED</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-600 text-[10px] font-bold animate-pulse">
+                    ⏳ TICKET PENDING
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-white">
+                  Thursday TNF (2 Legs Won) + Sunday Oct 18 (1 Leg Pending)
+                </h4>
+                <div className="space-y-1.5 text-xs">
+                  <div className="p-2 rounded-lg bg-slate-950/80 border border-emerald-600/40 text-emerald-300 flex items-center justify-between">
+                    <span>Leg 1: Seahawks +7.0 (+10 Teased)</span>
+                    <span className="font-bold text-[10px]">✅ WON (DEN 17, SEA 14)</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950/80 border border-emerald-600/40 text-emerald-300 flex items-center justify-between">
+                    <span>Leg 2: Under 53.5 (+10 Teased)</span>
+                    <span className="font-bold text-[10px]">✅ WON (31 Total Points)</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950/80 border border-amber-600/50 text-amber-300 flex items-center justify-between">
+                    <span>Leg 3: Detroit Lions +7.5 (+10 Teased)</span>
+                    <span className="font-bold text-[10px]">⏳ PENDING (Sun Oct 18 · 1:25 PM PST)</span>
+                  </div>
+                </div>
+                <div className="text-[11px] text-slate-400 border-t border-slate-800/80 pt-2 flex items-center justify-between">
+                  <span>Payout: -120 &bull; Staked: 1.5u</span>
+                  <span className="text-emerald-400 font-bold">2 of 3 Legs Cashed &bull; Ticket Intact</span>
+                </div>
               </div>
-              <h4 className="text-base font-bold text-white">
-                Thursday TNF Oct 15 (Day 1) + Sunday Oct 18 (Day 2)
-              </h4>
-              <p className="text-slate-300 text-xs font-sans leading-relaxed">
-                Legs: (1) Seahawks +10.0 (Thursday TNF), (2) Under 56.5 (Thursday TNF), (3) Lions +10.5 (Sunday Oct 18), (4) Under 64.5 (Sunday Oct 18).
-              </p>
-              <div className="text-[11px] text-slate-400">
-                Payout: -135 at Circa Sports / Caesars. Risk 1.35u to win 1.00u.
+
+              {/* In-Progress 4-Team Monster Teaser */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-purple-950/30 border-2 border-purple-500/70 shadow-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-0.5 rounded-full bg-purple-950 border border-purple-500 text-purple-300 font-bold text-xs flex items-center gap-1.5">
+                    <span>✓</span>
+                    <span>4-TEAM +13 MONSTER &bull; 2/4 LEGS CASHED</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-600 text-[10px] font-bold animate-pulse">
+                    ⏳ TICKET PENDING
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-white">
+                  Thursday TNF (2 Legs Won) + Sunday / Monday (2 Legs Pending)
+                </h4>
+                <div className="space-y-1.5 text-xs">
+                  <div className="p-2 rounded-lg bg-slate-950/80 border border-emerald-600/40 text-emerald-300 flex items-center justify-between">
+                    <span>Leg 1: Seahawks +10.0 (+13 Teased)</span>
+                    <span className="font-bold text-[10px]">✅ WON (Covered by 7 pts)</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950/80 border border-emerald-600/40 text-emerald-300 flex items-center justify-between">
+                    <span>Leg 2: Under 56.5 (+13 Teased)</span>
+                    <span className="font-bold text-[10px]">✅ WON (31 pts, under by 25.5)</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950/80 border border-amber-600/50 text-amber-300 flex items-center justify-between">
+                    <span>Leg 3: Baltimore Ravens +9.5 (+13 Teased)</span>
+                    <span className="font-bold text-[10px]">⏳ PENDING (Sun Oct 18 · 1:00 PM EDT)</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950/80 border border-amber-600/50 text-amber-300 flex items-center justify-between">
+                    <span>Leg 4: 49ers +5.5 (+13 Teased)</span>
+                    <span className="font-bold text-[10px]">⏳ PENDING (Mon Oct 19 · 8:15 PM EDT)</span>
+                  </div>
+                </div>
+                <div className="text-[11px] text-slate-400 border-t border-slate-800/80 pt-2 flex items-center justify-between">
+                  <span>Payout: -135 &bull; Staked: 1.35u</span>
+                  <span className="text-purple-300 font-bold">2 of 4 Legs Cashed &bull; Ticket Intact</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* New Teaser Recommendations for Remaining Unplayed Slate */}
+          <div className="space-y-3 pt-4 border-t border-slate-800">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                <span>🎯 New Teaser Recommendations for Unplayed Slate (Zero Passed Games):</span>
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                100% Unplayed Sunday &amp; Monday Games
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-700 text-slate-300 font-bold text-xs">
+                    NEW 3-TEAM +10 TEASER (UPCOMING)
+                  </span>
+                  <span className="text-emerald-400 font-bold">+15.2% EV</span>
+                </div>
+                <h4 className="text-base font-bold text-white">
+                  Sunday Showcase Oct 18 (Day 1) + Monday MNF Oct 19 (Day 2)
+                </h4>
+                <p className="text-slate-300 text-xs font-sans leading-relaxed">
+                  Legs: (1) Ravens +6.5 (Sunday Oct 18), (2) Under 50.5 (Sunday Oct 18), (3) 49ers +2.5 (Monday MNF Oct 19).
+                </p>
+                <div className="text-[11px] text-slate-400">
+                  Payout: -120 at DraftKings / Circa Sports. Risk 1.5u to win 1.25u.
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-700 text-slate-300 font-bold text-xs">
+                    NEW 4-TEAM +13 MONSTER (UPCOMING)
+                  </span>
+                  <span className="text-emerald-400 font-bold">+16.8% EV</span>
+                </div>
+                <h4 className="text-base font-bold text-white">
+                  Sunday Showcase Oct 18 (Day 1) + Monday MNF Oct 19 (Day 2)
+                </h4>
+                <p className="text-slate-300 text-xs font-sans leading-relaxed">
+                  Legs: (1) Ravens +9.5 (Sunday Oct 18), (2) Under 53.5 (Sunday Oct 18), (3) Panthers +9.5 (Sunday Oct 18), (4) 49ers +5.5 (Monday MNF Oct 19).
+                </p>
+                <div className="text-[11px] text-slate-400">
+                  Payout: -135 at Circa Sports / Caesars. Risk 1.35u to win 1.00u.
+                </div>
               </div>
             </div>
           </div>

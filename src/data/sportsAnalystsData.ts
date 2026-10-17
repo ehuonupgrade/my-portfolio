@@ -105,7 +105,7 @@ export const TRACKED_SPORTS_ANALYSTS: SportsAnalyst[] = [
 
 export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus> = {
   // ==========================================
-  // NEXT UPCOMING NFL GAME: Broncos @ Seahawks (Thursday Night Football · Oct 15)
+  // COMPLETED THURSDAY NIGHT FOOTBALL (Oct 15 - FINAL: DEN 17, SEA 14)
   // ==========================================
   'nfl-sea-den-tnf': {
     gameId: 'nfl-sea-den-tnf',

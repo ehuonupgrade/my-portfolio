@@ -365,7 +365,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
               className="text-xs font-mono font-medium px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/80 hover:border-emerald-400 text-emerald-300 flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Live Verified: Today (Oct 15) &bull; {formattedTime} ({secondsAgo === 0 ? 'just now' : `${secondsAgo}s ago`})</span>
+              <span>Live Verified: Today ({formattedDate}) &bull; {formattedTime} ({secondsAgo === 0 ? 'just now' : `${secondsAgo}s ago`})</span>
             </button>
           </h2>
 

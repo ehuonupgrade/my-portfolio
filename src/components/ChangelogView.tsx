@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import changelogData from '../data/changelog.json';
 import { playKeyClick } from '../utils/audio';
 
@@ -19,14 +19,39 @@ interface VersionEntry {
 
 export const ChangelogView: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState<string>('ALL');
+  const [versions, setVersions] = useState<VersionEntry[]>(() =>
+    Array.isArray(changelogData) ? (changelogData as VersionEntry[]) : []
+  );
   const [refreshCount, setRefreshCount] = useState<number>(0);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [showRefreshToast, setShowRefreshToast] = useState<boolean>(false);
 
-  const versions: VersionEntry[] = (Array.isArray(changelogData) ? changelogData : []) as VersionEntry[];
+  const fetchLiveChangelog = async () => {
+    try {
+      setIsSyncing(true);
+      const res = await fetch(`/api/changelog?_t=${Date.now()}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.versions) && data.versions.length > 0) {
+          setVersions(data.versions);
+        }
+      }
+    } catch {
+      // Fallback to static bundled changelogData
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLiveChangelog();
+  }, []);
+
   const tags = ['ALL', ...Array.from(new Set(versions.map((v) => v.tag || 'FEATURE').filter(Boolean)))];
 
-  const handleManualRefresh = () => {
+  const handleManualRefresh = async () => {
     playKeyClick();
+    await fetchLiveChangelog();
     setRefreshCount((prev) => prev + 1);
     setShowRefreshToast(true);
     setTimeout(() => setShowRefreshToast(false), 2500);
@@ -66,21 +91,22 @@ export const ChangelogView: React.FC = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-700/60 text-emerald-400 font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>LIVE CURRENT BUILD &bull; {versions[0]?.version || 'v0.9.19'} ({versions[0]?.date || 'October 15, 2026'})</span>
+              <span>LIVE CURRENT BUILD &bull; {versions[0]?.version || 'v0.9.23'} ({versions[0]?.date || 'October 17, 2026'})</span>
             </span>
             <span className="px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400 font-mono text-[10px]">
               {versions.length} TOTAL RELEASES
             </span>
             <button
               onClick={handleManualRefresh}
-              className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-700 hover:border-emerald-500 text-slate-300 hover:text-emerald-300 font-mono text-[10px] cursor-pointer transition-colors flex items-center gap-1"
+              disabled={isSyncing}
+              className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-700 hover:border-emerald-500 text-slate-300 hover:text-emerald-300 font-mono text-[10px] cursor-pointer transition-colors flex items-center gap-1 disabled:opacity-50"
               title="Force reload changelog from disk"
             >
-              <span>🔄 Force Sync</span>
+              <span>{isSyncing ? '🔄 Syncing...' : '🔄 Force Sync'}</span>
             </button>
             {showRefreshToast && (
               <span className="text-[10px] text-emerald-400 font-mono animate-fadeIn">
-                ✓ Changelog reloaded
+                ✓ Changelog reloaded from disk
               </span>
             )}
           </div>

@@ -1,0 +1,60 @@
+[
+  {
+    "id": "sms-mvbyvf4d-lrfs",
+    "phoneNumber": "+141-***-52671",
+    "alertTitle": "Large Line & Whale Money Movement",
+    "matchup": "Ravens @ Browns",
+    "formattedText": "[EDGEDETECT ALERT] 🚨 LARGE LINE & MONEY MOVEMENT\nMatchup: Baltimore Ravens @ Cleveland Browns\nMovement: Ravens line -3.5 | Under 41.5 ($24.5M Handle, 78% dollars)\n\nCRITICAL RISKS TO AVOID:\n1) Key Number Hook Risk: Do not chase Ravens past -3.5\n2) Injury Volatility: Lamar Jackson ruled OUT (Tyler Huntley starts)\n3) Vig Tax: Avoid -125 inflated juice\n\nRECOMMENDED ACTION:\nTake Baltimore Ravens -3.5 (2.0 Units) at DraftKings / Circa.\nTime: 5:39:23 AM EDT",
+    "sentAt": "2026-10-17T05:39:23.341Z",
+    "status": "LOCAL_LOG_ONLY",
+    "carrierResponse": "Server Twilio cellular gateway credentials not configured. Native device SMS dispatch recommended."
+  },
+  {
+    "id": "sms-mvbykb97-y4i0",
+    "phoneNumber": "650-815-8590",
+    "alertTitle": "🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 11.0 Points to Panthers -3.5!",
+    "matchup": "Carolina Panthers @ Philadelphia Eagles",
+    "movementSummary": "Spread: Eagles -7.5 -> Panthers -3.5 (11.0 Point Swing (Eagles -7.5 to Panthers -3.5 Fav)) | Total: 46.5 O/U -> 40.5 O/U (-6.0 Points Drop) | Whale Handle: 89% ($$21.8M Handle) on only 22% tickets (+67% Whale Divergence)",
+    "riskWarnings": [
+      "Emergency Medical Hospitalization: Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Tanner McKee will make his 1st NFL start.",
+      "Massive 11-Point Market Swing Across Zero: Odds shifted 11 full points from Philadelphia -7.5 to Carolina -3.5 across DraftKings, FanDuel, Circa, and Pinnacle following Adam Schefter breaking report."
+    ],
+    "actionRecommendation": "CRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -11.0 points without Jalen Hurts. Recommend taking Under 40.5 and Panthers -3.5 as road favorites over backup Tanner McKee.",
+    "formattedText": "[EDGEDETECT ALERT] 🚨 🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 11.0 Points to Panthers -3.5!\nMatchup: Carolina Panthers @ Philadelphia Eagles\nMovement: Spread: Eagles -7.5 -> Panthers -3.5 (11.0 Point Swing (Eagles -7.5 to Panthers -3.5 Fav)) | Total: 46.5 O/U -> 40.5 O/U (-6.0 Points Drop) | Whale Handle: 89% ($$21.8M Handle) on only 22% tickets (+67% Whale Divergence)\n\nCRITICAL RISKS TO AVOID:\n1) Emergency Medical Hospitalization: Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Tanner McKee will make his 1st NFL start.\n2) Massive 11-Point Market Swing Across Zero: Odds shifted 11 full points from Philadelphia -7.5 to Carolina -3.5 across DraftKings, FanDuel, Circa, and Pinnacle following Adam Schefter breaking report.\n\nRECOMMENDED ACTION:\nCRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -11.0 points without Jalen Hurts. Recommend taking Under 40.5 and Panthers -3.5 as road favorites over backup Tanner McKee.\nTime: 5:30:45 AM EDT",
+    "sentAt": "2026-10-17T05:30:45.115Z",
+    "status": "DELIVERED",
+    "carrierResponse": "Delivered via Verified Gateway Dispatch to 650-815-8590"
+  },
+  {
+    "id": "sms-mvbykanf-enlm",
+    "phoneNumber": "650-815-8590",
+    "alertTitle": "🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 11.0 Points to Panthers -3.5!",
+    "matchup": "Carolina Panthers @ Philadelphia Eagles",
+    "movementSummary": "Spread: Eagles -7.5 -> Panthers -3.5 (11.0 Point Swing (Eagles -7.5 to Panthers -3.5 Fav)) | Total: 46.5 O/U -> 40.5 O/U (-6.0 Points Drop) | Whale Handle: 89% ($$21.8M Handle) on only 22% tickets (+67% Whale Divergence)",
+    "riskWarnings": [
+      "Emergency Medical Hospitalization: Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Tanner McKee will make his 1st NFL start.",
+      "Massive 11-Point Market Swing Across Zero: Odds shifted 11 full points from Philadelphia -7.5 to Carolina -3.5 across DraftKings, FanDuel, Circa, and Pinnacle following Adam Schefter breaking report."
+    ],
+    "actionRecommendation": "CRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -11.0 points without Jalen Hurts. Recommend taking Under 40.5 and Panthers -3.5 as road favorites over backup Tanner McKee.",
+    "formattedText": "[EDGEDETECT ALERT] 🚨 🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 11.0 Points to Panthers -3.5!\nMatchup: Carolina Panthers @ Philadelphia Eagles\nMovement: Spread: Eagles -7.5 -> Panthers -3.5 (11.0 Point Swing (Eagles -7.5 to Panthers -3.5 Fav)) | Total: 46.5 O/U -> 40.5 O/U (-6.0 Points Drop) | Whale Handle: 89% ($$21.8M Handle) on only 22% tickets (+67% Whale Divergence)\n\nCRITICAL RISKS TO AVOID:\n1) Emergency Medical Hospitalization: Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Tanner McKee will make his 1st NFL start.\n2) Massive 11-Point Market Swing Across Zero: Odds shifted 11 full points from Philadelphia -7.5 to Carolina -3.5 across DraftKings, FanDuel, Circa, and Pinnacle following Adam Schefter breaking report.\n\nRECOMMENDED ACTION:\nCRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -11.0 points without Jalen Hurts. Recommend taking Under 40.5 and Panthers -3.5 as road favorites over backup Tanner McKee.\nTime: 5:30:44 AM EDT",
+    "sentAt": "2026-10-17T05:30:44.331Z",
+    "status": "DELIVERED",
+    "carrierResponse": "Delivered via Verified Gateway Dispatch to 650-815-8590"
+  },
+  {
+    "id": "sms-mvbyk4fj-9dyo",
+    "phoneNumber": "650-815-8590",
+    "alertTitle": "🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 11.0 Points to Panthers -3.5!",
+    "matchup": "Carolina Panthers @ Philadelphia Eagles",
+    "movementSummary": "Spread: Eagles -7.5 -> Panthers -3.5 (11.0 Point Swing (Eagles -7.5 to Panthers -3.5 Fav)) | Total: 46.5 O/U -> 40.5 O/U (-6.0 Points Drop) | Whale Handle: 89% ($$21.8M Handle) on only 22% tickets (+67% Whale Divergence)",
+    "riskWarnings": [
+      "Emergency Medical Hospitalization: Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Tanner McKee will make his 1st NFL start.",
+      "Massive 11-Point Market Swing Across Zero: Odds shifted 11 full points from Philadelphia -7.5 to Carolina -3.5 across DraftKings, FanDuel, Circa, and Pinnacle following Adam Schefter breaking report."
+    ],
+    "actionRecommendation": "CRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -11.0 points without Jalen Hurts. Recommend taking Under 40.5 and Panthers -3.5 as road favorites over backup Tanner McKee.",
+    "formattedText": "[EDGEDETECT ALERT] 🚨 🚨 CRITICAL BREAKING MEDICAL INJURY: Eagles QB Jalen Hurts Hospitalized with Blood Clot — Line Swings 11.0 Points to Panthers -3.5!\nMatchup: Carolina Panthers @ Philadelphia Eagles\nMovement: Spread: Eagles -7.5 -> Panthers -3.5 (11.0 Point Swing (Eagles -7.5 to Panthers -3.5 Fav)) | Total: 46.5 O/U -> 40.5 O/U (-6.0 Points Drop) | Whale Handle: 89% ($$21.8M Handle) on only 22% tickets (+67% Whale Divergence)\n\nCRITICAL RISKS TO AVOID:\n1) Emergency Medical Hospitalization: Jalen Hurts has been admitted to the hospital for emergency blood clot treatment and is OUT indefinitely. Tanner McKee will make his 1st NFL start.\n2) Massive 11-Point Market Swing Across Zero: Odds shifted 11 full points from Philadelphia -7.5 to Carolina -3.5 across DraftKings, FanDuel, Circa, and Pinnacle following Adam Schefter breaking report.\n\nRECOMMENDED ACTION:\nCRITICAL INJURY ADJUSTMENT: Model rating downgraded Eagles by -11.0 points without Jalen Hurts. Recommend taking Under 40.5 and Panthers -3.5 as road favorites over backup Tanner McKee.\nTime: 5:30:36 AM EDT",
+    "sentAt": "2026-10-17T05:30:36.271Z",
+    "status": "DELIVERED",
+    "carrierResponse": "Delivered via Verified Gateway Dispatch to 650-815-8590"
+  }
+]

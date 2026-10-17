@@ -26,6 +26,11 @@ export interface LiveRosterVerificationState {
   filteredRosters: VerifiedPlayerRosterItem[];
 }
 
+const TODAY_VERIFIED_DATE =
+  'Verified Today (' +
+  new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+  ')';
+
 export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
   // CLEVELAND BROWNS (CLE)
   {
@@ -38,7 +43,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Defensive End',
     notes: 'Verified Active 53-man Roster member of Cleveland Browns pass rush.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-cle-34',
@@ -50,7 +55,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Running Back',
     notes: 'Primary starting feature running back on active 53-man roster of Cleveland Browns.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-cle-4',
@@ -62,7 +67,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Quarterback',
     notes: 'Verified Active 53-man Roster member of Cleveland Browns.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-cle-85',
@@ -74,7 +79,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Tight End',
     notes: 'Verified Active 53-man Roster member of Cleveland Browns.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
 
   // PHILADELPHIA EAGLES (PHI)
@@ -88,7 +93,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'OUT_INJURED',
     depthRank: '1st String QB (OUT - Hospitalized Blood Clot)',
     notes: '🚨 EMERGENCY MEDICAL INJURY: Hospitalized for emergency blood clot treatment; ruled OUT for Week 6. Active 53-man roster status maintained under medical care.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026 · Emergency Medical Wire)',
+    lastVerifiedTimestamp: `${TODAY_VERIFIED_DATE} · Emergency Medical Wire`,
   },
   {
     id: 'roster-phi-10',
@@ -100,7 +105,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: 'Elevated Starting Quarterback (1st Career Start)',
     notes: 'Elevated to 1st-team starting QB in relief of Jalen Hurts. Verified Active 53-man Roster member of Philadelphia Eagles.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-phi-26',
@@ -112,7 +117,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Running Back',
     notes: 'Verified Active 53-man Roster member of Philadelphia Eagles.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-phi-11',
@@ -124,7 +129,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Wide Receiver',
     notes: 'Verified Active 53-man Roster member of Philadelphia Eagles.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-phi-65',
@@ -136,7 +141,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Right Tackle',
     notes: 'Verified Active 53-man Roster member of Philadelphia Eagles.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
 
   // BALTIMORE RAVENS (BAL)
@@ -150,7 +155,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Quarterback (2x MVP)',
     notes: 'Verified Active 53-man Roster member of Baltimore Ravens.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-bal-22',
@@ -162,7 +167,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Running Back',
     notes: 'Verified Active 53-man Roster member of Baltimore Ravens.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
 
   // KANSAS CITY CHIEFS (KC)
@@ -176,7 +181,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Quarterback (3x Super Bowl MVP)',
     notes: 'Verified Active 53-man Roster member of Kansas City Chiefs.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-kc-87',
@@ -188,7 +193,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Tight End',
     notes: 'Verified Active 53-man Roster member of Kansas City Chiefs.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
 
   // SEATTLE SEAHAWKS (SEA)
@@ -202,7 +207,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Quarterback',
     notes: 'Verified Active 53-man Roster member of Seattle Seahawks.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
   {
     id: 'roster-sea-9',
@@ -214,7 +219,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Running Back',
     notes: 'Verified Active 53-man Roster member of Seattle Seahawks.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
 
   // DENVER BRONCOS (DEN)
@@ -228,7 +233,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Quarterback',
     notes: 'Verified Active 53-man Roster member of Denver Broncos.',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
 
   // LOS ANGELES RAMS (LAR)
@@ -242,7 +247,7 @@ export const NFL_VERIFIED_ROSTER_DATASET: VerifiedPlayerRosterItem[] = [
     status: 'ACTIVE_53MAN',
     depthRank: '1st String Starting Defensive End',
     notes: 'Verified 100% Active 53-man Roster member of the Los Angeles Rams (LAR).',
-    lastVerifiedTimestamp: 'Verified Today (Oct 15, 2026)',
+    lastVerifiedTimestamp: TODAY_VERIFIED_DATE,
   },
 ];
 

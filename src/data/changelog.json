@@ -1,5 +1,83 @@
 [
   {
+    "version": "v0.9.24",
+    "date": "October 17, 2026",
+    "title": "Thursday Night Football Spread Correction: Seahawks -3.0 Graded as Loss per 17-14 Final Score",
+    "summary": "Corrected the grading on the Prime 1-Game Opportunity slip for Thursday Night Football (Denver 17, Seattle 14). Seattle lost outright by 3 points (14-17) and therefore failed to cover the Seattle Seahawks -3.0 point spread. The leg was properly corrected from Push to Loss, which settles the multi-leg slip as a Loss (-1.25 Units). Bumped storage schema to v19 with automated local storage migration to ensure client browsers immediately reflect the accurate ledger outcome without manual cache clearing.",
+    "tag": "Bet Ledger & Spread Correction",
+    "changes": [
+      {
+        "type": "bugfix",
+        "description": "Seahawks -3.0 Spread Graded as Loss: Corrected Leg #1 on rec-20261013-prime from PUSH to LOST. With Denver winning 17-14, Seattle suffered an outright 3-point defeat, failing to cover -3.0 points."
+      },
+      {
+        "type": "bugfix",
+        "description": "Slip Outcome Settled as Loss (-1.25u): Recomputed the Prime 1-Game Strategy outcome to LOST, adjusting net units from +1.85u to -1.25u in the historical ledger."
+      },
+      {
+        "type": "feature",
+        "description": "Storage Schema v19 & Instant Migration: Upgraded storage cache key to v19 with auto-migration to prevent client-side cached PUSH/WON states from persisting."
+      }
+    ],
+    "commits": ["e82f10b"]
+  },
+  {
+    "version": "v0.9.23",
+    "date": "October 17, 2026",
+    "title": "Dynamic Date Synchronization, Removal of Bespoke Integrity Check, and Live QR Mobile Text Dispatch",
+    "summary": "Completed a comprehensive sweep addressing all four user feedback vectors. Replaced hardcoded 'Today (Oct 15)' dates across the application with dynamic live calendar timestamps. Completely removed the attached retrospective data integrity check section from the Live Verification modal, keeping verification focused strictly on authentic NFL game outcomes and 32-team standings. Resolved Version History update lag by creating a live server-side endpoint (/api/changelog) with no-cache headers and instant on-demand sync. Solved mobile text dispatch by building an instant scannable SMS QR code (iPhone/Android camera compatible) with pre-filled line movement alerts, plus 1-tap clipboard copy and transparent carrier gateway diagnostics. Purged concluded Thursday Night Football games from the multi-day teaser portfolio in favor of active Sunday/Monday matchups.",
+    "tag": "Date Parity & Mobile QR Dispatch",
+    "changes": [
+      {
+        "type": "cleanup",
+        "description": "Purged Hardcoded 'Today (Oct 15)': Replaced static date strings across headers, banners, and roster verification with dynamic live calendar formatters."
+      },
+      {
+        "type": "cleanup",
+        "description": "Removed Pointless Integrity Check: Eliminated the artificial retrospective test tab and checklist from the Live Verification Modal, streamlining it to official scores and 32-team standings."
+      },
+      {
+        "type": "feature",
+        "description": "Live Server-Side Changelog Engine: Added /api/changelog endpoint on server.ts with no-cache headers and dynamic client polling, ensuring Version History immediately reflects on-disk changes without Vite cache lag."
+      },
+      {
+        "type": "feature",
+        "description": "Universal Mobile SMS QR Dispatcher: Built instant camera-scannable QR code using universal SMSTO standard that opens native Messages apps with the formatted alert ready to send on any smartphone."
+      },
+      {
+        "type": "cleanup",
+        "description": "Multi-Day Teaser Slate Realignment: Purged completed Thursday TNF legs from BetTrackerAndPatternView, repopulating with active Sunday (Ravens +6.5, Under 50.5) and Monday MNF (49ers +2.5) legs."
+      }
+    ],
+    "commits": ["a19c34e", "d48e21f"]
+  },
+  {
+    "version": "v0.9.22",
+    "date": "October 16, 2026",
+    "title": "Live Mobile SMS Text Dispatcher Realignment & Direct Device Messaging Integration",
+    "summary": "Resolved the issue where SMS text dispatches were not delivering to user mobile devices. Eliminated the hidden hardcoded dummy phone number (650-815-8590) and added an interactive phone number input allowing users to save and configure their authentic mobile number. Implemented 1-Tap Direct Mobile SMS (sms: protocol) that instantly opens the user's native text messaging app (Google Messages / Apple iMessage / Samsung) with the formatted critical line movement, risk warnings, and algorithmic action preloaded. Integrated Web Share API and one-click clipboard copying. Replaced deceptive simulated delivery responses in the backend with transparent carrier gateway diagnostics.",
+    "tag": "Mobile SMS & Alerts Dispatch",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Recipient Mobile Number Input: Added user-facing phone number configuration field that saves to local storage and syncs with backend alert preferences."
+      },
+      {
+        "type": "feature",
+        "description": "1-Tap Direct Mobile SMS (sms: URI): Built instant native messaging launcher that preloads the exact alert headline, matchup, line shift, and action into Google Messages / Apple iMessage / Samsung Messages."
+      },
+      {
+        "type": "feature",
+        "description": "Native Share & Copy Controls: Added Web Share API support and one-click clipboard copy with live confirmation."
+      },
+      {
+        "type": "cleanup",
+        "description": "Truthful Server Gateway Diagnostics: Fixed server.ts to return transparent status indicating whether external cellular carrier credentials (Twilio) are provisioned, preventing false 'DELIVERED' status messages."
+      }
+    ],
+    "commits": ["f7c19a4", "b3d82e1"]
+  },
+  {
     "version": "v0.9.21",
     "date": "October 16, 2026",
     "title": "Nearest Straight Bet Kickoff Realignment & Ravens Spread Parity",

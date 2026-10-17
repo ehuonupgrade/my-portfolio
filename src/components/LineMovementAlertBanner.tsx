@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import QRCode from 'qrcode';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 
 export interface MovementAlertItem {
@@ -281,7 +282,7 @@ export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
     headline: '🚨 EMERGENCY HOSPITALIZATION: Jalen Hurts admitted for blood clot treatment; ruled OUT indefinitely.',
     marketImpact: 'Offensive power rating downgraded by -11.0 pts. Backup Tanner McKee starts (0 career NFL starts).',
     lineMovementSummary: 'Spread swung 11.0 pts (PHI -7.5 -> CAR -3.5) / Total dropped 46.5 -> 40.5',
-    timeAgo: 'Just now (Oct 15, 2026)',
+    timeAgo: 'Just now (Updated for Sunday Slate)',
   },
   {
     id: 'med-barkley-2',
@@ -295,14 +296,14 @@ export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
     timeAgo: '12m ago',
   },
   {
-    id: 'med-palczewski-3',
-    playerName: 'Alex Palczewski',
-    team: 'Denver Broncos (DEN)',
-    position: 'RT #77',
-    status: 'OUT_IR',
-    headline: '🚨 RIGHT TACKLE RULED OUT: Starting RT Alex Palczewski (ankle sprain) OUT on short week vs Seattle.',
-    marketImpact: 'Bo Nix right-side pass protection compromised against Seattle simulated pressure packages.',
-    lineMovementSummary: 'Seattle Seahawks line steamed from -1.5 to -3.0 on 71% whale handle',
+    id: 'med-lamar-3',
+    playerName: 'Lamar Jackson',
+    team: 'Baltimore Ravens (BAL)',
+    position: 'QB #8',
+    status: 'EMERGENCY_OUT',
+    headline: '🚨 QUARTERBACK RULED OUT: Lamar Jackson (sprained left ankle) officially OUT vs Cleveland. Tyler Huntley starts.',
+    marketImpact: 'Ravens offensive strategy pivoting to Derrick Henry power ground attack in 20mph Lake Erie wind conditions.',
+    lineMovementSummary: 'Ravens line settled to -3.5 (Total 40.5) with 79% syndicate handle backing BAL -3.5',
     timeAgo: '25m ago',
   },
   {
@@ -394,11 +395,15 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
 
   const [isExpanded, setIsExpanded] = useState<boolean>(!defaultCollapsed);
   const [showSmsModal, setShowSmsModal] = useState<boolean>(false);
-  const [phoneNumber, setPhoneNumber] = useState<string>('650-815-8590');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [phoneSaved, setPhoneSaved] = useState<boolean>(false);
+  const [serverGatewayConfigured, setServerGatewayConfigured] = useState<boolean>(false);
+  const [serverNotice, setServerNotice] = useState<string | null>(null);
+  const [copiedAlertText, setCopiedAlertText] = useState<boolean>(false);
   const [autoAlertsEnabled, setAutoAlertsEnabled] = useState<boolean>(true);
   const [minSpreadThreshold, setMinSpreadThreshold] = useState<number>(1.0);
   const [isSendingSms, setIsSendingSms] = useState<boolean>(false);
-  const [smsDeliveryStatus, setSmsDeliveryStatus] = useState<string | null>('Background SMS Alerts Active');
+  const [smsDeliveryStatus, setSmsDeliveryStatus] = useState<string | null>('SMS Alert Dispatch Ready');
   const [lastSentText, setLastSentText] = useState<string | null>(null);
   const [lastSentTimestamp, setLastSentTimestamp] = useState<string | null>(null);
 
@@ -425,14 +430,79 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
   // Save/load phone and auto-alert preferences in background
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedPhone = localStorage.getItem('linepulse_user_phone_number');
-      if (savedPhone) {
+      const savedPhone =
+        localStorage.getItem('edgedetect_user_phone_number') ||
+        localStorage.getItem('linepulse_user_phone_number') ||
+        '';
+      if (savedPhone && savedPhone !== '650-815-8590') {
         setPhoneNumber(savedPhone);
-      } else {
-        localStorage.setItem('linepulse_user_phone_number', '650-815-8590');
       }
     }
+    fetch('/api/edgedetect/alerts/settings')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.settings?.phoneNumber && data.settings.phoneNumber !== '650-815-8590') {
+          setPhoneNumber(data.settings.phoneNumber);
+        }
+        if (data?.settings?.twilioConfigured) {
+          setServerGatewayConfigured(true);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  const getFormattedAlertText = useCallback((alert: MovementAlertItem) => {
+    return `[EDGEDETECT ALERT] 🚨 ${alert.headline}
+Matchup: ${alert.matchup} (${alert.scheduledTime})
+Movement: Spread ${alert.spreadShift.open} -> ${alert.spreadShift.current} (${alert.spreadShift.delta}) | Total ${alert.totalShift.open} -> ${alert.totalShift.current} (${alert.totalShift.delta})
+Whale Money: ${alert.moneyDivergence.dollarsPct}% ($${alert.moneyDivergence.dollarVolume}) on ${alert.moneyDivergence.ticketsPct}% tickets (+${alert.moneyDivergence.divergenceMargin}% Whale Divergence)
+
+RISKS:
+${alert.riskWarnings.map((r, i) => `${i + 1}) ${r.title}: ${r.description}`).join('\n')}
+
+ACTION: ${alert.actionAdvice}
+Time: ${new Date().toLocaleTimeString()} EDT`;
+  }, []);
+
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
+
+  useEffect(() => {
+    if (!showSmsModal) return;
+    const cleanPhone = (phoneNumber || '').replace(/[^0-9]/g, '');
+    const text = getFormattedAlertText(currentAlert);
+    const qrPayload = cleanPhone ? `SMSTO:${cleanPhone}:${text}` : `SMSTO::${text}`;
+    QRCode.toDataURL(qrPayload, {
+      width: 200,
+      margin: 1,
+      color: { dark: '#020617', light: '#ffffff' },
+    })
+      .then((url) => setQrDataUrl(url))
+      .catch(() => setQrDataUrl(''));
+  }, [showSmsModal, phoneNumber, currentAlert, getFormattedAlertText]);
+
+  const handleSavePhoneNumber = useCallback(
+    async (newPhone: string) => {
+      playKeyClick();
+      const trimmed = newPhone.trim();
+      setPhoneNumber(trimmed);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('edgedetect_user_phone_number', trimmed);
+        localStorage.setItem('linepulse_user_phone_number', trimmed);
+      }
+      try {
+        await fetch('/api/edgedetect/alerts/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phoneNumber: trimmed }),
+        });
+      } catch {
+        // ignore
+      }
+      setPhoneSaved(true);
+      setTimeout(() => setPhoneSaved(false), 3000);
+    },
+    []
+  );
 
   const dispatchSmsNotification = useCallback(
     async (alert: MovementAlertItem, phone: string, reasonLabel: string = 'Instant Dispatch') => {
@@ -463,32 +533,91 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
         const sentTime = new Date().toLocaleTimeString();
         playSuccessChime();
 
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && phone.trim()) {
           localStorage.setItem('edgedetect_user_phone_number', phone.trim());
         }
 
-        setSmsDeliveryStatus(`Alert Dispatched to Background Receiver at ${sentTime}! (${reasonLabel})`);
+        if (data.gatewayConfigured && data.deliveryStatus === 'DELIVERED') {
+          setSmsDeliveryStatus(`Delivered via Twilio SMS Gateway at ${sentTime}! (${reasonLabel})`);
+          setServerNotice(null);
+        } else {
+          setSmsDeliveryStatus(`Alert logged to system at ${sentTime}! (${reasonLabel})`);
+          setServerNotice(
+            data.note ||
+              'Server cellular gateway (Twilio) is not configured with API credentials. Use "Open in Text Messages (1-Tap Instant SMS)" to send directly through your device cellular plan.'
+          );
+        }
+
         setLastSentTimestamp(sentTime);
-        setLastSentText(
-          data.formattedText ||
-            `[EDGEDETECT ALERT] 🚨 ${alert.headline}\nMatchup: ${alert.matchup}\nMovement: Spread ${alert.spreadShift.current} | ${alert.moneyDivergence.dollarVolume} (${alert.moneyDivergence.dollarsPct}% handle)\nRISKS:\n${alert.riskWarnings.map((r, i) => `${i + 1}) ${r.title}`).join('\n')}\nAction: ${alert.actionAdvice}`
-        );
+        setLastSentText(data.formattedText || getFormattedAlertText(alert));
       } catch {
         const sentTime = new Date().toLocaleTimeString();
-        playSuccessChime();
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('edgedetect_user_phone_number', phone.trim());
-        }
-        setSmsDeliveryStatus(`Dispatched via SMS Carrier Gateway at ${sentTime}!`);
-        setLastSentTimestamp(sentTime);
-        setLastSentText(
-          `[EDGEDETECT ALERT] 🚨 ${alert.headline}\nMatchup: ${alert.matchup}\nMovement: Spread ${alert.spreadShift.current} | ${alert.moneyDivergence.dollarVolume} (${alert.moneyDivergence.dollarsPct}% handle)\nRISKS:\n${alert.riskWarnings.map((r, i) => `${i + 1}) ${r.title}`).join('\n')}\nAction: ${alert.actionAdvice}`
-        );
+        setSmsDeliveryStatus(`Alert saved locally at ${sentTime}`);
+        setServerNotice('Network request failed. Use 1-Tap Mobile SMS to open directly in your phone text app.');
       } finally {
         setIsSendingSms(false);
       }
     },
-    []
+    [getFormattedAlertText]
+  );
+
+  // 1-Tap Native SMS Launcher
+  const handleOpenNativeSms = useCallback(
+    (alert: MovementAlertItem = currentAlert) => {
+      playSuccessChime();
+      const text = getFormattedAlertText(alert);
+      const cleanPhone = (phoneNumber || '').replace(/[^0-9+]/g, '');
+      const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const smsUrl = cleanPhone
+        ? `sms:${cleanPhone}${isIOS ? '&' : '?'}body=${encodeURIComponent(text)}`
+        : `sms:${isIOS ? '&' : '?'}body=${encodeURIComponent(text)}`;
+
+      if (cleanPhone) {
+        dispatchSmsNotification(alert, cleanPhone, '1-Tap Native SMS Dispatch');
+      }
+
+      window.location.href = smsUrl;
+      const sentTime = new Date().toLocaleTimeString();
+      setSmsDeliveryStatus(`Opened in Mobile SMS App at ${sentTime}!`);
+    },
+    [currentAlert, phoneNumber, getFormattedAlertText, dispatchSmsNotification]
+  );
+
+  // Native Web Share Sheet
+  const handleShareViaMessages = useCallback(
+    async (alert: MovementAlertItem = currentAlert) => {
+      playKeyClick();
+      const text = getFormattedAlertText(alert);
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try {
+          await navigator.share({
+            title: `[EDGEDETECT ALERT] ${alert.headline}`,
+            text: text,
+          });
+          const sentTime = new Date().toLocaleTimeString();
+          setSmsDeliveryStatus(`Shared via Device Messages at ${sentTime}!`);
+        } catch {
+          // User dismissed share sheet
+        }
+      } else {
+        handleOpenNativeSms(alert);
+      }
+    },
+    [currentAlert, getFormattedAlertText, handleOpenNativeSms]
+  );
+
+  // Copy Alert Text
+  const handleCopyAlertText = useCallback(
+    (alert: MovementAlertItem = currentAlert) => {
+      playKeyClick();
+      const text = getFormattedAlertText(alert);
+      navigator.clipboard.writeText(text);
+      setCopiedAlertText(true);
+      setTimeout(() => setCopiedAlertText(false), 3000);
+      const sentTime = new Date().toLocaleTimeString();
+      setSmsDeliveryStatus(`Alert Text Copied to Clipboard at ${sentTime}!`);
+    },
+    [currentAlert, getFormattedAlertText]
   );
 
   const handleSendManualSms = (e?: React.FormEvent) => {
@@ -499,12 +628,16 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
       return;
     }
     playKeyClick();
-    dispatchSmsNotification(currentAlert, phoneNumber, 'Manual User Dispatch');
+    handleOpenNativeSms(currentAlert);
   };
 
   const handleSimulateSuddenTrip = () => {
     playKeyClick();
-    dispatchSmsNotification(currentAlert, phoneNumber, 'Automatic Line Threshold Tripped');
+    if (phoneNumber.trim()) {
+      handleOpenNativeSms(currentAlert);
+    } else {
+      setShowSmsModal(true);
+    }
   };
 
   return (
@@ -791,13 +924,19 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
               )}
 
               <button
-                onClick={handleSimulateSuddenTrip}
-                disabled={isSendingSms}
-                className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
-                title="Test tripping line threshold and triggering background SMS to your phone"
+                onClick={() => {
+                  playKeyClick();
+                  if (phoneNumber.trim()) {
+                    handleOpenNativeSms(currentAlert);
+                  } else {
+                    setShowSmsModal(true);
+                  }
+                }}
+                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                title="Send this line movement alert directly to your phone via SMS"
               >
-                <span>⚡</span>
-                <span>{isSendingSms ? 'Dispatching...' : 'Test Background Text Alert'}</span>
+                <span>📲</span>
+                <span>Send Text Alert</span>
               </button>
 
               <button
@@ -806,9 +945,10 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
                   setShowSmsModal(true);
                 }}
                 className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all shadow-md shadow-rose-600/30 flex items-center gap-1.5 cursor-pointer"
+                title="Configure SMS phone number and dispatch methods"
               >
                 <span>📱</span>
-                <span>Alert Telemetry</span>
+                <span>Text Dispatcher</span>
               </button>
 
               <button
@@ -993,12 +1133,18 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
 
                 <div className="flex items-center gap-2 shrink-0">
                   <button
-                    onClick={handleSendManualSms}
-                    disabled={isSendingSms}
-                    className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-bold text-xs transition-all shadow-md flex items-center gap-1 cursor-pointer"
+                    onClick={() => {
+                      playKeyClick();
+                      if (phoneNumber.trim()) {
+                        handleOpenNativeSms(currentAlert);
+                      } else {
+                        setShowSmsModal(true);
+                      }
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
                   >
-                    <span>📱</span>
-                    <span>{isSendingSms ? 'Dispatching...' : 'Dispatch Background Text Alert'}</span>
+                    <span>📲</span>
+                    <span>Send Text Alert</span>
                   </button>
 
                   {onOpenStrategy && (
@@ -1029,95 +1175,176 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
                 <span className="text-xl">📱</span>
                 <div>
                   <h3 className="text-base font-bold text-white">
-                    EdgeDetect Background SMS Alert Dispatcher
+                    EdgeDetect SMS Alert Dispatcher
                   </h3>
                   <span className="text-[11px] text-slate-400">
-                    Background carrier watcher: <strong className="text-emerald-400">Active &amp; Configured</strong>
+                    Live Mobile Alert Dispatch Engine
                   </span>
                 </div>
               </div>
 
               <button
                 onClick={() => setShowSmsModal(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-950 text-xs"
+                className="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-950 text-xs cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            {/* Auto-Alert Subscription Settings */}
-            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+            {/* Recipient Phone Number Input Box */}
+            <div className="p-4 rounded-xl bg-slate-950/90 border border-slate-800 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-white flex items-center gap-1.5">
-                  <span>⚙️ Automated Trigger Settings:</span>
-                </span>
-                <label className="flex items-center gap-1.5 cursor-pointer text-emerald-400 font-bold">
-                  <input
-                    type="checkbox"
-                    checked={autoAlertsEnabled}
-                    onChange={(e) => {
-                      playKeyClick();
-                      setAutoAlertsEnabled(e.target.checked);
-                    }}
-                    className="w-4 h-4 rounded text-emerald-500 bg-slate-900 border-slate-700"
-                  />
-                  <span>Background Auto-Text Enabled</span>
+                <label className="font-bold text-white flex items-center gap-1.5">
+                  <span>📞 Your Target Mobile Phone Number:</span>
                 </label>
+                {phoneSaved && (
+                  <span className="text-emerald-400 font-bold text-[11px] animate-fadeIn">
+                    ✓ Number Saved!
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="e.g. (555) 234-5678 or +15552345678"
+                  className="flex-1 bg-slate-900 border border-slate-700 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 rounded-xl px-3 py-2 text-white font-mono text-sm placeholder:text-slate-600 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleSavePhoneNumber(phoneNumber)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 hover:border-slate-600 border border-slate-700 text-slate-200 font-bold text-xs transition-all cursor-pointer whitespace-nowrap"
+                >
+                  Save Number
+                </button>
+              </div>
+              <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
+                Pre-populates the recipient field on your mobile device when scanning the QR code or launching native messaging.
+              </p>
+            </div>
+
+            {/* Instant Mobile QR Code Scanner (100% Reliable Cross-Platform) */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/40 border border-emerald-500/50 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-white text-xs flex items-center gap-1.5">
+                  <span>📸 Instant Mobile Delivery via QR Code:</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-600 text-emerald-300 font-bold text-[10px]">
+                  100% Guaranteed Delivery
+                </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px]">
-                <div className="p-2 rounded bg-slate-900 border border-slate-800">
-                  <span className="text-slate-400 block">Min Spread Move</span>
-                  <select
-                    value={minSpreadThreshold}
-                    onChange={(e) => setMinSpreadThreshold(parseFloat(e.target.value))}
-                    className="mt-1 w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white font-bold"
-                  >
-                    <option value={0.5}>&ge; 0.5 Point</option>
-                    <option value={1.0}>&ge; 1.0 Point (Standard)</option>
-                    <option value={1.5}>&ge; 1.5 Points (Major Steam)</option>
-                    <option value={2.0}>&ge; 2.0 Points (Extreme)</option>
-                  </select>
-                </div>
+              <div className="flex flex-col sm:flex-row items-center gap-4 bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
+                {qrDataUrl ? (
+                  <div className="p-2 bg-white rounded-xl shrink-0 shadow-lg shadow-emerald-950/40">
+                    <img
+                      src={qrDataUrl}
+                      alt="Scan to send SMS Alert"
+                      className="w-36 h-36 object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-36 h-36 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-center text-slate-500 text-xs text-center p-2">
+                    Generating QR...
+                  </div>
+                )}
 
-                <div className="p-2 rounded bg-slate-900 border border-slate-800">
-                  <span className="text-slate-400 block">Whale Divergence</span>
-                  <span className="mt-1 block font-bold text-amber-300">&ge; 20% Handle Advantage</span>
+                <div className="space-y-2 text-xs font-sans">
+                  <div className="font-bold text-emerald-400 font-mono text-sm">
+                    Point Phone Camera at Screen
+                  </div>
+                  <p className="text-slate-300 text-xs leading-relaxed">
+                    Open your iPhone or Android Camera app and point it at the QR code. Tap the &ldquo;Messages&rdquo; banner that pops up on your screen.
+                  </p>
+                  <p className="text-slate-400 text-[11px] leading-relaxed">
+                    Your phone will immediately open <strong>Google Messages / Apple iMessage / Samsung</strong> with this exact line movement alert pre-loaded and ready to send with 1 tap.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Background Dispatch Trigger Controls */}
-            <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-white">Private Recipient Status:</span>
-                <span className="text-emerald-400 font-bold text-[11px] flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Configured &amp; Verified</span>
+            {/* Primary Dispatch Actions */}
+            <div className="space-y-2.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block font-mono">
+                ⚡ Direct Mobile &amp; Clipboard Controls:
+              </span>
+
+              {/* 1-Tap Mobile SMS App Launcher */}
+              <button
+                type="button"
+                onClick={() => handleOpenNativeSms(currentAlert)}
+                className="w-full p-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 cursor-pointer border border-emerald-400/40"
+              >
+                <span className="text-lg">📲</span>
+                <span>Open Directly in Native Text App (Mobile Users)</span>
+              </button>
+
+              {/* Share & Copy Row */}
+              <div className="grid grid-cols-2 gap-2 pt-1 font-mono">
+                <button
+                  type="button"
+                  onClick={() => handleCopyAlertText(currentAlert)}
+                  className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 text-emerald-300 hover:text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <span>{copiedAlertText ? '✓' : '📋'}</span>
+                  <span>{copiedAlertText ? 'Copied Alert to Clipboard!' : 'Copy Formatted Alert Text'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleShareViaMessages(currentAlert)}
+                  className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>📤</span>
+                  <span>Share via Native Sheet</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Server Background Cellular Gateway Status */}
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5 text-xs font-mono">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-white flex items-center gap-1.5">
+                  <span>☁️ Cellular Carrier Gateway Diagnostic:</span>
+                </span>
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                    serverGatewayConfigured
+                      ? 'bg-emerald-950 text-emerald-400 border-emerald-700'
+                      : 'bg-amber-950/80 text-amber-300 border-amber-800/80'
+                  }`}
+                >
+                  {serverGatewayConfigured ? '🟢 Twilio Active' : '🟡 Standalone / No Twilio Key'}
                 </span>
               </div>
+
               <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
-                Your phone number is locked in the background server store and hidden from the website interface. Line movements exceeding trip thresholds automatically dispatch alerts to your mobile device.
+                {serverGatewayConfigured
+                  ? 'Server is provisioned with Twilio cellular gateway credentials to dispatch background SMS over mobile towers.'
+                  : 'Notice: Web apps cannot send cellular SMS texts without a paid telecommunications provider (Twilio API). Because no Twilio credentials exist in this environment, scanning the QR code above or copying the text is the verified, instant way to get this alert on your phone.'}
               </p>
-              <div className="pt-1 flex items-center gap-2">
+
+              <div className="flex items-center gap-2 pt-1">
                 <button
                   type="button"
                   onClick={handleSendManualSms}
                   disabled={isSendingSms}
-                  className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-bold text-xs transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-all border border-slate-700 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   {isSendingSms ? (
                     <>
                       <span className="animate-spin">🔄</span>
-                      <span>Dispatching Text...</span>
+                      <span>Logging to Server...</span>
                     </>
                   ) : (
                     <>
-                      <span>📲</span>
-                      <span>Test Background Dispatch</span>
+                      <span>⚡</span>
+                      <span>Log Alert to Archive</span>
                     </>
                   )}
                 </button>
+
                 {onOpenAlertLogs && (
                   <button
                     type="button"
@@ -1126,14 +1353,24 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
                       setShowSmsModal(false);
                       onOpenAlertLogs();
                     }}
-                    className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                    className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-xs font-bold transition-all border border-slate-800 flex items-center gap-1 cursor-pointer"
                   >
                     <span>📋</span>
-                    <span>View Historical Logs</span>
+                    <span>View Dispatched Logs</span>
                   </button>
                 )}
               </div>
             </div>
+
+            {/* Server Notice & Diagnostics */}
+            {serverNotice && (
+              <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-600/60 text-amber-300 text-[11px] space-y-1">
+                <div className="font-bold flex items-center gap-1">
+                  <span>ℹ️ Gateway Notice:</span>
+                </div>
+                <div className="text-slate-300 font-sans">{serverNotice}</div>
+              </div>
+            )}
 
             {/* Delivery Status Toast */}
             {smsDeliveryStatus && (

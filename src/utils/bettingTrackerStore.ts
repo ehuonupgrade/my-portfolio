@@ -1,6 +1,6 @@
 import { TrackedBetRecommendation, BetOutcome } from '../types/sportsBettingTracker';
 
-const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v16_settled_tnf_parlay_loss';
+const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v19_seahawks_loss_correction';
 
 /**
  * Production Recommendations Ledger
@@ -408,22 +408,110 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     ],
   },
   {
+    id: 'rec-20261013-teaser13',
+    date: '2026-10-15',
+    dateLabel: 'Oct 15, 2026',
+    slateTitle: 'Thursday TNF, Sunday & Monday Monster Teaser',
+    tier: 'TEASER_4TEAM_13',
+    title: '1 4-Team +13 Monster Teaser (Thursday TNF, Sunday & Monday MNF)',
+    subtitle: 'IN PROGRESS: 2 of 4 Legs Cashed on Thursday TNF (+13 Cushion Won); 2 Legs Pending Sunday/Monday',
+    badge: '4-TEAM +13 TEASER • 2/4 LEGS CASHED',
+    targetMatchup: 'Broncos @ Seahawks (TNF) + Ravens @ Browns (Sun) + Commanders @ 49ers (MNF)',
+    payoutOdds: '-135 (Circa Sports / Caesars)',
+    unitsStaked: 1.35,
+    unitsWonLost: 0,
+    status: 'PENDING',
+    postGameAnalysis: '2 of 4 teaser legs cashed cleanly on Thursday TNF: Seahawks +10.0 (W) and Under 56.5 (W, 31 total pts). Remaining 2 legs (Ravens +9.5 on Sun, 49ers +5.5 on Mon) are alive and pending.',
+    learnedTakeaway: '+13 point cushions across multi-day schedules protect against early variance and keep monster teasers alive heading into weekend.',
+    legs: [
+      {
+        id: 'leg-20261013-t13-1',
+        gameMatchup: 'Broncos @ Seahawks',
+        league: 'NFL',
+        gameDate: 'Played Thu Oct 15 · 5:15 PM PST',
+        betType: 'SPREAD',
+        targetSelection: 'Seattle Seahawks +10.0 (+13 Teased)',
+        originalLine: 'Seahawks -3.0',
+        teasedLine: 'Seahawks +10.0',
+        bestOdds: '-135',
+        bestSportsbook: 'Circa Sports / Caesars',
+        status: 'WON',
+        finalScore: 'DEN 17, SEA 14 (Covered +10.0 by 7 pts)',
+        rationale: 'Shifts Seattle past zero, through key margins 3, 7, and lands on double-digit +10 cushion.',
+      },
+      {
+        id: 'leg-20261013-t13-2',
+        gameMatchup: 'Broncos @ Seahawks',
+        league: 'NFL',
+        gameDate: 'Played Thu Oct 15 · 5:15 PM PST',
+        betType: 'TOTAL',
+        targetSelection: 'Under 56.5 Game Total (+13 Teased)',
+        originalLine: 'Under 43.5',
+        teasedLine: 'Under 56.5',
+        bestOdds: '-135',
+        bestSportsbook: 'DraftKings / Circa',
+        status: 'WON',
+        finalScore: '31 Total Points (Under 56.5 by 25.5 pts)',
+        rationale: 'Elevates total into shootout range for a low-scoring defensive clash.',
+      },
+      {
+        id: 'leg-20261013-t13-3',
+        gameMatchup: 'Baltimore Ravens @ Cleveland Browns',
+        league: 'NFL',
+        gameDate: 'Sunday, Oct 18 · 1:00 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Baltimore Ravens +9.5 (+13 Teased)',
+        originalLine: 'Ravens -3.5',
+        teasedLine: 'Ravens +9.5',
+        bestOdds: '-135',
+        bestSportsbook: 'Circa Sports / DraftKings',
+        status: 'PENDING',
+        finalScore: 'Scheduled: Sun Oct 18 · 1:00 PM EDT',
+        rationale: 'Converts Baltimore road favorite into a huge +9.5 point underdog in Lake Erie shoreline wind.',
+      },
+      {
+        id: 'leg-20261013-t13-4',
+        gameMatchup: 'Washington Commanders @ San Francisco 49ers',
+        league: 'NFL',
+        gameDate: 'Monday, Oct 19 · 8:15 PM EDT (MNF)',
+        betType: 'SPREAD',
+        targetSelection: 'San Francisco 49ers +5.5 (+13 Teased)',
+        originalLine: '49ers -7.5',
+        teasedLine: '49ers +5.5',
+        bestOdds: '-135',
+        bestSportsbook: 'Caesars / DraftKings',
+        status: 'PENDING',
+        finalScore: 'Scheduled: Mon Oct 19 · 8:15 PM EDT',
+        rationale: 'Shifts undefeated 5-0 49ers at Levi\'s Stadium from laying 7.5 to getting +5.5 points on MNF.',
+      },
+    ],
+    signalsTagged: ['KEY_NUMBER_CROSS_3_7', 'SAME_GAME_CORRELATED', 'HOME_UNDERDOG'],
+    preBetRationale: 'Massive 13-point threshold crossings across Thursday TNF, Sunday afternoon, and Monday Night Football.',
+    appliedWeights: [
+      {
+        signal: 'KEY_NUMBER_CROSS_3_7',
+        weightMultiplier: 1.35,
+        description: 'Active model weight: Crossed key NFL margins across three distinct days.',
+      },
+    ],
+  },
+  {
     id: 'rec-20261013-prime',
     date: '2026-10-15',
     dateLabel: 'Oct 15, 2026',
     slateTitle: 'Prime 1-Game Opportunity of Thursday TNF',
     tier: 'PRIME_1GAME',
     title: '1 Game Strategy: Under 43.5 & Denver +2.5 / Seattle Spread at Empower Field',
-    subtitle: 'COMPLETED: 1 Leg Pushed (3-pt margin), 2 Legs Cashed (Under 43.5 & Walker Over 68.5)',
-    badge: '1 PRIME GAME STRATEGY • WON (1 PUSH, 2 CASHED)',
+    subtitle: 'COMPLETED: 1 Leg Lost (Seattle -3.0 failed in 17-14 loss), 2 Legs Cashed',
+    badge: '1 PRIME GAME STRATEGY • LOST (1 LEG LOST)',
     targetMatchup: 'Broncos @ Seahawks (Thursday Night Football · Oct 15 · 5:15 PM PST)',
     payoutOdds: '+280 Same Game Parlay / Straight Split',
     unitsStaked: 1.25,
-    unitsWonLost: 1.85,
-    status: 'WON',
+    unitsWonLost: -1.25,
+    status: 'LOST',
     settledAt: '2026-10-15T20:30:00-07:00',
-    postGameAnalysis: 'Prime Thursday Night strategy cashed: Leg #1 pushed on exact 3-point margin (DEN 17-14 SEA), Leg #2 Under 43.5 won (31 total pts), and Leg #3 Kenneth Walker Over 68.5 won (86 yds). Reduced SGP pays +1.85 Units!',
-    learnedTakeaway: 'Correlated ground control scripts on short-week Thursday games continue to yield high positive EV.',
+    postGameAnalysis: 'Thursday Night strategy settled as a Loss: Leg #1 (Seattle -3.0) lost as Denver defeated Seattle 17-14 outright. Seattle lost by 3 points, so against a -3.0 line this is a loss (had the line been +3.0 it would have pushed; with -3.0, Seattle needed to win by 4+ to cover or win by 3 to push). Legs #2 (Under 43.5) and #3 (Walker Over 68.5) both cashed, but the lost spread leg settled the entire parlay slip as a loss (-1.25 Units).',
+    learnedTakeaway: 'Laying points with road favorites on short-week road games carries high risk when turnover and defensive pressure swing outright outcomes.',
     legs: [
       {
         id: 'leg-20261013-p-1',
@@ -435,9 +523,9 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         originalLine: 'Seahawks -3.0 (-106)',
         bestOdds: '-106',
         bestSportsbook: 'Circa Sports / DraftKings',
-        status: 'PUSH',
-        finalScore: 'PUSH (Exact 3-Pt Margin · DEN 17, SEA 14)',
-        rationale: 'Exact 3-point final margin results in a Push. In Same Game Parlays / Straight Splits, push legs reduce and preserve winning legs (does not lose the slip).',
+        status: 'LOST',
+        finalScore: 'LOST (DEN 17, SEA 14 · Seahawks lost by 3, failed to cover -3.0)',
+        rationale: 'Seahawks lost outright 17-14. When laying -3.0 points, an outright 3-point loss means an effective -6 margin against the spread, resulting in a loss.',
       },
       {
         id: 'leg-20261013-p-2',
@@ -493,10 +581,12 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
 export function getTrackedBets(): TrackedBetRecommendation[] {
   if (typeof window === 'undefined') return INITIAL_TRACKED_BETS;
   try {
-    // Purge deprecated cache keys (v1 through v14)
-    for (let i = 1; i <= 14; i++) {
+    // Purge deprecated cache keys (v1 through v18)
+    for (let i = 1; i <= 18; i++) {
       localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}`);
       localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_nearest_tnf_seahawks`);
+      localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_settled_tnf_parlay_loss`);
+      localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_intact_pending_teasers`);
     }
 
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -505,6 +595,28 @@ export function getTrackedBets(): TrackedBetRecommendation[] {
       return INITIAL_TRACKED_BETS;
     }
     let parsed: TrackedBetRecommendation[] = JSON.parse(raw);
+
+    // Auto-migration guard: ensure rec-20261013-prime reflects that Seahawks lost 14-17 (did not cover -3.0 spread)
+    let needsSave = false;
+    parsed = parsed.map((b) => {
+      if (b.id === 'rec-20261013-prime' && b.status !== 'LOST') {
+        needsSave = true;
+        const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261013-prime');
+        return seedVersion || {
+          ...b,
+          status: 'LOST' as BetOutcome,
+          unitsWonLost: -1.25,
+          badge: '1 PRIME GAME STRATEGY • LOST (1 LEG LOST)',
+          subtitle: 'COMPLETED: 1 Leg Lost (Seattle -3.0 failed in 17-14 loss), 2 Legs Cashed',
+        };
+      }
+      return b;
+    });
+
+    if (needsSave) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+    }
+
     return parsed;
   } catch {
     return INITIAL_TRACKED_BETS;
@@ -667,17 +779,17 @@ export function simulateTonightOutcome(): TrackedBetRecommendation[] {
     if (b.id === 'rec-20261013-prime') {
       return {
         ...b,
-        status: 'WON' as BetOutcome,
-        unitsWonLost: 1.85,
+        status: 'LOST' as BetOutcome,
+        unitsWonLost: -1.25,
         settledAt: new Date().toISOString(),
-        postGameAnalysis: 'Prime Thursday Night strategy cashed: Leg #1 pushed on exact 3-point margin (DEN 17-14 SEA), Leg #2 Under 43.5 won (31 total pts), and Leg #3 Kenneth Walker Over 68.5 won (86 yds). Reduced SGP pays +1.85 Units!',
-        learnedTakeaway: 'In Same Game Parlays / Straight Splits, push legs reduce and preserve winning legs without busting the ticket.',
+        postGameAnalysis: 'Thursday Night strategy settled as a Loss: Leg #1 (Seattle -3.0) lost as Denver defeated Seattle 17-14. While Under 43.5 and Walker Over 68.5 cashed, the failed spread settled the parlay as a loss (-1.25 Units).',
+        learnedTakeaway: 'Laying points on the road in short-week games carries downside risk when the team loses outright.',
         legs: b.legs.map((leg, idx) => ({
           ...leg,
-          status: idx === 0 ? ('PUSH' as BetOutcome) : ('WON' as BetOutcome),
+          status: idx === 0 ? ('LOST' as BetOutcome) : ('WON' as BetOutcome),
           finalScore:
             idx === 0
-              ? 'PUSH (Exact 3-Pt Margin · DEN 17, SEA 14)'
+              ? 'LOST (DEN 17, SEA 14 · Seahawks lost by 3, failed to cover -3.0)'
               : idx === 1
               ? '31 Total Points (Under 43.5 Covered)'
               : 'Walker 86 Rushing Yards (Over 68.5 line)',

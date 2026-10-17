@@ -408,7 +408,7 @@ const SMS_LOGS_FILE = path.join(DATA_DIR, 'linepulse_sms_logs.json');
 const SMS_SETTINGS_FILE = path.join(DATA_DIR, 'linepulse_sms_settings.json');
 
 const DEFAULT_SMS_SETTINGS = {
-  phoneNumber: '650-815-8590',
+  phoneNumber: '',
   autoAlertsEnabled: true,
   minSpreadShift: 1.0,
   minTotalShift: 1.5,
@@ -457,15 +457,19 @@ function writeSmsLogs(logs: any[]): void {
   }
 }
 
-// GET: Current Auto-Alert Settings (Private background config)
+// GET: Current Auto-Alert Settings
 app.get(['/api/edgedetect/alerts/settings', '/api/linepulse/alerts/settings'], (req, res) => {
   const settings = readSmsSettings();
-  const safeSettings = {
-    ...settings,
-    hasConfiguredPhone: !!settings.phoneNumber,
-    phoneNumber: settings.phoneNumber ? 'Configured (Private)' : null,
-  };
-  res.json({ success: true, settings: safeSettings });
+  const twilioConfigured = !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_FROM_NUMBER);
+  res.json({
+    success: true,
+    settings: {
+      ...settings,
+      hasConfiguredPhone: !!settings.phoneNumber,
+      phoneNumber: settings.phoneNumber || '',
+      twilioConfigured,
+    },
+  });
 });
 
 // POST: Update Auto-Alert Settings
@@ -477,12 +481,14 @@ app.post(['/api/edgedetect/alerts/settings', '/api/linepulse/alerts/settings'], 
     updatedAt: new Date().toISOString(),
   };
   writeSmsSettings(updated);
+  const twilioConfigured = !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_FROM_NUMBER);
   res.json({
     success: true,
     settings: {
       ...updated,
       hasConfiguredPhone: !!updated.phoneNumber,
-      phoneNumber: 'Configured (Private)',
+      phoneNumber: updated.phoneNumber || '',
+      twilioConfigured,
     },
   });
 });
@@ -490,30 +496,32 @@ app.post(['/api/edgedetect/alerts/settings', '/api/linepulse/alerts/settings'], 
 // POST: Send/Log SMS Alert to user's phone
 app.post(['/api/edgedetect/alerts/sms', '/api/linepulse/alerts/sms'], async (req, res) => {
   const { phoneNumber, alertTitle, matchup, movementSummary, riskWarnings, actionRecommendation } = req.body;
-  const targetPhone = phoneNumber || readSmsSettings().phoneNumber || '650-815-8590';
+  const currentSettings = readSmsSettings();
+  const targetPhone = (phoneNumber || currentSettings.phoneNumber || '').trim();
 
   const messageId = `sms-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
   const timestamp = new Date().toISOString();
 
   const formattedText = `[EDGEDETECT ALERT] 🚨 ${alertTitle || 'LARGE LINE & MONEY MOVEMENT'}
-Matchup: ${matchup || 'Denver Broncos @ Seattle Seahawks'}
-Movement: ${movementSummary || 'Bills steamed +4.5 to +3.5 | Under 51.0 crashed to 48.5 ($16.4M Handle, 68% dollars)'}
+Matchup: ${matchup || 'Baltimore Ravens @ Cleveland Browns'}
+Movement: ${movementSummary || 'Ravens line -3.5 | Under 41.5 ($24.5M Handle, 78% dollars)'}
 
 CRITICAL RISKS TO AVOID:
-${(riskWarnings || ['Key Number Hook Risk: Do not chase Bills below +3.5', 'Injury Volatility: Check inactive reports at 6:45 PM', 'Vig Tax: Avoid -125 inflated juice']).map((r: string, i: number) => `${i + 1}) ${r}`).join('\n')}
+${(riskWarnings || ['Key Number Hook Risk: Do not chase Ravens past -3.5', 'Injury Volatility: Lamar Jackson ruled OUT (Tyler Huntley starts)', 'Vig Tax: Avoid -125 inflated juice']).map((r: string, i: number) => `${i + 1}) ${r}`).join('\n')}
 
 RECOMMENDED ACTION:
-${actionRecommendation || 'Take Buffalo Bills +3.5 road hook (2.0 Units) at FanDuel / Pinnacle.'}
+${actionRecommendation || 'Take Baltimore Ravens -3.5 (2.0 Units) at DraftKings / Circa.'}
 Time: ${new Date().toLocaleTimeString()} EDT`;
 
-  let carrierNote = 'Delivered via Verified Gateway Dispatch to ' + targetPhone;
-
-  // Real Twilio support if API keys are provided in environment
   const twilioSid = process.env.TWILIO_ACCOUNT_SID;
   const twilioToken = process.env.TWILIO_AUTH_TOKEN;
   const twilioFrom = process.env.TWILIO_FROM_NUMBER;
+  const hasTwilio = !!(twilioSid && twilioToken && twilioFrom);
 
-  if (twilioSid && twilioToken && twilioFrom) {
+  let carrierNote = '';
+  let twilioSuccess = false;
+
+  if (hasTwilio && targetPhone) {
     try {
       const cleanPhone = targetPhone.replace(/[^0-9+]/g, '');
       const fullTarget = cleanPhone.startsWith('+') ? cleanPhone : `+1${cleanPhone}`;
@@ -535,6 +543,7 @@ Time: ${new Date().toLocaleTimeString()} EDT`;
       );
       const twilioData = await twilioRes.json();
       if (twilioData.sid) {
+        twilioSuccess = true;
         carrierNote = `Twilio Live Carrier Dispatch OK (SID: ${twilioData.sid})`;
       } else {
         carrierNote = `Twilio Gateway Notice: ${twilioData.message || 'Queued'}`;
@@ -542,19 +551,21 @@ Time: ${new Date().toLocaleTimeString()} EDT`;
     } catch (e: any) {
       carrierNote = `Carrier Gateway Routed (Notice: ${e.message})`;
     }
+  } else if (!hasTwilio) {
+    carrierNote = 'Server Twilio cellular gateway credentials not configured. Native device SMS dispatch recommended.';
   }
 
   const logEntry = {
     id: messageId,
-    phoneNumber: targetPhone,
+    phoneNumber: targetPhone ? targetPhone.replace(/(\d{3})\d{3}(\d{4})/, '$1-***-$2') : 'Not Configured',
     alertTitle: alertTitle || 'Large Line & Whale Money Movement',
-    matchup: matchup || 'Bills @ Rams',
+    matchup: matchup || 'Ravens @ Browns',
     movementSummary,
     riskWarnings,
     actionRecommendation,
     formattedText,
     sentAt: timestamp,
-    status: 'DELIVERED',
+    status: twilioSuccess ? 'DELIVERED' : 'LOCAL_LOG_ONLY',
     carrierResponse: carrierNote,
   };
 
@@ -562,14 +573,22 @@ Time: ${new Date().toLocaleTimeString()} EDT`;
   logs.unshift(logEntry);
   writeSmsLogs(logs.slice(0, 100));
 
+  const cleanPhone = targetPhone.replace(/[^0-9+]/g, '');
+
   res.json({
     success: true,
     messageId,
-    target: 'Verified Background Mobile Carrier',
+    targetPhone,
+    hasConfiguredPhone: !!targetPhone,
     sentAt: timestamp,
     formattedText,
-    deliveryStatus: 'DELIVERED',
-    carrierResponse: 'Delivered via Background SMS Gateway',
+    gatewayConfigured: hasTwilio,
+    deliveryStatus: twilioSuccess ? 'DELIVERED' : 'LOCAL_LOG_ONLY',
+    carrierResponse: carrierNote,
+    smsComposeUri: `sms:${cleanPhone}${cleanPhone ? '?' : ''}body=${encodeURIComponent(formattedText)}`,
+    note: hasTwilio
+      ? 'Alert dispatched via Twilio SMS cellular network.'
+      : 'Server cellular gateway (Twilio) is not configured. Use the 1-Tap Mobile SMS button to send or open the text alert directly in your messaging app.',
   });
 });
 
@@ -583,6 +602,25 @@ app.get(['/api/edgedetect/alerts/sms/history', '/api/linepulse/alerts/sms/histor
   }));
   res.json({ success: true, count: sanitizedLogs.length, logs: sanitizedLogs });
 });
+
+// GET: Retrieve live changelog directly from disk without client bundling lag
+app.get('/api/changelog', (req, res) => {
+  try {
+    const changelogPath = path.join(__dirname, 'src', 'data', 'changelog.json');
+    if (fs.existsSync(changelogPath)) {
+      const data = fs.readFileSync(changelogPath, 'utf-8');
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      return res.json({ success: true, versions: JSON.parse(data) });
+    }
+    return res.status(404).json({ success: false, error: 'Changelog file not found' });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
 
 // ----------------- LINEPULSE LIVE ODDS & NEWS ENGINE -----------------
 
