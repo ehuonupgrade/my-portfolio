@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import QRCode from 'qrcode';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
+import { useSportsData } from '../context/SportsDataContext';
 
 export interface MovementAlertItem {
   id: string;
@@ -49,32 +50,32 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
     stadium: 'Gillette Stadium, Foxborough, MA',
     alertType: 'INJURY_RECOVERY',
     severity: 'CRITICAL',
-    headline: '⚡ BREAKING ROSTER ACTIVATION: Patriots WR A.J. Brown Activated from IR (Ankle Cleared) — Line Steamed to Patriots -2.5 vs Jets!',
+    headline: '⚡ BREAKING ROSTER ACTIVATION: Patriots WR A.J. Brown Activated from IR (Ankle Cleared) — Line Steamed to Patriots -7.5 vs Jets!',
     spreadShift: {
-      open: 'Patriots +1.5 / PK (Pre-Activation)',
-      current: 'Patriots -2.5 (Sharp Inflow on A.J. Brown Return)',
-      delta: '+2.5 Point Patriots Steam (A.J. Brown Cleared to Play)',
+      open: 'Patriots -6.0 / -6.5 (Pre-Activation)',
+      current: 'Patriots -7.5 (Sharp Inflow on A.J. Brown Return)',
+      delta: '+1.5 Point Patriots Steam (Crossed Key Number 7)',
       favoredTeam: 'New England Patriots (Mike Vrabel WR1 Weapon)',
     },
     totalShift: {
-      open: '39.5 O/U',
-      current: '41.5 O/U',
+      open: '41.5 O/U',
+      current: '43.5 O/U',
       delta: '+2.0 Points Rise',
       direction: 'OVER',
     },
     moneyDivergence: {
-      dollarsPct: 81,
-      ticketsPct: 38,
+      dollarsPct: 84,
+      ticketsPct: 41,
       divergenceMargin: 43,
-      dollarVolume: '$21.2M Handle',
-      favoredSide: 'Patriots -2.0 / Over 40.5 / A.J. Brown Over 54.5 Rec Yds',
+      dollarVolume: '$24.6M Handle',
+      favoredSide: 'Patriots -7.0 / Over 43.5 / A.J. Brown Over 58.5 Rec Yds',
     },
     riskWarnings: [
       {
-        title: 'First Game Back from Ankle Rehab',
+        title: 'Key Number 7 Hook Risk',
         description:
-          'Returning from Week 1 high ankle sprain; practiced in full all week under Mike Vrabel with no injury designation or snap limits reported.',
-        severityLevel: 'MEDIUM',
+          'Books offering -7.5 require a win by 8+ points. Grab stale -7.0 (-115) at Circa/FanDuel or tease down to -1.5 through key numbers 7, 6, 4, 3.',
+        severityLevel: 'HIGH',
       },
       {
         title: 'Jets Press-Man Secondary',
@@ -84,7 +85,7 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
       },
     ],
     actionAdvice:
-      '⚡ IMMEDIATE SHARP ACTION: Grab New England Patriots -2.0 before consensus books push to key number -3.0. Target A.J. Brown Over 54.5 Receiving Yards (-115) and Over 4.5 Receptions (-120). Mike Vrabel features Brown immediately as his premier alpha boundary threat.',
+      '⚡ IMMEDIATE SHARP ACTION: Back New England Patriots at -7.0 before consensus books solidify on -7.5 / -8.0. Target A.J. Brown Over 58.5 Receiving Yards (-115) and Anytime Touchdown (+125). Mike Vrabel features Brown immediately as his premier red-zone and boundary target.',
   },
   {
     id: 'alert-phi-hurts-blood-clot-20261015',
@@ -326,8 +327,8 @@ export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
     position: 'WR #11',
     status: 'ACTIVE_CLEARED',
     headline: '⚡ ROSTER ACTIVATION: A.J. Brown officially activated from Injured Reserve; cleared to start Sunday vs Jets.',
-    marketImpact: 'Superstar WR1 returns for Mike Vrabel and the New England Patriots offense. High ankle sprain fully healed; line steamed to Patriots -2.5.',
-    lineMovementSummary: 'Patriots spread steamed from +1.5 to -2.5 / Total elevated 39.5 -> 41.5',
+    marketImpact: 'Superstar WR1 returns for Mike Vrabel and the New England Patriots offense. High ankle sprain fully healed; consensus line steamed across key number 7 to Patriots -7.5.',
+    lineMovementSummary: 'Patriots spread steamed from -6.0 to -7.5 / Total elevated 41.5 -> 43.5',
     timeAgo: 'Just now (Verified Live Wire)',
   },
   {
@@ -464,7 +465,33 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
   const [lastSentText, setLastSentText] = useState<string | null>(null);
   const [lastSentTimestamp, setLastSentTimestamp] = useState<string | null>(null);
 
-  const currentAlert = ACTIVE_MOVEMENT_ALERTS[activeAlertIndex] || ACTIVE_MOVEMENT_ALERTS[0];
+  const { games } = useSportsData();
+
+  const reconciledMovementAlerts = ACTIVE_MOVEMENT_ALERTS.map((alert) => {
+    const matchingGame = games.find(
+      (g) =>
+        g.id === alert.gameId ||
+        (g.homeTeam?.abbr && alert.matchup.includes(g.homeTeam.abbr)) ||
+        (g.awayTeam?.abbr && alert.matchup.includes(g.awayTeam.abbr))
+    );
+
+    if (matchingGame?.consensus?.spread) {
+      return {
+        ...alert,
+        spreadShift: {
+          ...alert.spreadShift,
+          current: `${matchingGame.consensus.spread} (Live ESPN Verified)`,
+        },
+        totalShift: {
+          ...alert.totalShift,
+          current: matchingGame.consensus.total ? `${matchingGame.consensus.total} O/U` : alert.totalShift.current,
+        },
+      };
+    }
+    return alert;
+  });
+
+  const currentAlert = reconciledMovementAlerts[activeAlertIndex] || reconciledMovementAlerts[0];
   const currentWireItem = SUPERSTAR_BREAKING_MEDICAL_WIRE[tickerIndex] || SUPERSTAR_BREAKING_MEDICAL_WIRE[0];
 
   // Auto-rolling ticker cycle every 5.5 seconds

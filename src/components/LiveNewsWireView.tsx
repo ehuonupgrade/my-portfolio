@@ -269,7 +269,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
 
           <div className="flex items-center gap-2">
             <span className="text-emerald-400 font-bold text-xs bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">
-              Model Action: +2.5 Pt Steam on Patriots (-2.5)
+              Model Action: Line Steamed to Patriots -7.5 (Total 43.5)
             </span>
           </div>
         </div>
@@ -296,19 +296,19 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-400 font-bold">✓</span>
                 <div>
-                  <strong className="text-white">Patriots -2.0 / -2.5 Spread:</strong> Back New England at home before books push across key number -3.0.
+                  <strong className="text-white">Patriots -7.0 / -7.5 Spread:</strong> Back New England at Gillette Stadium as Mike Vrabel unleashes Brown.
                 </div>
               </li>
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-400 font-bold">✓</span>
                 <div>
-                  <strong className="text-white">A.J. Brown Over 54.5 Rec Yds (-115):</strong> Heavy target share as Mike Vrabel&apos;s primary boundary target.
+                  <strong className="text-white">A.J. Brown Over 58.5 Rec Yds (-115):</strong> Heavy target share as Mike Vrabel&apos;s primary boundary target.
                 </div>
               </li>
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-400 font-bold">✓</span>
                 <div>
-                  <strong className="text-white">Over 40.5 Game Total:</strong> Total rebounds from 39.5 with restored perimeter explosiveness.
+                  <strong className="text-white">Over 43.5 Game Total:</strong> Total elevated to 43.5 with restored perimeter explosiveness.
                 </div>
               </li>
             </ul>

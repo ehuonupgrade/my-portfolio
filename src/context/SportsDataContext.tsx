@@ -3,6 +3,7 @@ import { GameMarket } from '../types/sportsBetting';
 import { TrackedBetRecommendation } from '../types/sportsBettingTracker';
 import { MOCK_GAMES_MARKETS } from '../data/sportsBettingData';
 import { purifyAndRealignGame } from '../utils/gameAlignmentGuard';
+import { getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
 import { getTrackedBets } from '../utils/bettingTrackerStore';
 import { getGameDisplayStatus, GameStatusMetadata, DisplayGameStatus } from '../components/common/GameStatusBadge';
 
@@ -232,7 +233,10 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
         }
       });
 
-      const finalMergedSlate = [...updatedBaseGames, ...extraLiveGames];
+      const finalMergedSlate = [...updatedBaseGames, ...extraLiveGames].map((g) => ({
+        ...g,
+        marketOpinions: getUniversalGameMarketOpinions(g),
+      }));
 
       console.info(
         `[SportsDataProvider:API] 📊 Cycle #${cycle} Verification Summary: Total=${finalMergedSlate.length} games (In Progress: ${inProgressCount}, Completed: ${completedCount}, Upcoming: ${upcomingCount})`

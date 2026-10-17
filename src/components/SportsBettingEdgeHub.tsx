@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, SportsLeague } from '../types/sportsBetting';
 import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
-import { NFL_MARKET_OPINIONS_MAP } from '../data/nflMarketOpinionsData';
+import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BetTrackerAndPatternView } from './BetTrackerAndPatternView';
 import { AnalystConsensusTracker } from './AnalystConsensusTracker';
@@ -175,7 +175,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
 
     return [...updatedBase, ...extraLive].map((g) => ({
       ...g,
-      marketOpinions: g.marketOpinions || NFL_MARKET_OPINIONS_MAP[g.id],
+      marketOpinions: getUniversalGameMarketOpinions(g),
     }));
   }, [liveGames, contextGames]);
 

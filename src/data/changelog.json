@@ -3,7 +3,7 @@
     "version": "v0.9.25",
     "date": "October 17, 2026",
     "title": "A.J. Brown (New England Patriots) IR Activation & Market Recalibration vs Jets",
-    "summary": "Enhanced the live news wire and betting intelligence pipeline to intercept breaking player transactions and IR activations in real time. Corrected roster attribution: All-Pro WR A.J. Brown plays for the New England Patriots (acquired via blockbuster trade on June 1, 2026, reuniting with head coach Mike Vrabel). Following his 4-week high ankle sprain rehabilitation from Week 1, Brown was officially activated from IR on Saturday, October 17, 2026 for Sunday's Week 6 clash against the New York Jets at Gillette Stadium. Recalibrated Patriots betting lines with sharp steam moving New England from +1.5/PK to -2.5, total elevating from 39.5 to 41.5, and highlighting A.J. Brown player props.",
+    "summary": "Enhanced the live news wire and betting intelligence pipeline to intercept breaking player transactions and IR activations in real time. Corrected roster attribution: All-Pro WR A.J. Brown plays for the New England Patriots (acquired via blockbuster trade on June 1, 2026, reuniting with head coach Mike Vrabel). Following his 4-week high ankle sprain rehabilitation from Week 1, Brown was officially activated from IR on Saturday, October 17, 2026 for Sunday's Week 6 clash against the New York Jets at Gillette Stadium. Aligned with live ESPN sportsbook consensus odds: Patriots -7.5 (-110), total 43.5 O/U, and high-conviction recommendations on Patriots -7.0 / -7.5 and A.J. Brown receiving yard props.",
     "tag": "Live Ingestion & Market Recalibration",
     "changes": [
       {
@@ -12,7 +12,7 @@
       },
       {
         "type": "feature",
-        "description": "A.J. Brown Activation Wire vs NY Jets: Added live spotlight and movement alert reflecting A.J. Brown's return from IR, triggering a +2.5 point line steam on the Patriots (-2.5) and Over 41.5 total adjustment."
+        "description": "A.J. Brown Activation Wire vs NY Jets: Added live spotlight and movement alert reflecting A.J. Brown's return from IR, triggering line steam across key number 7 to Patriots -7.5 and Over 43.5 total adjustment."
       },
       {
         "type": "feature",
@@ -20,7 +20,7 @@
       },
       {
         "type": "feature",
-        "description": "Recalibrated Bet Recommendations: Featured New England Patriots -2.0 / -2.5 and A.J. Brown Over 54.5 Receiving Yards against the New York Jets."
+        "description": "Recalibrated Bet Recommendations: Featured New England Patriots -7.0 / -7.5 and A.J. Brown Over 58.5 Receiving Yards against the New York Jets."
       }
     ],
     "commits": ["c94d12a"]

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
-import { NFL_MARKET_OPINIONS_MAP } from '../data/nflMarketOpinionsData';
+import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
 import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, SUPERSTAR_BREAKING_MEDICAL_WIRE, MovementAlertItem } from './LineMovementAlertBanner';
 import {
   TrackedBetRecommendation,
@@ -210,7 +210,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
     // 2. Map marketOpinions if missing on any game
     const list = upcomingList.map((g) => ({
       ...g,
-      marketOpinions: g.marketOpinions || NFL_MARKET_OPINIONS_MAP[g.id],
+      marketOpinions: getUniversalGameMarketOpinions(g),
     })).filter((g) => g.marketOpinions);
 
     let filtered = list;

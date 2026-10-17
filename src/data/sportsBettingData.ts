@@ -1,6 +1,6 @@
 import { GameMarket, DailySlatePortfolio, PlayerInjuryItem } from '../types/sportsBetting';
 import { MOCK_ANALYST_CONSENSUS_DATA } from './sportsAnalystsData';
-import { NFL_MARKET_OPINIONS_MAP, NFL_LIVE_VOLUME_SHIFTS_MAP } from './nflMarketOpinionsData';
+import { NFL_MARKET_OPINIONS_MAP, NFL_LIVE_VOLUME_SHIFTS_MAP, getUniversalGameMarketOpinions } from './nflMarketOpinionsData';
 
 export const PUBLIC_SPORTSBOOKS = [
   { name: 'DraftKings', code: 'DK', color: '#53d337' },
@@ -617,6 +617,206 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
         timeAgo: 'Oct 12',
         summary: 'Tyler Bass connected on a 34-yard field goal with 3:12 left in overtime after Josh Allen scrambled for two first downs.',
         relevance: 'MARKET_FLOW',
+      },
+    ],
+  },
+
+  // =========================================================================
+  // GAME 2.5: AFC EAST MARQUEE (New York Jets @ New England Patriots - A.J. BROWN ACTIVATED)
+  // =========================================================================
+  {
+    id: 'nfl-nyj-ne-w6',
+    league: 'NFL',
+    homeTeam: {
+      name: 'Patriots',
+      city: 'New England',
+      abbr: 'NE',
+      record: '3-2',
+      logoColor: '#002244',
+    },
+    awayTeam: {
+      name: 'Jets',
+      city: 'New York',
+      abbr: 'NYJ',
+      record: '2-3',
+      logoColor: '#125740',
+    },
+    scheduledTime: 'Sunday, Oct 18 · 1:00 PM EDT (10:00 AM PDT)',
+    stadium: 'Gillette Stadium, Foxborough, MA',
+    weatherCondition: '52°F, 9-14 mph crisp NE wind, overcast autumn skies',
+    status: 'UPCOMING',
+    totalBetsPlaced: 198000,
+    totalDollarsWagered: 26800000,
+    splits: {
+      spread: {
+        home: {
+          side: 'New England Patriots -7.5',
+          ticketPercentage: 41,
+          moneyPercentage: 84,
+          totalTicketsCount: 81180,
+          totalHandleAmount: 22512000,
+          sharpSignal: 'HEAVY_SHARP',
+          divergenceNotice: 'Heavy Whale Steam (+43% dollar margin): Syndicates hammered New England after A.J. Brown was officially activated from IR, driving the line to -7.5.',
+        },
+        away: {
+          side: 'New York Jets +7.5',
+          ticketPercentage: 59,
+          moneyPercentage: 16,
+          totalTicketsCount: 116820,
+          totalHandleAmount: 4288000,
+          sharpSignal: 'PUBLIC_HEAVY',
+          divergenceNotice: 'Casual tickets taking the touchdown-and-a-hook with the Jets.',
+        },
+      },
+      moneyline: {
+        home: {
+          side: 'Patriots ML (-330)',
+          ticketPercentage: 62,
+          moneyPercentage: 86,
+          totalTicketsCount: 42160,
+          totalHandleAmount: 6450000,
+          sharpSignal: 'HEAVY_SHARP',
+        },
+        away: {
+          side: 'Jets ML (+265)',
+          ticketPercentage: 38,
+          moneyPercentage: 14,
+          totalTicketsCount: 25840,
+          totalHandleAmount: 1050000,
+          sharpSignal: 'PUBLIC_HEAVY',
+        },
+      },
+      total: {
+        over: {
+          side: 'Over 43.5',
+          ticketPercentage: 48,
+          moneyPercentage: 74,
+          totalTicketsCount: 38400,
+          totalHandleAmount: 4810000,
+          sharpSignal: 'HEAVY_SHARP',
+          divergenceNotice: 'Sharp money driving the total up from 41.5 to 43.5 with A.J. Brown back as WR1.',
+        },
+        under: {
+          side: 'Under 43.5',
+          ticketPercentage: 52,
+          moneyPercentage: 26,
+          totalTicketsCount: 41600,
+          totalHandleAmount: 1690000,
+          sharpSignal: 'PUBLIC_HEAVY',
+        },
+      },
+    },
+    lineMovements: [
+      { timestamp: '2026-10-11T18:00:00Z', timeLabel: 'Sunday Open', spread: -6.0, total: 41.5, moneylineHome: -280, note: 'Opened NE -6.0 prior to A.J. Brown practice clearance' },
+      { timestamp: '2026-10-14T15:00:00Z', timeLabel: 'Mid-Week', spread: -6.5, total: 42.0, moneylineHome: -295, note: 'Brown logged full participation at practice' },
+      { timestamp: '2026-10-17T09:30:00Z', timeLabel: 'Current Consensus', spread: -7.5, total: 43.5, moneylineHome: -330, note: 'Official IR activation steamed line across key number 7' },
+    ],
+    sportsbooks: [
+      {
+        bookName: 'DraftKings',
+        spreadHome: -7.5,
+        spreadHomeOdds: -110,
+        spreadAway: 7.5,
+        spreadAwayOdds: -110,
+        totalOver: 43.5,
+        totalOverOdds: -110,
+        totalUnder: 43.5,
+        totalUnderOdds: -110,
+        moneylineHome: -330,
+        moneylineAway: +265,
+        lastUpdated: '1 min ago',
+      },
+      {
+        bookName: 'FanDuel',
+        spreadHome: -7.0,
+        spreadHomeOdds: -115,
+        spreadAway: 7.0,
+        spreadAwayOdds: -105,
+        totalOver: 43.5,
+        totalOverOdds: -108,
+        totalUnder: 43.5,
+        totalUnderOdds: -112,
+        moneylineHome: -320,
+        moneylineAway: +260,
+        lastUpdated: 'Just now',
+      },
+      {
+        bookName: 'Circa Sports',
+        spreadHome: -7.5,
+        spreadHomeOdds: -108,
+        spreadAway: 7.5,
+        spreadAwayOdds: -108,
+        totalOver: 43.5,
+        totalOverOdds: -110,
+        totalUnder: 43.5,
+        totalUnderOdds: -110,
+        moneylineHome: -325,
+        moneylineAway: +265,
+        lastUpdated: '3 mins ago',
+      },
+      {
+        bookName: 'BetMGM',
+        spreadHome: -7.5,
+        spreadHomeOdds: -105,
+        spreadAway: 7.5,
+        spreadAwayOdds: -115,
+        totalOver: 43.5,
+        totalOverOdds: -110,
+        totalUnder: 43.5,
+        totalUnderOdds: -110,
+        moneylineHome: -340,
+        moneylineAway: +270,
+        lastUpdated: '2 mins ago',
+      },
+    ],
+    consensus: {
+      spread: 'NE -7.5 (-110)',
+      total: 43.5,
+      moneylineHome: -330,
+      moneylineAway: +265,
+    },
+    weatherForecast: {
+      isDome: false,
+      temperature: '52°F',
+      conditions: 'Crisp autumn weather, partly cloudy',
+      wind: '9-14 mph breeze',
+      humidity: '50%',
+      precipitationChance: '10%',
+      impactLevel: 'LOW',
+      impactSummary: 'Standard October Foxborough conditions; clear passing visibility for Drake Maye and A.J. Brown.',
+    },
+    injuries: {
+      homeInjuries: [
+        { player: 'A.J. Brown', position: 'WR', status: 'ACTIVE', injury: 'High Ankle Sprain (Activated from IR)', gameImpact: 'OFFICIALLY ACTIVATED FROM IR: 100% cleared to start without snap limitations. WR1 alpha target for Mike Vrabel; transforms passing offense and commands double coverage.' },
+        { player: 'Drake Maye', position: 'QB', status: 'ACTIVE', injury: 'None', gameImpact: 'Starting QB; elevated efficiency with premier boundary separator available.' },
+        { player: 'Rhamondre Stevenson', position: 'RB', status: 'ACTIVE', injury: 'None', gameImpact: 'Starting lead RB facing lighter 6/7-man defensive boxes.' },
+        { player: 'Christian Gonzalez', position: 'CB', status: 'ACTIVE', injury: 'None', gameImpact: 'Top cover cornerback matching up with Garrett Wilson.' },
+      ],
+      awayInjuries: [
+        { player: 'Aaron Rodgers', position: 'QB', status: 'ACTIVE', injury: 'Ankle', gameImpact: 'Starting veteran quarterback under center.' },
+        { player: 'Garrett Wilson', position: 'WR', status: 'ACTIVE', injury: 'None', gameImpact: 'Primary perimeter target drawing Gonzalez shadow.' },
+        { player: 'Breece Hall', position: 'RB', status: 'ACTIVE', injury: 'None', gameImpact: 'Lead dual-threat running back.' },
+        { player: 'C.J. Mosley', position: 'LB', status: 'ACTIVE', injury: 'Neck', gameImpact: 'Starting defensive captain and run stopper.' },
+      ],
+      lineImpactAnalysis: 'Sharp Line Steam: Patriots steamed from -6.0 to -7.5 on news of A.J. Brown activation from IR; market pricing in a touchdown+ New England victory.',
+      totalImpactRating: 'GAME_CHANGING',
+    },
+    latestNews: [
+      {
+        id: 'news-nyj-ne-0',
+        headline: 'Patriots officially activate WR A.J. Brown from IR; fully cleared for Sunday vs Jets',
+        source: 'ESPN NFL Insider',
+        timeAgo: 'Just now',
+        summary: 'Mike Vrabel confirmed Brown completed full practice participation all week and starts without snap limitations.',
+        relevance: 'INJURY_UPDATE',
+      },
+      {
+        id: 'news-nyj-ne-1',
+        headline: 'Sharp syndicates steam Patriots spread across key number 7 to -7.5 at Circa and DraftKings',
+        source: 'Circa Sports Desk',
+        timeAgo: '1h ago',
+        summary: 'Heavy whale money pushed New England to a 7.5-point favorite with A.J. Brown restored to the lineup.',
+        relevance: 'CRITICAL_LINE_MOVE',
       },
     ],
   },
@@ -2072,7 +2272,7 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
  */
 export const MOCK_GAMES_MARKETS: GameMarket[] = BASE_MOCK_GAMES_MARKETS.map((g) => ({
   ...g,
-  marketOpinions: NFL_MARKET_OPINIONS_MAP[g.id] || g.marketOpinions,
+  marketOpinions: getUniversalGameMarketOpinions(g),
   liveVolumeShifts: NFL_LIVE_VOLUME_SHIFTS_MAP[g.id] || g.liveVolumeShifts,
 }));
 
