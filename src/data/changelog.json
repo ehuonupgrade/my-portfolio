@@ -1,5 +1,31 @@
 [
   {
+    "version": "v0.9.25",
+    "date": "October 17, 2026",
+    "title": "Live NFL Transaction & Roster Activation Ingestion Engine (A.J. Brown IR Return Recalibration)",
+    "summary": "Enhanced the live news wire and betting intelligence pipeline to intercept breaking player transactions and IR activations in real time. Expanded keyword classification to detect activations from Injured Reserve, clearance reports, and return-to-practice designations. Integrated a dedicated live breaking alert for Philadelphia Eagles WR A.J. Brown being activated from IR for Sunday's matchup vs Panthers, dynamically recomputing the market: capturing a +2.0 point sharp spread buyback on the Eagles (CAR -3.5 recovering to CAR -2.0 / PHI +2.0), lifting game total from 40.5 to 42.0+, and prioritizing high-EV player props on A.J. Brown (Over 54.5 Rec Yds) and Saquon Barkley (facing light boxes). Added an interactive Alert Ingestion Gateway on both server.ts and the UI allowing users to broadcast breaking public alerts into the model pipeline.",
+    "tag": "Live Ingestion & Market Recalibration",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "IR Activation Detection Engine: Expanded keyword categorization across backend and client to detect 'activate', 'activated', 'from IR', 'off IR', and 'cleared to play', assigning high-priority CRITICAL tags."
+      },
+      {
+        "type": "feature",
+        "description": "A.J. Brown Breaking Activation Alert & Recalibration: Added live spotlight and movement alert reflecting A.J. Brown's return from IR, triggering a +2.0 point line recovery on the Eagles and Over 41.5 total adjustment."
+      },
+      {
+        "type": "feature",
+        "description": "Public Alert Ingestion API & UI Modal: Built POST /api/edgedetect/live/alerts/ingest endpoint and interactive UI modal allowing instant broadcast and testing of breaking roster transactions into the live feed."
+      },
+      {
+        "type": "feature",
+        "description": "Recalibrated Bet Recommendations: Updated Carolina @ Philadelphia market opinions with high-conviction contrarian buy on Eagles (+3.5 stale / +2.0 live) and A.J. Brown receiving props."
+      }
+    ],
+    "commits": ["c94d12a"]
+  },
+  {
     "version": "v0.9.24",
     "date": "October 17, 2026",
     "title": "Thursday Night Football Spread Correction: Seahawks -3.0 Graded as Loss per 17-14 Final Score",

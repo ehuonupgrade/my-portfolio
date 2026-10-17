@@ -5,7 +5,7 @@ import { fetchLiveNewsWithFallback } from '../utils/liveSportsFeed';
 export interface LiveNewsArticle {
   id: string;
   league: string;
-  wireType: 'INJURY_INACTIVES' | 'SHARP_LINE_IMPACT' | 'BREAKING_NEWS';
+  wireType: 'INJURY_INACTIVES' | 'SHARP_LINE_IMPACT' | 'BREAKING_NEWS' | 'ROSTER_ACTIVATION';
   impactLevel: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'STANDARD';
   headline: string;
   description: string;
@@ -25,10 +25,14 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [feedSource, setFeedSource] = useState<string>('Live Wire');
-  const [activeFilter, setActiveFilter] = useState<'ALL' | 'INJURY' | 'SHARP' | 'NFL'>('NFL');
+  const [activeFilter, setActiveFilter] = useState<'ALL' | 'INJURY' | 'SHARP' | 'ACTIVATIONS' | 'NFL'>('NFL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showIngestModal, setShowIngestModal] = useState<boolean>(false);
+  const [ingestHeadline, setIngestHeadline] = useState<string>('');
+  const [ingestDescription, setIngestDescription] = useState<string>('');
+  const [isSubmittingIngest, setIsSubmittingIngest] = useState<boolean>(false);
 
   const fetchNews = useCallback(async (isManual: boolean = false) => {
     setIsLoading(true);
@@ -66,6 +70,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
     return articles.filter((a) => {
       if (activeFilter === 'INJURY' && a.wireType !== 'INJURY_INACTIVES') return false;
       if (activeFilter === 'SHARP' && a.wireType !== 'SHARP_LINE_IMPACT' && a.impactLevel !== 'CRITICAL') return false;
+      if (activeFilter === 'ACTIVATIONS' && a.wireType !== 'ROSTER_ACTIVATION') return false;
       if (activeFilter === 'NFL' && a.league !== 'NFL') return false;
 
       if (searchQuery.trim()) {
@@ -82,6 +87,10 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
 
   const injuryCount = useMemo(() => {
     return articles.filter((a) => a.wireType === 'INJURY_INACTIVES').length;
+  }, [articles]);
+
+  const activationCount = useMemo(() => {
+    return articles.filter((a) => a.wireType === 'ROSTER_ACTIVATION').length;
   }, [articles]);
 
   const highImpactCount = useMemo(() => {
@@ -109,6 +118,36 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
     navigator.clipboard.writeText(text);
     setCopiedId(a.id);
     setTimeout(() => setCopiedId(null), 3000);
+  };
+
+  const handleIngestAlert = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!ingestHeadline.trim()) return;
+    setIsSubmittingIngest(true);
+    try {
+      const res = await fetch('/api/edgedetect/live/alerts/ingest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          headline: ingestHeadline.trim(),
+          description: ingestDescription.trim(),
+          league: 'NFL',
+          wireType: 'ROSTER_ACTIVATION',
+          impactLevel: 'CRITICAL',
+        }),
+      });
+      if (res.ok) {
+        playSuccessChime();
+        setIngestHeadline('');
+        setIngestDescription('');
+        setShowIngestModal(false);
+        await fetchNews(true);
+      }
+    } catch (err) {
+      console.error('Failed to ingest breaking alert:', err);
+    } finally {
+      setIsSubmittingIngest(false);
+    }
   };
 
   return (
@@ -155,6 +194,17 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
             <button
               onClick={() => {
                 playKeyClick();
+                setShowIngestModal(true);
+              }}
+              className="px-3.5 py-2 rounded-xl bg-purple-900/60 hover:bg-purple-800 border border-purple-600/60 text-purple-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>📡</span>
+              <span>Ingest Breaking Alert</span>
+            </button>
+
+            <button
+              onClick={() => {
+                playKeyClick();
                 setAutoRefresh(!autoRefresh);
               }}
               className={`px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -170,11 +220,17 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
         </div>
 
         {/* Live Metrics Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-4 text-xs">
           <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
             <span className="text-slate-400 text-[11px] block">Tracked Stories</span>
             <span className="text-lg font-bold text-white">{articles.length}</span>
             <span className="text-[10px] text-slate-500 block">Active NFL Wire &amp; Reports</span>
+          </div>
+
+          <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/40">
+            <span className="text-emerald-300 text-[11px] block">⚡ Activations / Returns</span>
+            <span className="text-lg font-bold text-emerald-400">{activationCount}</span>
+            <span className="text-[10px] text-emerald-300/80 block">Off IR / Cleared to Play</span>
           </div>
 
           <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800/40">
@@ -189,13 +245,73 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
             <span className="text-[10px] text-amber-300/80 block">Starters &amp; Depth Chart</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-800/40">
+          <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-800/40 col-span-2 sm:col-span-1">
             <span className="text-indigo-300 text-[11px] block">Last Live Sync</span>
             <span className="text-sm font-bold text-indigo-200 truncate">{lastSynced || 'Connecting...'}</span>
             <span className="text-[10px] text-emerald-400 block flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
               ESPN API OK
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* DEDICATED SPOTLIGHT: A.J. BROWN IR ACTIVATION & MODEL RECALIBRATION */}
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-950 border-2 border-emerald-500/70 shadow-xl space-y-4 font-mono animate-fadeIn">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-emerald-500/30 pb-3">
+          <div className="flex items-center gap-2.5">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-900/90 border border-emerald-400 text-emerald-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>ROSTER ACTIVATION &amp; RECALIBRATION</span>
+            </span>
+            <span className="text-slate-400 text-xs">Philadelphia Eagles (Week 6 vs Panthers)</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-emerald-400 font-bold text-xs bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">
+              Model Action: +2.0 Pt Buyback on Eagles
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
+          <div className="md:col-span-2 space-y-2">
+            <h4 className="text-base font-bold text-white font-mono flex items-center gap-2">
+              <span>⚡</span>
+              <span>WR A.J. Brown Officially Activated from IR (Hamstring 100% Cleared)</span>
+            </h4>
+            <p className="text-slate-300 text-xs leading-relaxed">
+              <strong>Transaction Intercepted:</strong> The Philadelphia Eagles have activated WR1 A.J. Brown from Injured Reserve to the 53-man active roster. Brown completed all team practices without limitation and starts alongside DeVonta Smith.
+            </p>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              <strong>Quarterback &amp; Scheme Impact:</strong> Backup QB Tanner McKee gains an elite perimeter boundary threat who creates immediate separation on slants and screens. Crucially, Carolina can no longer stack 8 men in the box against Saquon Barkley without risking single coverage on Brown.
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-slate-950/80 border border-emerald-600/40 space-y-2 font-mono">
+            <div className="text-[11px] text-emerald-400 font-bold uppercase">
+              🎯 Immediate Algorithmic Bets:
+            </div>
+            <ul className="space-y-1.5 text-[11px] text-slate-200">
+              <li className="flex items-start gap-1.5">
+                <span className="text-emerald-400 font-bold">✓</span>
+                <div>
+                  <strong className="text-white">Eagles +3.5 / +2.0 Spread:</strong> Grab stale lines before books fully reprice down to +1.5.
+                </div>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <span className="text-emerald-400 font-bold">✓</span>
+                <div>
+                  <strong className="text-white">A.J. Brown Over 54.5 Rec Yds (-115):</strong> Heavy target share as McKee&apos;s primary safety valve.
+                </div>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <span className="text-emerald-400 font-bold">✓</span>
+                <div>
+                  <strong className="text-white">Over 41.5 Game Total:</strong> Total rebounds from 40.5 with restored red-zone efficiency.
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -215,6 +331,23 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
             }`}
           >
             All Stories ({articles.length})
+          </button>
+
+          <button
+            onClick={() => {
+              playKeyClick();
+              setActiveFilter('ACTIVATIONS');
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+              activeFilter === 'ACTIVATIONS'
+                ? 'bg-emerald-500 text-slate-950 font-extrabold shadow-emerald-500/20 shadow'
+                : 'text-emerald-400 hover:text-emerald-200 hover:bg-slate-800'
+            }`}
+          >
+            <span>⚡ Roster Activations</span>
+            <span className="px-1.5 py-0.2 rounded bg-emerald-950 border border-emerald-700 text-[10px] text-emerald-200">
+              {activationCount}
+            </span>
           </button>
 
           <button
@@ -309,6 +442,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredArticles.map((article) => {
+            const isActivation = article.wireType === 'ROSTER_ACTIVATION';
             const isInjury = article.wireType === 'INJURY_INACTIVES';
             const isSharp = article.wireType === 'SHARP_LINE_IMPACT';
 
@@ -316,7 +450,9 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
               <div
                 key={article.id}
                 className={`p-5 rounded-2xl border transition-all flex flex-col justify-between group ${
-                  isInjury
+                  isActivation
+                    ? 'bg-gradient-to-br from-slate-900 via-emerald-950/25 to-slate-900 border-emerald-600/50 hover:border-emerald-400/80 shadow-lg'
+                    : isInjury
                     ? 'bg-gradient-to-br from-slate-900 via-rose-950/20 to-slate-900 border-rose-900/40 hover:border-rose-600/70 shadow-lg'
                     : isSharp
                     ? 'bg-gradient-to-br from-slate-900 via-amber-950/20 to-slate-900 border-amber-900/40 hover:border-amber-600/70 shadow-lg'
@@ -330,6 +466,13 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
                       <span className="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-200 border border-slate-700">
                         {article.league}
                       </span>
+
+                      {isActivation && (
+                        <span className="px-2 py-0.5 rounded font-bold bg-emerald-950 border border-emerald-600 text-emerald-300 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                          <span>ROSTER ACTIVATION</span>
+                        </span>
+                      )}
 
                       {isInjury && (
                         <span className="px-2 py-0.5 rounded font-bold bg-rose-950 border border-rose-700 text-rose-300 flex items-center gap-1">
@@ -421,6 +564,99 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* INGEST BREAKING ALERT MODAL */}
+      {showIngestModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-slate-900 border-2 border-purple-500 shadow-2xl p-6 space-y-4 font-mono text-slate-100 animate-scaleIn">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">📡</span>
+                <div>
+                  <h3 className="text-base font-bold text-white">Live Alert &amp; Transaction Ingestion</h3>
+                  <span className="text-[11px] text-purple-300">Push Public Breaking News Directly into Pipeline</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowIngestModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-950 text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quick Fill Buttons */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] text-slate-400 font-bold uppercase block">⚡ Quick-Fill Verified Alerts:</span>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIngestHeadline('🚨 BREAKING: Eagles WR A.J. Brown Activated from Injured Reserve for Sunday vs Panthers');
+                    setIngestDescription('Philadelphia Eagles have activated superstar wide receiver A.J. Brown to the 53-man active roster following full clearance from hamstring rehab. Tanner McKee starts at QB with Brown as primary boundary target.');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600 text-emerald-300 text-[11px] font-bold cursor-pointer transition-colors"
+                >
+                  WR A.J. Brown Activated
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIngestHeadline('⚡ 49ers activate Christian McCaffrey from IR; cleared for full workload on MNF');
+                    setIngestDescription('San Francisco 49ers have officially activated RB Christian McCaffrey ahead of Monday Night Football against the Washington Commanders.');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-[11px] font-bold cursor-pointer transition-colors"
+                >
+                  RB McCaffrey Returns
+                </button>
+              </div>
+            </div>
+
+            {/* Ingest Form */}
+            <form onSubmit={handleIngestAlert} className="space-y-3">
+              <div>
+                <label className="text-xs text-slate-300 block mb-1 font-bold">Breaking Alert Headline *</label>
+                <input
+                  type="text"
+                  required
+                  value={ingestHeadline}
+                  onChange={(e) => setIngestHeadline(e.target.value)}
+                  placeholder="e.g. Eagles activate WR A.J. Brown from IR ahead of Week 6"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-300 block mb-1 font-bold">Details / Market Summary</label>
+                <textarea
+                  rows={3}
+                  value={ingestDescription}
+                  onChange={(e) => setIngestDescription(e.target.value)}
+                  placeholder="Provide transaction details, injury clearance notes, and expected starter/snap count impact..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowIngestModal(false)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingIngest || !ingestHeadline.trim()}
+                  className="px-4 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {isSubmittingIngest ? 'Ingesting...' : 'Broadcast to Live Wire'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

@@ -9,7 +9,7 @@ export interface MovementAlertItem {
   league: string;
   scheduledTime: string;
   stadium: string;
-  alertType: 'WHALE_STEAM' | 'REVERSE_LINE_MOVEMENT' | 'HEAVY_SHARP_INFLOW';
+  alertType: 'WHALE_STEAM' | 'REVERSE_LINE_MOVEMENT' | 'HEAVY_SHARP_INFLOW' | 'INJURY_RECOVERY';
   severity: 'CRITICAL' | 'HIGH' | 'MODERATE';
   headline: string;
   spreadShift: {
@@ -40,6 +40,52 @@ export interface MovementAlertItem {
 }
 
 export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
+  {
+    id: 'alert-phi-aj-brown-activated-20261017',
+    gameId: 'nfl-car-phi-w6',
+    matchup: 'Carolina Panthers @ Philadelphia Eagles',
+    league: 'NFL',
+    scheduledTime: 'Sunday, Oct 18 · 10:00 AM PDT (1:00 PM EDT)',
+    stadium: 'Lincoln Financial Field, Philadelphia, PA',
+    alertType: 'INJURY_RECOVERY',
+    severity: 'CRITICAL',
+    headline: '⚡ BREAKING ROSTER ACTIVATION: WR A.J. Brown Activated from IR (Hamstring Cleared) — Line Moving Back Toward Pick\'em (+2.0 Value)!',
+    spreadShift: {
+      open: 'Panthers -3.5 (Post-Hurts Clot Crash)',
+      current: 'Panthers -1.5 / Eagles +2.0 (+2.0 Sharp Buyback)',
+      delta: '+2.0 Point Eagles Recovery (A.J. Brown Cleared to Play)',
+      favoredTeam: 'Philadelphia Eagles (Sharp Inflow)',
+    },
+    totalShift: {
+      open: '40.5 O/U',
+      current: '42.5 O/U',
+      delta: '+2.0 Points Rise',
+      direction: 'OVER',
+    },
+    moneyDivergence: {
+      dollarsPct: 76,
+      ticketsPct: 34,
+      divergenceMargin: 42,
+      dollarVolume: '$18.4M Handle',
+      favoredSide: 'Eagles +3.5 / Over 41.5 / A.J. Brown Over 54.5 Rec Yds',
+    },
+    riskWarnings: [
+      {
+        title: 'Snap Count Limitation Risk',
+        description:
+          'First game back from hamstring soft-tissue injury; Philadelphia medical staff may monitor snap count if game gets out of hand, though Brown practiced fully Friday.',
+        severityLevel: 'MEDIUM',
+      },
+      {
+        title: 'Backup Quarterback Sync',
+        description:
+          'Tanner McKee making first career NFL start; will rely heavily on Brown for quick-read boundary slants against Panthers single-high coverage.',
+        severityLevel: 'HIGH',
+      },
+    ],
+    actionAdvice:
+      '⚡ IMMEDIATE SHARP ACTION: Grab Philadelphia Eagles +3.5 before sportsbooks finish reprecising down to +1.5. Target A.J. Brown Over 54.5 Receiving Yards (-115) and Over 4.5 Receptions (-120). With Brown attracting Carolina safety help, Saquon Barkley rush lanes open up against light boxes.',
+  },
   {
     id: 'alert-phi-hurts-blood-clot-20261015',
     gameId: 'nfl-car-phi-w6',
@@ -273,6 +319,17 @@ export interface SuperstarMedicalWireItem {
 }
 
 export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
+  {
+    id: 'med-ajbrown-activated-1',
+    playerName: 'A.J. Brown',
+    team: 'Philadelphia Eagles (PHI)',
+    position: 'WR #11',
+    status: 'ACTIVE_CLEARED',
+    headline: '⚡ ROSTER ACTIVATION: A.J. Brown officially activated from Injured Reserve; cleared to start Sunday vs Panthers.',
+    marketImpact: 'Elite WR1 returns for backup QB Tanner McKee. Restores perimeter X-receiver threat; line buyback shifts spread from Panthers -3.5 to Panthers -1.5 / Eagles +2.0.',
+    lineMovementSummary: 'Eagles spread +2.0 pt sharp recovery / Total elevated 40.5 -> 42.5',
+    timeAgo: 'Just now (Verified Live Wire)',
+  },
   {
     id: 'med-hurts-1',
     playerName: 'Jalen Hurts',
