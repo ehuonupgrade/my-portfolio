@@ -117,7 +117,7 @@ export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewPr
           <div className="p-3 rounded-xl bg-cyan-950/30 border border-cyan-800/40 space-y-0.5">
             <span className="text-cyan-400 text-[10px] uppercase font-bold">Max Conviction Locks</span>
             <div className="text-lg font-bold text-cyan-300">{maxLockCount} Matchups (94%+)</div>
-            <span className="text-[10px] text-cyan-400/80">#1 Ravens &bull; #2 Seahawks</span>
+            <span className="text-[10px] text-cyan-400/80">#1 Ravens &bull; #2 Panthers</span>
           </div>
 
           <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 space-y-0.5">

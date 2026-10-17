@@ -462,13 +462,27 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-3 font-mono text-xs border-t border-slate-800/80">
-            <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-0.5">
-              <span className="text-[10px] text-slate-400 uppercase font-semibold">Today&apos;s #1 Lock</span>
-              <div className="text-emerald-400 font-bold text-sm">Ravens -6.5 (96%)</div>
+            <div
+              onClick={() => {
+                playKeyClick();
+                onSelectGameAndInspect('nfl-bal-cle-w6', 'opinions');
+              }}
+              title="Click to inspect #1 Lock: Baltimore Ravens -3.5"
+              className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-emerald-500/50 transition-all cursor-pointer space-y-0.5 group"
+            >
+              <span className="text-[10px] text-slate-400 group-hover:text-emerald-300 uppercase font-semibold transition-colors">Today&apos;s #1 Lock</span>
+              <div className="text-emerald-400 font-bold text-sm">Ravens -3.5 (96%)</div>
             </div>
-            <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-0.5">
+            <div
+              onClick={() => {
+                playKeyClick();
+                onSelectGameAndInspect('nfl-bal-cle-w6', 'strategy');
+              }}
+              title="Click to inspect Nearest Upcoming Straight Bet: Baltimore Ravens -3.5 (Sunday Oct 18 · 1:00 PM EDT)"
+              className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/50 transition-all cursor-pointer space-y-0.5 group"
+            >
               <span className="text-[10px] text-cyan-400 uppercase font-semibold">Nearest Straight Bet</span>
-              <div className="text-cyan-300 font-bold text-sm">Seahawks -2.5 (TNF)</div>
+              <div className="text-cyan-300 font-bold text-sm">Ravens -3.5 (Sun 1PM)</div>
             </div>
             <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-0.5">
               <span className="text-[10px] text-amber-400 uppercase font-semibold">Radar Alerts</span>
