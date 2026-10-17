@@ -23,6 +23,7 @@ import { LiveVerificationModal } from './LiveVerificationModal';
 import { LiveOddsStreamBadge } from './LiveOddsStreamBadge';
 import { LiveOddsStreamModal } from './LiveOddsStreamModal';
 import { LiveRosterStreamBadge } from './LiveRosterStreamBadge';
+import { GameStatusBadge } from './common/GameStatusBadge';
 import { LiveRosterVerificationModal } from './LiveRosterVerificationModal';
 import { MonteCarloSimulationModal } from './MonteCarloSimulationModal';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
@@ -668,6 +669,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                               <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
                                 {game.awayTeam.city} {game.awayTeam.name} ({game.awayTeam.record}) @ {game.homeTeam.city} {game.homeTeam.name} ({game.homeTeam.record})
                               </h3>
+                              <GameStatusBadge game={game} size="xs" showIcon />
                               <span className="text-xs font-mono text-slate-400">
                                 &bull; {game.scheduledTime}
                               </span>

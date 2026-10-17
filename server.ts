@@ -713,9 +713,11 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
   }
 
   try {
+    console.log(`[Server:SportsFeed] Querying ESPN NFL Scoreboard API at ${new Date().toISOString()}...`);
     const espnRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard');
     const espnData = await espnRes.json();
     const events = espnData.events || [];
+    console.log(`[Server:SportsFeed] Received ${events.length} NFL events from ESPN. Parsing live markets...`);
 
     const formattedGames = events.map((event: any, idx: number) => {
       const comp = event.competitions?.[0] || {};
@@ -737,14 +739,24 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
       const awayScore = Number(awayCompetitor.score) || 0;
       const awayColor = awayCompetitor.team?.color ? `#${awayCompetitor.team.color}` : '#00338d';
 
-      // Parse status
+      // Parse status strictly with state and completion verification
       const statusType = event.status?.type?.name || '';
-      const statusDetail = event.status?.type?.detail || event.status?.type?.shortDetail || 'Upcoming';
+      const statusState = event.status?.type?.state || ''; // 'pre' | 'in' | 'post'
+      const isCompleted = event.status?.type?.completed === true || statusState === 'post' || statusType === 'STATUS_FINAL';
+      const isInProgress = statusState === 'in' || statusType === 'STATUS_IN_PROGRESS' || statusType === 'STATUS_HALFTIME' || statusType === 'STATUS_END_PERIOD';
+      const statusDetail = event.status?.type?.detail || event.status?.type?.shortDetail || (isCompleted ? 'Final' : isInProgress ? 'In Progress' : 'Upcoming');
+
       let marketStatus: 'UPCOMING' | 'LIVE' | 'FINAL' = 'UPCOMING';
-      if (statusType === 'STATUS_FINAL') {
+      let gameStatusCategory: 'Completed' | 'In Progress' | 'Upcoming' = 'Upcoming';
+      if (isCompleted) {
         marketStatus = 'FINAL';
-      } else if (statusType === 'STATUS_IN_PROGRESS' || statusType === 'STATUS_HALFTIME') {
+        gameStatusCategory = 'Completed';
+      } else if (isInProgress) {
         marketStatus = 'LIVE';
+        gameStatusCategory = 'In Progress';
+      } else {
+        marketStatus = 'UPCOMING';
+        gameStatusCategory = 'Upcoming';
       }
 
       // Parse Odds
@@ -852,6 +864,9 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
             logoColor: awayColor,
           },
           scheduledTime: statusDetail,
+          statusDetail,
+          statusState,
+          gameStatusCategory,
           gameDate: event.date,
           stadium: comp.venue?.fullName || 'NFL Stadium',
           status: marketStatus,
@@ -997,6 +1012,11 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
       };
     });
 
+    const completedCount = formattedGames.filter((g: any) => g.status === 'FINAL').length;
+    const inProgressCount = formattedGames.filter((g: any) => g.status === 'LIVE').length;
+    const upcomingCount = formattedGames.filter((g: any) => g.status === 'UPCOMING').length;
+    console.log(`[Server:SportsFeed] Prepared ${formattedGames.length} games. Breakdown: In Progress=${inProgressCount}, Completed=${completedCount}, Upcoming=${upcomingCount}`);
+
     const responsePayload = {
       success: true,
       source: 'Live ESPN Scoreboard & DraftKings Feed',
@@ -1004,6 +1024,12 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
       season: espnData.season,
       week: espnData.week,
       count: formattedGames.length,
+      statusCounts: {
+        total: formattedGames.length,
+        inProgress: inProgressCount,
+        completed: completedCount,
+        upcoming: upcomingCount,
+      },
       games: formattedGames,
     };
 

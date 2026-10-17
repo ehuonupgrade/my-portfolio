@@ -20,6 +20,8 @@ import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
 import { purifyAndRealignGame, auditAllGamesInSlate } from '../utils/gameAlignmentGuard';
 import { useSportsData } from '../context/SportsDataContext';
+import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
+import { ApiFetchDiagnosticsModal } from './common/ApiFetchDiagnosticsModal';
 
 interface SportsBettingEdgeHubProps {
   onBack?: () => void;
@@ -111,7 +113,17 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
     return () => clearInterval(interval);
   }, [liveAutoSync, fetchLiveGames]);
 
-  const { games: contextGames } = useSportsData();
+  const {
+    games: contextGames,
+    fetchCycleCount,
+    fetchSummary,
+    statusFilter,
+    setStatusFilter,
+    statusCounts,
+    refreshLiveData,
+    isLoading: isContextLoading,
+  } = useSportsData();
+  const [isApiDiagnosticsOpen, setIsApiDiagnosticsOpen] = useState<boolean>(false);
 
   // Merge live ESPN & DraftKings feed data into market games with Alignment Guard
   const allAvailableGames = useMemo(() => {
@@ -167,7 +179,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
     }));
   }, [liveGames, contextGames]);
 
-  // Filter games with Closest Upcoming Slate Priority
+  // Filter games with Status Classification & Upcoming Slate Priority
   const filteredGames = useMemo(() => {
     const list = allAvailableGames.filter((g) => {
       if (selectedLeague !== 'ALL' && g.league !== selectedLeague) return false;
@@ -177,23 +189,30 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
         const matchAway = g.awayTeam.name.toLowerCase().includes(q) || g.awayTeam.city.toLowerCase().includes(q);
         if (!matchHome && !matchAway) return false;
       }
+      if (statusFilter !== 'ALL') {
+        const meta = getGameDisplayStatus(g);
+        if (statusFilter === 'IN_PROGRESS' && !meta.isLive) return false;
+        if (statusFilter === 'COMPLETED' && !meta.isCompleted) return false;
+        if (statusFilter === 'UPCOMING' && !meta.isUpcoming) return false;
+      }
       return true;
     });
 
-    // Priority sorting: Closest upcoming slate first, settled/final games at bottom
+    // Priority sorting: In Progress first, Upcoming games next, Completed games at bottom
     return list.sort((a, b) => {
-      const getPriority = (g: GameMarket) => {
-        if (g.status === 'FINAL') return 99;
-        const timeStr = (g.scheduledTime || '').toLowerCase();
-        if (timeStr.includes('tonight') || timeStr.includes('today') || timeStr.includes('oct 13')) return 1;
-        if (timeStr.includes('thursday') || timeStr.includes('oct 15')) return 2;
-        if (timeStr.includes('sunday') || timeStr.includes('oct 18')) return 3;
-        if (timeStr.includes('monday') || timeStr.includes('oct 19')) return 4;
-        return 10;
+      const metaA = getGameDisplayStatus(a);
+      const metaB = getGameDisplayStatus(b);
+      const getPriority = (meta: any) => {
+        if (meta.isLive) return 1;
+        if (meta.isUpcoming) return 2;
+        return 99; // Completed
       };
-      return getPriority(a) - getPriority(b);
+      if (getPriority(metaA) !== getPriority(metaB)) {
+        return getPriority(metaA) - getPriority(metaB);
+      }
+      return 0;
     });
-  }, [allAvailableGames, selectedLeague, searchQuery]);
+  }, [allAvailableGames, selectedLeague, searchQuery, statusFilter]);
 
   // Active Selected Game (guarantees upcoming game focus)
   const activeGame = useMemo(() => {
@@ -760,14 +779,31 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
           <button
-            onClick={() => fetchLiveGames(true)}
-            disabled={isSyncingLive}
+            onClick={() => setIsApiDiagnosticsOpen(true)}
+            className="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-500 text-xs font-mono font-bold text-slate-300 hover:text-white flex items-center gap-2 transition-all cursor-pointer shadow group"
+            title="Inspect Live ESPN Scoreboard API Fetch Cycles, Latency, and Game Status Distribution"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span className="text-white group-hover:text-cyan-300">API Cycle #{fetchCycleCount}</span>
+            <span className="text-slate-600">|</span>
+            <span className="text-emerald-400">{statusCounts.inProgress} Live</span>
+            <span className="text-cyan-400">{statusCounts.upcoming} Up</span>
+            <span className="text-slate-400">{statusCounts.completed} Fin</span>
+            <span className="text-cyan-400 text-[10px] hidden sm:inline">&rarr; Verify</span>
+          </button>
+
+          <button
+            onClick={() => {
+              fetchLiveGames(true);
+              refreshLiveData();
+            }}
+            disabled={isSyncingLive || isContextLoading}
             className="px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow disabled:opacity-50"
           >
-            <span className={isSyncingLive ? 'animate-spin' : ''}>🔄</span>
-            <span>{isSyncingLive ? 'Syncing...' : 'Sync Live Lines'}</span>
+            <span className={isSyncingLive || isContextLoading ? 'animate-spin' : ''}>🔄</span>
+            <span>{isSyncingLive || isContextLoading ? 'Syncing...' : 'Sync Live'}</span>
           </button>
 
           <button
@@ -786,7 +822,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
           </button>
 
           {lastLiveSyncTime && (
-            <span className="text-[11px] text-slate-400 hidden sm:inline">
+            <span className="text-[11px] text-slate-400 hidden lg:inline">
               Synced {lastLiveSyncTime}
             </span>
           )}
@@ -836,12 +872,70 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
             <span>Handle / Bets Volume</span>
           </div>
 
+          {/* Quick Game Status Indicator Tabs */}
+          <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-950 border border-slate-800 text-[10px] font-mono">
+            <button
+              onClick={() => {
+                playKeyClick();
+                setStatusFilter('ALL');
+              }}
+              className={`py-1 rounded-lg text-center font-bold transition-all cursor-pointer ${
+                statusFilter === 'ALL'
+                  ? 'bg-slate-800 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              All ({statusCounts.all})
+            </button>
+            <button
+              onClick={() => {
+                playKeyClick();
+                setStatusFilter('UPCOMING');
+              }}
+              className={`py-1 rounded-lg text-center font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                statusFilter === 'UPCOMING'
+                  ? 'bg-cyan-950 border border-cyan-500 text-cyan-300 shadow-sm'
+                  : 'text-cyan-400 hover:text-cyan-300'
+              }`}
+            >
+              <span>Upcoming</span>
+              <span>({statusCounts.upcoming})</span>
+            </button>
+            <button
+              onClick={() => {
+                playKeyClick();
+                setStatusFilter('IN_PROGRESS');
+              }}
+              className={`py-1 rounded-lg text-center font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                statusFilter === 'IN_PROGRESS'
+                  ? 'bg-emerald-950 border border-emerald-500 text-emerald-300 shadow-sm'
+                  : 'text-emerald-400 hover:text-emerald-300'
+              }`}
+            >
+              <span>Live</span>
+              <span>({statusCounts.inProgress})</span>
+            </button>
+            <button
+              onClick={() => {
+                playKeyClick();
+                setStatusFilter('COMPLETED');
+              }}
+              className={`py-1 rounded-lg text-center font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                statusFilter === 'COMPLETED'
+                  ? 'bg-slate-900 border border-slate-700 text-slate-300 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <span>Final</span>
+              <span>({statusCounts.completed})</span>
+            </button>
+          </div>
+
           <div className="space-y-2.5">
             {filteredGames.map((game) => {
               const isSelected = game.id === activeGameId;
-              const isLive = game.status === 'LIVE';
-              const isFinal = game.status === 'FINAL';
               const hasScores = (game as any).scores && ((game as any).scores.home > 0 || (game as any).scores.away > 0);
+              const meta = getGameDisplayStatus(game);
 
               return (
                 <div
@@ -861,21 +955,11 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                       <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-cyan-400">
                         {game.league}
                       </span>
-                      {isLive ? (
-                        <span className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>LIVE: {game.scheduledTime}</span>
-                        </span>
-                      ) : isFinal ? (
-                        <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-700 text-slate-400">
-                          FINAL
-                        </span>
-                      ) : (
-                        <span>{game.scheduledTime}</span>
-                      )}
+                      <GameStatusBadge game={game} size="xs" showIcon />
+                      <span className="text-[10px] text-slate-400">{game.scheduledTime}</span>
                     </span>
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {isFinal ? (
+                      {meta.isCompleted ? (
                         <span className="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-slate-950 border border-slate-700 text-slate-400">
                           SETTLED &bull; FINAL
                         </span>
@@ -895,7 +979,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                           <span>Rank #{(game as any).displayRank || game.marketOpinions.overallConfidenceRank} ({game.marketOpinions.overallConfidenceScore}%)</span>
                         </span>
                       ) : null}
-                      {game.isPrimeOpportunity && !isFinal && (
+                      {game.isPrimeOpportunity && !meta.isCompleted && (
                         <span className="px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold text-[10px] animate-pulse">
                           ★ PRIME
                         </span>
@@ -977,7 +1061,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                   {/* Line summary & Handle split preview */}
                   <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
                     <div>
-                      <span className="text-slate-500 text-[10px] uppercase">{isFinal ? 'Consensus Line:' : 'Spread / ML:'}</span>{' '}
+                      <span className="text-slate-500 text-[10px] uppercase">{meta.isCompleted ? 'Consensus Line:' : 'Spread / ML:'}</span>{' '}
                       <span className="text-emerald-400 font-bold">{game.consensus.spread}</span>
                     </div>
 
@@ -998,9 +1082,12 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 font-mono">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
               <div>
-                <span className="text-xs text-cyan-400 font-bold uppercase">
-                  {activeGame.league} &bull; {activeGame.scheduledTime}
-                </span>
+                <div className="flex items-center gap-2 flex-wrap pb-1">
+                  <span className="text-xs text-cyan-400 font-bold uppercase">
+                    {activeGame.league} &bull; {activeGame.scheduledTime}
+                  </span>
+                  <GameStatusBadge game={activeGame} size="sm" showIcon />
+                </div>
                 <h3 className="text-xl font-bold text-white font-sans">
                   {activeGame.awayTeam.city} {activeGame.awayTeam.name} vs. {activeGame.homeTeam.city} {activeGame.homeTeam.name}
                 </h3>
@@ -2040,6 +2127,11 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
         lastVerifiedTime={lastVerifiedTime}
         onReverify={reverify}
         isVerifying={isVerifying}
+      />
+      {/* API FETCH CYCLE TELEMETRY & STATUS DIAGNOSTICS MODAL */}
+      <ApiFetchDiagnosticsModal
+        isOpen={isApiDiagnosticsOpen}
+        onClose={() => setIsApiDiagnosticsOpen(false)}
       />
     </div>
   );

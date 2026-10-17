@@ -119,6 +119,11 @@ export interface GameMarket {
   stadium: string;
   weatherCondition?: string;
   status: 'UPCOMING' | 'LIVE' | 'FINAL';
+  gameStatusCategory?: 'In Progress' | 'Completed' | 'Upcoming';
+  statusDetail?: string;
+  gameDate?: string;
+  statusState?: 'pre' | 'in' | 'post';
+  isLiveFeed?: boolean;
   scores?: { home: number; away: number };
   
   // Public Wagering Volume

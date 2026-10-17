@@ -6,6 +6,7 @@ import {
 } from '../data/sportsAnalystsData';
 import { AnalystMarketConsensus, AnalystPick } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
+import { GameStatusBadge } from './common/GameStatusBadge';
 
 interface AnalystConsensusTrackerProps {
   onSelectGame?: (gameId: string) => void;
@@ -236,10 +237,15 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
           <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-700">
                     {activeConsensus.league}
                   </span>
+                  <GameStatusBadge
+                    statusOverride={activeTab === 'history' ? 'Completed' : 'Upcoming'}
+                    size="xs"
+                    showIcon
+                  />
                   <span className="text-xs text-slate-400 font-mono">
                     Tracked Media Analysts: {activeConsensus.totalAnalystsTracked}
                   </span>

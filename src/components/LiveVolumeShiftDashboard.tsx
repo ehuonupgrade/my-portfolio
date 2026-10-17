@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime, playChime } from '../utils/audio';
+import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
 
 interface LiveVolumeShiftDashboardProps {
   games: GameMarket[];
@@ -24,11 +25,11 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
 
   // Active upcoming games only (strictly excluding completed games like TNF & Bills)
   const activeUpcomingGames = useMemo(() => {
-    return games.filter((g) => g.status !== 'FINAL');
+    return games.filter((g) => !getGameDisplayStatus(g).isCompleted);
   }, [games]);
 
   const settledGames = useMemo(() => {
-    return games.filter((g) => g.status === 'FINAL');
+    return games.filter((g) => getGameDisplayStatus(g).isCompleted);
   }, [games]);
 
   const displayedGames = showSettledArchive ? games : activeUpcomingGames;
@@ -347,8 +348,11 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
                   {/* Top Matchup Header */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
                     <div>
-                      <div className="text-[10px] text-cyan-400 font-bold uppercase">
-                        {game.scheduledTime} &bull; {game.stadium.split(',')[0]}
+                      <div className="flex items-center gap-2 flex-wrap pb-1">
+                        <GameStatusBadge game={game} size="xs" showIcon />
+                        <span className="text-[10px] text-cyan-400 font-bold uppercase">
+                          {game.scheduledTime} &bull; {game.stadium.split(',')[0]}
+                        </span>
                       </div>
                       <h4 className="text-base font-bold text-white font-sans flex items-center gap-2">
                         <span>{game.awayTeam.city} {game.awayTeam.name}</span>

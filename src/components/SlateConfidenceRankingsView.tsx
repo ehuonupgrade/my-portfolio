@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { GameMarket } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
+import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
 
 interface SlateConfidenceRankingsViewProps {
   games: GameMarket[];
@@ -20,7 +21,7 @@ export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewPr
   // Sort upcoming to-be-played games strictly by model confidence and re-index sequentially 1..N
   const rankedGames = useMemo(() => {
     // 1. Exclude completed/FINAL games so this view strictly represents TO-BE-PLAYED games
-    const list = games.filter((g) => g.status !== 'FINAL' && g.marketOpinions);
+    const list = games.filter((g) => !getGameDisplayStatus(g).isCompleted && g.marketOpinions);
 
     list.sort((a, b) => {
       const rankA = a.marketOpinions?.overallConfidenceRank ?? 999;
@@ -265,7 +266,8 @@ export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewPr
                     </span>
                   </div>
 
-                  <div className="text-right text-xs">
+                  <div className="flex items-center gap-2 text-xs">
+                    <GameStatusBadge game={game} size="xs" showIcon />
                     <span className="text-slate-400">{game.scheduledTime}</span>
                   </div>
                 </div>

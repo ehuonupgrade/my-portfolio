@@ -12,6 +12,7 @@ import {
 import { GameMarket } from '../types/sportsBetting';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { playKeyClick } from '../utils/audio';
+import { GameStatusBadge } from './common/GameStatusBadge';
 
 interface GameLineMovementViewProps {
   game: GameMarket;
@@ -67,9 +68,10 @@ export const GameLineMovementView: React.FC<GameLineMovementViewProps> = ({ game
             </div>
 
             <div>
-              <div className="flex items-center gap-2 font-mono text-xs text-slate-400">
+              <div className="flex items-center gap-2 font-mono text-xs text-slate-400 flex-wrap">
                 <span>{game.league}</span>
                 <span>&bull;</span>
+                <GameStatusBadge game={game} size="xs" showIcon />
                 <span>{game.scheduledTime}</span>
                 <span>&bull;</span>
                 <span>{game.stadium}</span>
