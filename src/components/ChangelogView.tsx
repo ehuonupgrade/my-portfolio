@@ -113,58 +113,6 @@ export const ChangelogView: React.FC = () => {
         </div>
       </div>
 
-      {/* SYSTEM ALIGNMENT & DATA INTEGRITY STATUS DASHBOARD */}
-      <div className="p-4 rounded-2xl bg-slate-900/80 border border-emerald-900/60 space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
-          <div className="flex items-center gap-2">
-            <span className="text-emerald-400 text-sm">🛡️</span>
-            <span className="text-xs font-bold font-mono uppercase tracking-wider text-white">
-              Data Integrity &amp; Alignment Controls Dashboard
-            </span>
-          </div>
-          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/70 border border-emerald-800/80 px-2 py-0.5 rounded-full">
-            100% AUDIT PASS (11 OF 11 GAMES)
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs">
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1">
-            <div className="text-[10px] text-slate-400 font-mono uppercase font-bold flex items-center justify-between">
-              <span>Roster Wire</span>
-              <span className="text-emerald-400 font-bold">✓ VERIFIED</span>
-            </div>
-            <div className="text-slate-200 font-semibold">Nick Chubb: RETIRED</div>
-            <div className="text-[10px] text-slate-500">Excluded from active injury wire &amp; rosters</div>
-          </div>
-
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1">
-            <div className="text-[10px] text-slate-400 font-mono uppercase font-bold flex items-center justify-between">
-              <span>Panthers @ Eagles</span>
-              <span className="text-emerald-400 font-bold">✓ VERIFIED</span>
-            </div>
-            <div className="text-emerald-400 font-semibold">CAR -3.5 (Total 40.5)</div>
-            <div className="text-[10px] text-slate-500">Zero CLE odds leak; favorite-first syntax</div>
-          </div>
-
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1">
-            <div className="text-[10px] text-slate-400 font-mono uppercase font-bold flex items-center justify-between">
-              <span>Token Tracker</span>
-              <span className="text-cyan-400 font-bold">✓ LIVE OCT 15</span>
-            </div>
-            <div className="text-cyan-300 font-semibold">1,068,400+ Tokens</div>
-            <div className="text-[10px] text-slate-500">Cache bumped to v9; live stream active</div>
-          </div>
-
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-1">
-            <div className="text-[10px] text-slate-400 font-mono uppercase font-bold flex items-center justify-between">
-              <span>Alignment Guard</span>
-              <span className="text-emerald-400 font-bold">✓ ACTIVE</span>
-            </div>
-            <div className="text-slate-200 font-semibold">gameAlignmentGuard.ts</div>
-            <div className="text-[10px] text-slate-500">Automated pre-render multi-layer checks</div>
-          </div>
-        </div>
-      </div>
 
       {/* Version Timeline */}
       <div className="space-y-6">

@@ -1,5 +1,53 @@
 [
   {
+    "version": "v0.9.21",
+    "date": "October 16, 2026",
+    "title": "Nearest Straight Bet Kickoff Realignment & Ravens Spread Parity",
+    "summary": "Resolved hero metric and betting portfolio inconsistencies across the EdgeDetect dashboard. Realigned the 'Nearest Straight Bet' indicator from the already-concluded Thursday Night Football game (Seattle Seahawks @ Denver Broncos, DEN 17, SEA 14) to the true nearest upcoming kickoff on the active board: Sunday, Oct 18 · 1:00 PM EDT (Baltimore Ravens -3.5 Point Spread). Corrected the 'Today's #1 Lock' hero line from an outdated -6.5 remnant to the verified live consensus line of Ravens -3.5, reflecting Lamar Jackson's confirmed absence. Purged completed Thursday legs from the 4-Team +13 Monster Teaser and Single Game Straight Deck, repopulating with active Sunday/Monday games. Removed static, hardcoded data integrity test banners from the changelog interface.",
+    "tag": "Slate Synchronization & Market Parity",
+    "changes": [
+      {
+        "type": "cleanup",
+        "description": "Nearest Straight Bet Hero Realignment: Replaced concluded Thursday Night Football (Seahawks -2.5) with true nearest upcoming slate game: Baltimore Ravens -3.5 Point Spread (Sunday, Oct 18 · 1:00 PM EDT)."
+      },
+      {
+        "type": "cleanup",
+        "description": "Ravens Line Parity (-3.5): Synchronized Today's #1 Lock hero metric, 5m/15m/1h live market pulses, and whale buy indicators from stale -6.5 to live consensus -3.5 across all feeds."
+      },
+      {
+        "type": "feature",
+        "description": "Teaser & Portfolio Slate Purge: Purged completed Thursday TNF legs from the 4-Team +13 Monster Teaser and Single Bet Deck, realigning all selections across active Sunday/Monday matchups (BAL +9.5, Under 54.5, CAR -3.5, KC +4.5, SF +5.5)."
+      },
+      {
+        "type": "cleanup",
+        "description": "Removed Hardcoded Data Integrity Banner: Eliminated the static, retrospective test checklist from ChangelogView to keep the changelog focused strictly on genuine version chronology."
+      }
+    ],
+    "commits": ["e4a8f12", "c7b39d0"]
+  },
+  {
+    "version": "v0.9.20",
+    "date": "October 16, 2026",
+    "title": "Lamar Jackson Injury Narrative Isolation & Inactive Threat Guard",
+    "summary": "Investigated and eliminated contradictory analytical commentary describing Lamar Jackson as an active offensive threat and zone-read runner while officially designated as OUT (sprained left ankle). Built an automated Inactive Player Narrative Guard in gameAlignmentGuard.ts that scans all divergence notices, strategy rationales, and analyst opinions to ensure players ruled OUT or placed on IR are never described as active game-day threats. Aligned Ravens offensive strategy around Derrick Henry power-gap rushing in 20mph Lake Erie shoreline winds with Tyler Huntley managing under center.",
+    "tag": "Roster & Narrative Integrity",
+    "changes": [
+      {
+        "type": "infra",
+        "description": "Inactive Player Narrative Guard: Implemented automated AST/corpus validation in gameAlignmentGuard.ts to flag and auto-purify stale tactical commentary referencing OUT/IR players as active threats."
+      },
+      {
+        "type": "cleanup",
+        "description": "Narrative Synchronization for BAL @ CLE: Updated sportsBettingData.ts, nflMarketOpinionsData.ts, sportsAnalystsData.ts, and bettingTrackerStore.ts to reflect Tyler Huntley starting and Derrick Henry leading the ground attack."
+      },
+      {
+        "type": "feature",
+        "description": "Dynamic Weather & Game-Manager Script: Modeled Ravens offensive plan against Cleveland front seven around heavy run volume and clock management in sustained 18-24 mph shoreline crosswinds."
+      }
+    ],
+    "commits": ["d2e5a76", "b1f4c93"]
+  },
+  {
     "version": "v0.9.19",
     "date": "October 15, 2026",
     "title": "All-Game Sportsbook Realignment & Multi-Level Alignment Guard Matrix",
