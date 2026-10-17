@@ -2,17 +2,17 @@
   {
     "version": "v0.9.25",
     "date": "October 17, 2026",
-    "title": "Live NFL Transaction & Roster Activation Ingestion Engine (A.J. Brown IR Return Recalibration)",
-    "summary": "Enhanced the live news wire and betting intelligence pipeline to intercept breaking player transactions and IR activations in real time. Expanded keyword classification to detect activations from Injured Reserve, clearance reports, and return-to-practice designations. Integrated a dedicated live breaking alert for Philadelphia Eagles WR A.J. Brown being activated from IR for Sunday's matchup vs Panthers, dynamically recomputing the market: capturing a +2.0 point sharp spread buyback on the Eagles (CAR -3.5 recovering to CAR -2.0 / PHI +2.0), lifting game total from 40.5 to 42.0+, and prioritizing high-EV player props on A.J. Brown (Over 54.5 Rec Yds) and Saquon Barkley (facing light boxes). Added an interactive Alert Ingestion Gateway on both server.ts and the UI allowing users to broadcast breaking public alerts into the model pipeline.",
+    "title": "A.J. Brown (New England Patriots) IR Activation & Market Recalibration vs Jets",
+    "summary": "Enhanced the live news wire and betting intelligence pipeline to intercept breaking player transactions and IR activations in real time. Corrected roster attribution: All-Pro WR A.J. Brown plays for the New England Patriots (acquired via blockbuster trade on June 1, 2026, reuniting with head coach Mike Vrabel). Following his 4-week high ankle sprain rehabilitation from Week 1, Brown was officially activated from IR on Saturday, October 17, 2026 for Sunday's Week 6 clash against the New York Jets at Gillette Stadium. Recalibrated Patriots betting lines with sharp steam moving New England from +1.5/PK to -2.5, total elevating from 39.5 to 41.5, and highlighting A.J. Brown player props.",
     "tag": "Live Ingestion & Market Recalibration",
     "changes": [
       {
         "type": "feature",
-        "description": "IR Activation Detection Engine: Expanded keyword categorization across backend and client to detect 'activate', 'activated', 'from IR', 'off IR', and 'cleared to play', assigning high-priority CRITICAL tags."
+        "description": "Patriots WR1 Roster Alignment: Aligned all roster databases, transaction feeds, and medical wires with A.J. Brown's New England Patriots status (traded from Philadelphia June 1, 2026 to reunite with Mike Vrabel)."
       },
       {
         "type": "feature",
-        "description": "A.J. Brown Breaking Activation Alert & Recalibration: Added live spotlight and movement alert reflecting A.J. Brown's return from IR, triggering a +2.0 point line recovery on the Eagles and Over 41.5 total adjustment."
+        "description": "A.J. Brown Activation Wire vs NY Jets: Added live spotlight and movement alert reflecting A.J. Brown's return from IR, triggering a +2.5 point line steam on the Patriots (-2.5) and Over 41.5 total adjustment."
       },
       {
         "type": "feature",
@@ -20,7 +20,7 @@
       },
       {
         "type": "feature",
-        "description": "Recalibrated Bet Recommendations: Updated Carolina @ Philadelphia market opinions with high-conviction contrarian buy on Eagles (+3.5 stale / +2.0 live) and A.J. Brown receiving props."
+        "description": "Recalibrated Bet Recommendations: Featured New England Patriots -2.0 / -2.5 and A.J. Brown Over 54.5 Receiving Yards against the New York Jets."
       }
     ],
     "commits": ["c94d12a"]

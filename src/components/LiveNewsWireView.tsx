@@ -264,12 +264,12 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
               <span>ROSTER ACTIVATION &amp; RECALIBRATION</span>
             </span>
-            <span className="text-slate-400 text-xs">Philadelphia Eagles (Week 6 vs Panthers)</span>
+            <span className="text-slate-400 text-xs">New England Patriots (Week 6 vs New York Jets)</span>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-emerald-400 font-bold text-xs bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">
-              Model Action: +2.0 Pt Buyback on Eagles
+              Model Action: +2.5 Pt Steam on Patriots (-2.5)
             </span>
           </div>
         </div>
@@ -278,13 +278,13 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
           <div className="md:col-span-2 space-y-2">
             <h4 className="text-base font-bold text-white font-mono flex items-center gap-2">
               <span>⚡</span>
-              <span>WR A.J. Brown Officially Activated from IR (Hamstring 100% Cleared)</span>
+              <span>WR A.J. Brown Officially Activated from IR (High Ankle Sprain 100% Cleared)</span>
             </h4>
             <p className="text-slate-300 text-xs leading-relaxed">
-              <strong>Transaction Intercepted:</strong> The Philadelphia Eagles have activated WR1 A.J. Brown from Injured Reserve to the 53-man active roster. Brown completed all team practices without limitation and starts alongside DeVonta Smith.
+              <strong>Transaction Intercepted:</strong> The New England Patriots have activated WR1 A.J. Brown from Injured Reserve to the 53-man active roster. Acquired via blockbuster trade from Philadelphia on June 1, 2026 (reuniting with head coach Mike Vrabel), Brown completed all team practices without limitation and starts Sunday at Gillette Stadium against the New York Jets.
             </p>
             <p className="text-slate-400 text-[11px] leading-relaxed">
-              <strong>Quarterback &amp; Scheme Impact:</strong> Backup QB Tanner McKee gains an elite perimeter boundary threat who creates immediate separation on slants and screens. Crucially, Carolina can no longer stack 8 men in the box against Saquon Barkley without risking single coverage on Brown.
+              <strong>Offensive &amp; Scheme Impact:</strong> Head coach Mike Vrabel regains his premier WR1 alpha playmaker who commands safety help and transforms New England&apos;s passing attack. Crucially, the Jets secondary can no longer stack 8 men in the box without leaving single coverage on Brown on boundary vertical and intermediate routes.
             </p>
           </div>
 
@@ -296,19 +296,19 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-400 font-bold">✓</span>
                 <div>
-                  <strong className="text-white">Eagles +3.5 / +2.0 Spread:</strong> Grab stale lines before books fully reprice down to +1.5.
+                  <strong className="text-white">Patriots -2.0 / -2.5 Spread:</strong> Back New England at home before books push across key number -3.0.
                 </div>
               </li>
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-400 font-bold">✓</span>
                 <div>
-                  <strong className="text-white">A.J. Brown Over 54.5 Rec Yds (-115):</strong> Heavy target share as McKee&apos;s primary safety valve.
+                  <strong className="text-white">A.J. Brown Over 54.5 Rec Yds (-115):</strong> Heavy target share as Mike Vrabel&apos;s primary boundary target.
                 </div>
               </li>
               <li className="flex items-start gap-1.5">
                 <span className="text-emerald-400 font-bold">✓</span>
                 <div>
-                  <strong className="text-white">Over 41.5 Game Total:</strong> Total rebounds from 40.5 with restored red-zone efficiency.
+                  <strong className="text-white">Over 40.5 Game Total:</strong> Total rebounds from 39.5 with restored perimeter explosiveness.
                 </div>
               </li>
             </ul>
@@ -594,8 +594,8 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setIngestHeadline('🚨 BREAKING: Eagles WR A.J. Brown Activated from Injured Reserve for Sunday vs Panthers');
-                    setIngestDescription('Philadelphia Eagles have activated superstar wide receiver A.J. Brown to the 53-man active roster following full clearance from hamstring rehab. Tanner McKee starts at QB with Brown as primary boundary target.');
+                    setIngestHeadline('🚨 BREAKING: Patriots WR A.J. Brown Activated from Injured Reserve for Sunday vs Jets');
+                    setIngestDescription('New England Patriots have activated superstar wide receiver A.J. Brown to the 53-man active roster following high ankle sprain rehab. Acquired via trade from Philadelphia June 1, 2026 to reunite with Mike Vrabel, Brown starts Sunday against the Jets.');
                   }}
                   className="px-2.5 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-600 text-emerald-300 text-[11px] font-bold cursor-pointer transition-colors"
                 >
@@ -623,7 +623,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
                   required
                   value={ingestHeadline}
                   onChange={(e) => setIngestHeadline(e.target.value)}
-                  placeholder="e.g. Eagles activate WR A.J. Brown from IR ahead of Week 6"
+                  placeholder="e.g. Patriots activate WR A.J. Brown from IR ahead of Week 6 vs Jets"
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400"
                 />
               </div>

@@ -105,12 +105,12 @@ export async function fetchLiveNewsWithFallback(): Promise<{
       league: 'NFL',
       wireType: 'ROSTER_ACTIVATION',
       impactLevel: 'CRITICAL',
-      headline: '🚨 BREAKING: Eagles WR A.J. Brown Activated from Injured Reserve for Sunday vs Panthers',
-      description: 'Philadelphia Eagles have officially activated superstar wide receiver A.J. Brown to the 53-man active roster following hamstring rehab. Brown practiced without limitations and is cleared to start with backup QB Tanner McKee.',
+      headline: '🚨 BREAKING: Patriots WR A.J. Brown Activated from Injured Reserve for Sunday vs Jets',
+      description: 'New England Patriots have officially activated superstar wide receiver A.J. Brown to the 53-man active roster following high ankle sprain rehab. Acquired via trade from Philadelphia on June 1, 2026 (reuniting with head coach Mike Vrabel), Brown is cleared to play Sunday against the New York Jets.',
       publishedAt: new Date().toISOString(),
-      categories: ['NFL', 'Philadelphia Eagles', 'Transactions', 'Injury Recovery'],
+      categories: ['NFL', 'New England Patriots', 'Transactions', 'Injury Recovery'],
       imageUrl: 'https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/4047646.png&w=350&h=254',
-      linkUrl: 'https://www.espn.com/nfl/team/_/name/phi/philadelphia-eagles',
+      linkUrl: 'https://www.patriots.com',
       byline: 'NFL Transaction Wire & Beat Reports',
     });
 

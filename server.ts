@@ -8,7 +8,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const isProd = process.env.NODE_ENV === 'production';
+const PORT = isProd ? Number(process.env.PORT) || 3000 : 3000;
 
 app.use(express.json());
 
@@ -1175,21 +1176,21 @@ app.get(['/api/edgedetect/live/news', '/api/linepulse/live/news'], async (req, r
         league: 'NFL',
         wireType: 'ROSTER_ACTIVATION',
         impactLevel: 'CRITICAL',
-        headline: '🚨 BREAKING: Eagles WR A.J. Brown Activated from Injured Reserve for Sunday vs Panthers',
-        description: 'Philadelphia Eagles have officially activated superstar wide receiver A.J. Brown to the 53-man active roster following hamstring rehab. Brown practiced without limitations and is cleared to start with backup QB Tanner McKee.',
+        headline: '🚨 BREAKING: Patriots WR A.J. Brown Activated from Injured Reserve for Sunday vs Jets',
+        description: 'New England Patriots have officially activated superstar wide receiver A.J. Brown to the 53-man active roster following high ankle sprain rehab. Acquired via trade from Philadelphia on June 1, 2026 (reuniting with head coach Mike Vrabel), Brown is cleared to play Sunday against the New York Jets.',
         publishedAt: new Date().toISOString(),
-        categories: ['NFL', 'Philadelphia Eagles', 'Transactions', 'Injury Recovery'],
+        categories: ['NFL', 'New England Patriots', 'Transactions', 'Injury Recovery'],
         imageUrl: 'https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/4047646.png&w=350&h=254',
-        linkUrl: 'https://www.espn.com/nfl/team/_/name/phi/philadelphia-eagles',
+        linkUrl: 'https://www.patriots.com',
         byline: 'NFL Transaction Wire & Beat Reports',
       },
       {
-        id: 'news-nfl-panthers-phi-market-shift',
+        id: 'news-nfl-patriots-jets-market-shift',
         league: 'NFL',
         wireType: 'SHARP_LINE_IMPACT',
         impactLevel: 'CRITICAL',
-        headline: '⚡ MARKET REACTION: A.J. Brown return triggers sharp buyback on Eagles (+2.0 pt line recovery)',
-        description: 'Following A.J. Brown activation confirmation, syndicates moved fast to grab stale Eagles +3.5 lines, driving the consensus spread down toward Panthers -1.5 / Eagles +2.0. Total moved up 40.5 -> 42.5.',
+        headline: '⚡ MARKET REACTION: A.J. Brown return triggers sharp steam on Patriots vs Jets (+2.5 pt shift)',
+        description: 'Following A.J. Brown activation confirmation, syndicates moved aggressively to back the Patriots at Gillette Stadium, driving New England lines as Mike Vrabel gets his premier WR1 back on the field.',
         publishedAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
         categories: ['NFL', 'Market Shift', 'Sharp Action'],
         imageUrl: null,
@@ -1286,12 +1287,10 @@ app.get(['/api/edgedetect/live/status', '/api/linepulse/live/status'], (req, res
 
 // ----------------- VITE MIDDLEWARE SETUP -----------------
 async function startServer() {
-  const isProd = process.env.NODE_ENV === 'production';
-
   if (!isProd) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: false },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -1303,8 +1302,12 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://0.0.0.0:${PORT} (isProd: ${isProd})`);
+  });
+
+  server.on('error', (err: any) => {
+    console.error('Server listen error:', err);
   });
 }
 
