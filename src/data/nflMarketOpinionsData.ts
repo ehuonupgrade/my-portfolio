@@ -31,7 +31,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceStars: 5,
       verdict: 'STRONG_BUY',
       selectionSummary: 'Laying under a field goal against 31st-ranked pass offense in sustained 20mph gusts.',
-      rationale: 'The weather forecast calls for sustained 18–24 mph shoreline winds off Lake Erie, which historically degrades deep passing completion rates below 32%. Deshaun Watson has struggled with pocket processing, taking sacks at a league-high 11.2% rate. Conversely, Baltimore ranks #1 in rushing EPA behind Derrick Henry and Lamar Jackson, an offensive profile impervious to cold wind. Cleveland\'s defensive front is missing starting safety Ronnie Hickman and linebacker Jordan Hicks, leaving second-level gaps that Baltimore will systematically exploit.',
+      rationale: 'The weather forecast calls for sustained 18–24 mph shoreline winds off Lake Erie, which historically degrades deep passing completion rates below 32%. Deshaun Watson has struggled with pocket processing, taking sacks at a league-high 11.2% rate. Conversely, Baltimore ranks #1 in rushing EPA behind Derrick Henry\'s north-south ground attack, an offensive profile tailored for Lake Erie cold wind with Lamar Jackson OUT (sprained ankle) and Tyler Huntley managing under center. Cleveland\'s defensive front is missing starting safety Ronnie Hickman and linebacker Jordan Hicks, leaving second-level gaps that Baltimore will systematically exploit.',
     },
     moneylineOpinion: {
       betType: 'MONEYLINE',

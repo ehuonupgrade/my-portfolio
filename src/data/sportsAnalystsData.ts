@@ -609,7 +609,7 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         confidenceRating: 4,
         publishedTime: 'Oct 15 · 7:30 AM PST',
         rationale:
-          'Lamar Jackson and Derrick Henry zone-read mesh will tire out Cleveland front seven by the 4th quarter.',
+          'With Lamar Jackson officially ruled OUT, Todd Monken leans into Derrick Henry power-gap runs to control the clock and wear down Cleveland\'s front seven in 20 mph winds.',
         isContrarianFadeTarget: false,
       },
       {

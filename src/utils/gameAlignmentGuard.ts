@@ -267,6 +267,40 @@ export function auditGameAlignment(game: GameMarket): GameAuditDetail {
     }
   }
 
+  // Inactive Player Threat & Rationale Alignment Guard:
+  // Any player officially ruled OUT or on IR must NEVER be referenced as an active on-field weapon/threat
+  // in betting rationales, syndicate divergence notices, or prime strategy discrepancies.
+  const outPlayers = allInjuredPlayers.filter((p) => p.status === 'OUT' || p.status === 'IR');
+  const narrativeCorpus = [
+    game.splits?.spread?.away?.divergenceNotice || '',
+    game.splits?.spread?.home?.divergenceNotice || '',
+    game.primeStrategy?.keyDiscrepancy || '',
+    ...(game.primeStrategy?.legs?.map((l) => l.rationale) || []),
+  ].join(' ');
+
+  for (const outPlayer of outPlayers) {
+    const lastName = outPlayer.player.split(' ').pop() || outPlayer.player;
+    if (narrativeCorpus.includes(lastName)) {
+      const isDescribedAsActive =
+        narrativeCorpus.includes(`${lastName} mobile`) ||
+        narrativeCorpus.includes(`${lastName} pressure`) ||
+        narrativeCorpus.includes(`${lastName} ground`) ||
+        narrativeCorpus.includes(`${lastName} run`) ||
+        narrativeCorpus.includes(`${lastName} dual-threat`);
+      const hasOutClarification =
+        narrativeCorpus.includes(`${lastName} OUT`) ||
+        narrativeCorpus.includes(`${lastName} is OUT`) ||
+        narrativeCorpus.includes(`${outPlayer.player} OUT`);
+
+      if (isDescribedAsActive && !hasOutClarification) {
+        rosterInjuryAligned = false;
+        notes.push(
+          `Integrity Violation: ${outPlayer.player} is ruled ${outPlayer.status} on injury wire but referenced in game strategy narrative as an active offensive threat.`
+        );
+      }
+    }
+  }
+
   // 5. Cross Contamination Free check
   let crossContaminationFree = true;
   // If game is Panthers @ Eagles, Browns or CLE odds cannot be present
@@ -391,6 +425,23 @@ export function purifyAndRealignGame(game: GameMarket): GameMarket {
       moneylineHome: 154,
       moneylineAway: -185,
     }));
+  }
+
+  // Auto-purify inactive player narrative references for Baltimore or any game where key QB is ruled OUT
+  const allInjuries = [...(cleaned.injuries?.homeInjuries || []), ...(cleaned.injuries?.awayInjuries || [])];
+  const isLamarOut = allInjuries.some(
+    (p) => p.player.toLowerCase().includes('lamar') && (p.status === 'OUT' || p.status === 'IR')
+  );
+
+  if (isLamarOut && cleaned.primeStrategy) {
+    if (cleaned.primeStrategy.keyDiscrepancy.includes('Lamar Jackson mobile')) {
+      cleaned.primeStrategy.keyDiscrepancy =
+        'Whale Handle Inflow (+32% money gap): 78% of handle backing Baltimore on 66% of tickets. Browns turnover-prone offense against Ravens top-ranked rushing EPA with Derrick Henry carrying full workload, while Lamar Jackson is OUT (sprained ankle) and Tyler Huntley starts.';
+    }
+    if (cleaned.splits?.spread?.away?.divergenceNotice?.includes('Lamar Jackson & Derrick Henry ground attack')) {
+      cleaned.splits.spread.away.divergenceNotice =
+        'Syndicate Steam (+44% divergence): 78% of handle on Ravens -3.5 behind Derrick Henry ground attack and Tyler Huntley game-manager script in 18-24 mph Lake Erie crosswinds with Lamar Jackson OUT.';
+    }
   }
 
   return cleaned;

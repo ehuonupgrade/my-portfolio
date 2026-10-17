@@ -63,7 +63,7 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
           totalTicketsCount: 141520,
           totalHandleAmount: 21605000,
           sharpSignal: 'HEAVY_SHARP',
-          divergenceNotice: 'Syndicate Steam (+44% divergence): 78% of handle on Ravens -3.5 behind Lamar Jackson & Derrick Henry ground attack.',
+          divergenceNotice: 'Syndicate Steam (+44% divergence): 78% of handle on Ravens -3.5 behind Derrick Henry ground attack and Tyler Huntley game-manager script in 18-24 mph Lake Erie crosswinds with Lamar Jackson OUT.',
         },
       },
       moneyline: {
@@ -217,7 +217,7 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
       expectedValue: 9.2,
       confidenceScore: 92,
       totalHandleAnalyzed: '$24.5M Aggregate Handle',
-      keyDiscrepancy: 'Whale Handle Inflow (+32% money gap): 78% of handle backing Baltimore on 66% of tickets. Browns turnover-prone offense facing Lamar Jackson mobile pressure in 18-24 mph Lake Erie wind conditions.',
+      keyDiscrepancy: 'Whale Handle Inflow (+32% money gap): 78% of handle backing Baltimore on 66% of tickets. Browns turnover-prone offense against Ravens top-ranked rushing EPA with Derrick Henry carrying full workload, while Lamar Jackson is OUT (sprained ankle) and Tyler Huntley starts.',
       legs: [
         {
           id: 'prime-bal-1',
@@ -231,7 +231,7 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
           bestSportsbook: 'DraftKings / Circa Sports',
           impliedProb: 52.4,
           modelEdge: 7.4,
-          rationale: 'Whale money advantage backing Baltimore road favorite. Lamar Jackson & Derrick Henry 180+ combined rushing yards EPA.',
+          rationale: 'Whale money advantage backing Baltimore road favorite. Derrick Henry 25+ touch game script with Tyler Huntley starting under center with Lamar Jackson OUT (sprained ankle).',
         },
         {
           id: 'prime-bal-2',
@@ -2083,7 +2083,7 @@ export const DAILY_SLATE_PORTFOLIOS: DailySlatePortfolio[] = [
       expectedValue: 9.2,
       confidenceScore: 92,
       daySpanNote: 'Nearest Upcoming NFL Game: Sunday, Oct 18 · 1:00 PM EDT (Cleveland Browns Stadium)',
-      keyDiscrepancy: 'Whale Handle Divergence (+32% money gap): 74% of total handle backing Baltimore road favorite on only 42% of tickets. Browns defense vulnerable to Lamar Jackson mobile run/pass options in Lake Erie winds.',
+      keyDiscrepancy: 'Whale Handle Divergence (+32% money gap): 74% of total handle backing Baltimore road favorite on only 42% of tickets. Browns defense facing heavy Derrick Henry power-run volume with Lamar Jackson OUT (sprained ankle) and Tyler Huntley managing the offense in Lake Erie winds.',
       legs: [
         {
           id: 'single-leg-1',

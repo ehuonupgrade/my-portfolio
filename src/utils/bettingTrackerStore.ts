@@ -307,7 +307,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestSportsbook: 'DraftKings',
         status: 'PENDING',
         finalScore: 'Scheduled: Sun Oct 18 · 1:00 PM EDT',
-        rationale: 'Divisional road mismatch: Lamar Jackson mobile offense against Browns turnover-prone game script in lake winds.',
+        rationale: 'Divisional road mismatch: Derrick Henry ground-and-pound and Ravens defense against Browns turnover-prone offense in Lake Erie winds (Lamar Jackson OUT - sprained ankle).',
       },
       {
         id: 'leg-20261013-parlay-3',
