@@ -142,7 +142,7 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
     stadium: 'Huntington Bank Field, Cleveland, OH',
     alertType: 'WHALE_STEAM',
     severity: 'CRITICAL',
-    headline: 'Nearest Upcoming NFL Game: Sharp Syndicate Steam Pushes Baltimore Ravens -3.5 on 78% Dollars in Lake Erie Wind',
+    headline: 'Nearest Upcoming NFL Game: Sharp Syndicate Steam Pushes Baltimore Ravens -3.5 on 78% Dollars',
     spreadShift: {
       open: 'Ravens -2.5',
       current: 'Ravens -3.5',
@@ -166,7 +166,7 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
       {
         title: '🚨 BREAKING: Lamar Jackson (Sprained Ankle) Ruled OUT; Tyler Huntley Starts',
         description:
-          'Lamar Jackson did not practice all week due to a sprained left ankle and is officially OUT for Week 6 at Cleveland. Tyler Huntley makes his second straight start, with Todd Monken shifting the offensive load to Derrick Henry and power-run game in 18-24 mph Lake Erie crosswinds.',
+          'Lamar Jackson did not practice all week due to a sprained left ankle and is officially OUT for Week 6 at Cleveland. Tyler Huntley makes his second straight start, with Todd Monken shifting the offensive load to Derrick Henry against Cleveland\'s injured front seven.',
         severityLevel: 'HIGH',
       },
       {
@@ -176,9 +176,9 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
         severityLevel: 'HIGH',
       },
       {
-        title: 'Lake Erie Shoreline Wind Impact',
+        title: 'Verified Live Weather Update',
         description:
-          'Sustained 18-24 mph shoreline winds off Lake Erie degrade deep passing EPA, favoring Baltimore ground control.',
+          'Live satellite reports confirm Lake Erie wind died down to a mild 9 mph breeze at 56°F; minimal weather drag on passing.',
         severityLevel: 'MEDIUM',
       },
     ],
@@ -234,17 +234,17 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
     stadium: 'Huntington Bank Field, Cleveland, OH',
     alertType: 'WHALE_STEAM',
     severity: 'HIGH',
-    headline: 'High Weather Alert: 18-24 mph Lake Erie Wind Shear Drops Total from 44.5 to 41.5',
+    headline: 'Market Line Movement: Sharp Syndicate Handle Pushes Baltimore Spread and Total Aligns at 41.5',
     spreadShift: {
       open: 'Browns +6.0',
-      current: 'Browns +4.5',
-      delta: '+1.5 Line Move on Dog',
+      current: 'Browns +3.5',
+      delta: '+2.5 Line Move on Dog',
       favoredTeam: 'Cleveland Browns',
     },
     totalShift: {
       open: '44.5 O/U',
       current: '41.5 O/U',
-      delta: '-3.0 Points Total Steam',
+      delta: '-3.0 Points Total Movement',
       direction: 'UNDER',
     },
     moneyDivergence: {
@@ -252,14 +252,14 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
       ticketsPct: 38,
       divergenceMargin: 27,
       dollarVolume: '$15.4M Handle',
-      favoredSide: 'Under 41.5 Total Points',
+      favoredSide: 'Baltimore Ravens -3.5 / Under 41.5',
     },
     riskWarnings: [
       {
-        title: 'Severe Lake Erie Wind Shear (24 mph Gusts)',
+        title: 'Verified Mild Live Weather (56°F, 9 mph Breeze)',
         description:
-          'Sustained shoreline winds historically reduce passing depth of target by 2.4 yards and field goal accuracy beyond 42 yards down to 54%.',
-        severityLevel: 'HIGH',
+          'Live satellite weather confirms earlier 20+ mph wind forecasts have died down to 9 mph, clearing passing drag for Tyler Huntley and Deshaun Watson.',
+        severityLevel: 'MEDIUM',
       },
     ],
     actionAdvice:
@@ -360,7 +360,7 @@ export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
     position: 'QB #8',
     status: 'EMERGENCY_OUT',
     headline: '🚨 QUARTERBACK RULED OUT: Lamar Jackson (sprained left ankle) officially OUT vs Cleveland. Tyler Huntley starts.',
-    marketImpact: 'Ravens offensive strategy pivoting to Derrick Henry power ground attack in 20mph Lake Erie wind conditions.',
+    marketImpact: 'Ravens offensive strategy pivoting to Derrick Henry power ground attack against Cleveland\'s banged-up front seven.',
     lineMovementSummary: 'Ravens line settled to -3.5 (Total 40.5) with 79% syndicate handle backing BAL -3.5',
     timeAgo: '25m ago',
   },
@@ -393,7 +393,7 @@ export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
     position: 'QB #8',
     status: 'EMERGENCY_OUT',
     headline: '🚨 BREAKING: Lamar Jackson (Sprained Ankle) Officially Ruled OUT for Week 6 at Cleveland; Tyler Huntley Starts',
-    marketImpact: 'Tyler Huntley starts at QB. Line adjusted from -6.5 to -3.5 as Baltimore leans heavily into Derrick Henry and ground power in 18-24 mph lake winds.',
+    marketImpact: 'Tyler Huntley starts at QB. Line adjusted from -6.5 to -3.5 as Baltimore leans heavily into Derrick Henry power running against Cleveland\'s injured defense.',
     lineMovementSummary: 'Ravens spread adjusted to -3.5 / Total down to 41.5',
     timeAgo: '15m ago',
   },

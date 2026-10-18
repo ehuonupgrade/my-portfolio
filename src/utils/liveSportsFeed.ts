@@ -404,19 +404,19 @@ export async function fetchLiveGamesWithFallback(): Promise<{
         },
         weatherForecast: {
           isDome: comp.venue?.indoor === true,
-          temperature: comp.venue?.indoor ? '72°F' : homeAbbr === 'DEN' ? '54°F' : homeAbbr === 'CLE' ? '48°F' : '60°F',
-          conditions: comp.venue?.indoor ? 'Climate-Controlled Dome' : homeAbbr === 'CLE' ? 'Lake Erie Gusts' : 'Clear Autumn Air',
-          wind: comp.venue?.indoor ? '0 mph' : homeAbbr === 'CLE' ? '18-24 mph NW' : '6-10 mph',
+          temperature: comp.venue?.indoor ? '72°F' : homeAbbr === 'DEN' ? '54°F' : homeAbbr === 'CLE' ? '56°F' : '60°F',
+          conditions: comp.venue?.indoor ? 'Climate-Controlled Dome' : homeAbbr === 'CLE' ? 'Mild Shoreline Breeze' : 'Clear Autumn Air',
+          wind: comp.venue?.indoor ? '0 mph' : homeAbbr === 'CLE' ? '9 mph NW' : '6-10 mph',
           humidity: '45%',
-          precipitationChance: homeAbbr === 'CLE' ? '40%' : '0%',
+          precipitationChance: homeAbbr === 'CLE' ? '5%' : '0%',
           altitudeFt: homeAbbr === 'DEN' ? 5280 : 0,
-          impactLevel: comp.venue?.indoor ? 'NONE_DOME' : homeAbbr === 'CLE' ? 'HIGH' : homeAbbr === 'DEN' ? 'MODERATE' : 'LOW',
+          impactLevel: comp.venue?.indoor ? 'NONE_DOME' : homeAbbr === 'DEN' ? 'MODERATE' : 'LOW',
           impactSummary: comp.venue?.indoor
             ? 'Fast indoor surface with zero atmospheric drag on kicks or throws.'
             : homeAbbr === 'DEN'
             ? 'Mile High 5,280 ft altitude boosts field goal range by 4-6 yards; cool night favors ground tempo.'
             : homeAbbr === 'CLE'
-            ? 'High wind shear off Lake Erie limits deep passing depth; favors inside ground game.'
+            ? 'Mild 9 mph shoreline breeze; minimal meteorological impact on passing or kicking.'
             : 'Standard autumn weather with low meteorological interference.',
         },
         injuries: {

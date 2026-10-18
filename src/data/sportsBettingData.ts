@@ -163,13 +163,13 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
     },
     weatherForecast: {
       isDome: false,
-      temperature: '48°F',
-      conditions: 'Chilly shoreline, 18-24 mph sustained NW wind with gusts off Lake Erie',
-      wind: '22 mph NW',
-      humidity: '68%',
-      precipitationChance: '25%',
-      impactLevel: 'HIGH',
-      impactSummary: '22 mph Lake Erie winds degrade deep passing completion rates below 32%.',
+      temperature: '56°F',
+      conditions: 'Crisp autumn sunshine, mild shoreline breeze',
+      wind: '9 mph NW (Gusts 14 mph)',
+      humidity: '48%',
+      precipitationChance: '5%',
+      impactLevel: 'LOW',
+      impactSummary: 'Mild 9 mph breeze off Lake Erie; minimal meteorological impact on kicking or passing.',
     },
     injuries: {
       homeInjuries: [

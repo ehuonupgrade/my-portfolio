@@ -440,7 +440,7 @@ export function purifyAndRealignGame(game: GameMarket): GameMarket {
     }
     if (cleaned.splits?.spread?.away?.divergenceNotice?.includes('Lamar Jackson & Derrick Henry ground attack')) {
       cleaned.splits.spread.away.divergenceNotice =
-        'Syndicate Steam (+44% divergence): 78% of handle on Ravens -3.5 behind Derrick Henry ground attack and Tyler Huntley game-manager script in 18-24 mph Lake Erie crosswinds with Lamar Jackson OUT.';
+        'Syndicate Steam (+44% divergence): 78% of handle on Ravens -3.5 behind Derrick Henry ground attack and Tyler Huntley game-manager script against Cleveland\'s injured front seven with Lamar Jackson OUT.';
     }
   }
 

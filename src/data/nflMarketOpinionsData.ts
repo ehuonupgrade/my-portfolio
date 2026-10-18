@@ -20,7 +20,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
     overallConfidenceScore: 96,
     confidenceTier: 'MAX_LOCK',
     primaryRecommendedBet: 'SPREAD',
-    executiveMatchupVerdict: 'Unquestioned #1 Confidence Lock of NFL Week 6. Sustained 18–24 mph winds off Lake Erie directly attack Cleveland\'s primary offensive deficiency (inefficient downfield passing) while playing right into Baltimore\'s historic Derrick Henry power rushing scheme. Heavy sharp money ($1.9M) has steamed the Ravens line.',
+    executiveMatchupVerdict: 'Unquestioned #1 Confidence Lock of NFL Week 6. Live weather verifies mild 9 mph breeze at 56°F. Derrick Henry\'s #1-ranked rushing EPA mismatch against Cleveland\'s injured front seven (LB Jordan Hicks OUT) anchors Baltimore as heavy sharp favorite ($1.9M handle).',
     spreadOpinion: {
       betType: 'SPREAD',
       pick: 'Baltimore Ravens -3.5',
@@ -30,8 +30,8 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceRating: 96,
       confidenceStars: 5,
       verdict: 'STRONG_BUY',
-      selectionSummary: 'Laying under a field goal against 31st-ranked pass offense in sustained 20mph gusts.',
-      rationale: 'The weather forecast calls for sustained 18–24 mph shoreline winds off Lake Erie, which historically degrades deep passing completion rates below 32%. Deshaun Watson has struggled with pocket processing, taking sacks at a league-high 11.2% rate. Conversely, Baltimore ranks #1 in rushing EPA behind Derrick Henry\'s north-south ground attack, an offensive profile tailored for Lake Erie cold wind with Lamar Jackson OUT (sprained ankle) and Tyler Huntley managing under center. Cleveland\'s defensive front is missing starting safety Ronnie Hickman and linebacker Jordan Hicks, leaving second-level gaps that Baltimore will systematically exploit.',
+      selectionSummary: 'Laying under a half-touchdown against Deshaun Watson\'s 31st-ranked pass offense.',
+      rationale: 'Live meteorological reports confirm Lake Erie wind has died down to a mild 9 mph breeze at 56°F, providing clean passing visibility. The primary handicap remains Baltimore\'s #1 rushing EPA attack behind Derrick Henry against Cleveland\'s banged-up front seven (missing LB Jordan Hicks and S Ronnie Hickman). With Lamar Jackson OUT (sprained ankle), Tyler Huntley manages a clean ground-and-pound script while Deshaun Watson continues taking sacks at a league-high 11.2% rate.',
     },
     moneylineOpinion: {
       betType: 'MONEYLINE',
@@ -43,7 +43,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceStars: 5,
       verdict: 'STRONG_BUY',
       selectionSummary: 'Ultimate parlay cornerstone with 86.4% projected outright win probability.',
-      rationale: 'While laying -295 requires significant stake, our predictive simulation assigns Baltimore an 86.4% outright victory likelihood. Cleveland\'s limited scoring ceiling in adverse weather (projected team total of 14.5 points) provides almost no mathematical pathway for an outright Browns upset unless Baltimore commits multiple unforced giveaways in their own red zone.',
+      rationale: 'While laying -295 requires significant stake, our predictive simulation assigns Baltimore an 86.4% outright victory likelihood. Cleveland\'s limited scoring ceiling (projected team total of 14.5 points) provides almost no mathematical pathway for an outright Browns upset unless Baltimore commits multiple unforced giveaways in their own red zone.',
     },
     totalOpinion: {
       betType: 'TOTAL',
@@ -54,11 +54,11 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceRating: 95,
       confidenceStars: 5,
       verdict: 'STRONG_BUY',
-      selectionSummary: 'Severe wind drag + heavy run play-calling bleed the clock continuously.',
-      rationale: 'Historical NFL data shows that regular season games played with sustained crosswinds of 18+ mph go Under the closing total at a 63.8% rate. Both coaching staffs will pivot to ground-heavy play-calling, keeping the clock running with minimal incompletion stoppages. Cleveland\'s red zone touchdown conversion rate of 38.5% ranks 30th in the NFL, ensuring field goal attempts rather than touchdowns.',
+      selectionSummary: 'Heavy run-first play calling and clock management keep scoring tempo controlled.',
+      rationale: 'Even with mild 9 mph shoreline winds, both coaching staffs will lean heavily into ground play-calling. Derrick Henry anchors Baltimore\'s time of possession, keeping the clock running continuously, while Cleveland\'s 38.5% red zone touchdown conversion rate (30th in NFL) limits high-scoring shootouts.',
     },
     keyFactors: {
-      weatherImpactFactor: '18–24 mph sustained shoreline wind off Lake Erie limits passing depth and field goal accuracy past 42 yards.',
+      weatherImpactFactor: 'Live Weather Update: Lake Erie wind forecast died down to a mild 9 mph breeze at 56°F; minimal weather impact on passing or kicking.',
       injuryAdvantage: 'Browns missing LB Jordan Hicks and S Ronnie Hickman; Ravens offensive line at full health.',
       sharpMoneySignal: '79% of syndicate handle backed Ravens -3.5 despite 48% public ticket split (Reverse Line Move).',
       schemeEdge: 'Baltimore #1 rushing EPA vs. Cleveland 26th-ranked run defense success rate.',

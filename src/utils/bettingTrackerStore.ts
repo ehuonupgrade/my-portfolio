@@ -308,7 +308,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestSportsbook: 'DraftKings',
         status: 'PENDING',
         finalScore: 'Scheduled: Sun Oct 18 · 1:00 PM EDT',
-        rationale: 'Divisional road mismatch: Derrick Henry ground-and-pound and Ravens defense against Browns turnover-prone offense in Lake Erie winds (Lamar Jackson OUT - sprained ankle).',
+        rationale: 'Divisional road mismatch: Derrick Henry ground-and-pound and Ravens defense against Browns turnover-prone offense (Lamar Jackson OUT - sprained ankle).',
       },
       {
         id: 'leg-20261013-parlay-3',
@@ -468,7 +468,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         bestSportsbook: 'Circa Sports / DraftKings',
         status: 'PENDING',
         finalScore: 'Scheduled: Sun Oct 18 · 1:00 PM EDT',
-        rationale: 'Converts Baltimore road favorite into a huge +9.5 point underdog in Lake Erie shoreline wind.',
+        rationale: 'Converts Baltimore road favorite into a huge +9.5 point underdog at Huntington Bank Field.',
       },
       {
         id: 'leg-20261013-t13-4',
