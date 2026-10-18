@@ -497,30 +497,30 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
     overallConfidenceScore: 78,
     confidenceTier: 'MODERATE_EDGE',
     primaryRecommendedBet: 'SPREAD',
-    executiveMatchupVerdict: 'London international showcase at Wembley Stadium. CJ Stroud and Houston\'s high-octane perimeter weapons mismatch against Jacksonville\'s 31st-ranked pass defense.',
+    executiveMatchupVerdict: 'London international showcase at Wembley Stadium. CJ Stroud catching +2.5 points against Jacksonville\'s 31st-ranked pass defense.',
     spreadOpinion: {
       betType: 'SPREAD',
-      pick: 'Houston Texans -2.5',
+      pick: 'Houston Texans +2.5',
       odds: '-110',
       bestSportsbook: 'DraftKings',
       modelEdge: 4.8,
       confidenceRating: 78,
       confidenceStars: 4,
       verdict: 'BUY',
-      selectionSummary: 'Lay the points under 7 against Doug Pederson\'s reeling Jaguars secondary.',
-      rationale: 'Jacksonville surrenders an alarming 287 passing yards per game. CJ Stroud has an embarrassment of riches with Stefon Diggs, Tank Dell, and Dalton Schultz. The neutral London environment strips Jacksonville of their home crowd advantage.',
+      selectionSummary: 'Grab the +2.5 points with CJ Stroud taking the field at Wembley Stadium in London.',
+      rationale: 'Jacksonville surrenders an alarming 287 passing yards per game. CJ Stroud has an embarrassment of riches with Stefon Diggs, Tank Dell, and Dalton Schultz. Getting +2.5 points on neutral turf with Houston\'s passing attack provides solid underdog value.',
     },
     moneylineOpinion: {
       betType: 'MONEYLINE',
       pick: 'Houston Texans ML',
-      odds: '-275',
+      odds: '+120',
       bestSportsbook: 'Caesars',
       modelEdge: 5.4,
       confidenceRating: 83,
       confidenceStars: 4,
       verdict: 'BUY',
-      selectionSummary: 'Clean moneyline winner avoiding overseas international game volatility.',
-      rationale: 'Overseas games can feature weird bounces and jetlag, but Houston\'s talent edge on both sides of the ball gives them an 77% outright victory projection.',
+      selectionSummary: 'Outright underdog value on Houston in neutral London showcase.',
+      rationale: 'Overseas games feature jetlag and neutral crowd dynamics, making Houston\'s passing talent edge attractive at +120 underdog odds.',
     },
     totalOpinion: {
       betType: 'TOTAL',
@@ -1480,6 +1480,47 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
 };
 
 /**
+ * DYNAMIC SPREAD ALIGNMENT GUARD
+ * 
+ * Verifies and constructs mathematically coherent spread pick titles.
+ * Ensures that if team T is recommended and consensus is FAVORITE -X.X,
+ * team T's line is rendered with correct favorite (-) or underdog (+) sign:
+ * e.g., if Houston Texans are recommended and consensus is JAX -2.5,
+ * correctly formats as "Houston Texans +2.5 (JAX -2.5)" rather than "Houston Texans -2.5".
+ */
+export function formatDynamicSpreadPick(
+  rawPick: string,
+  liveConsensus: string,
+  homeAbbr: string,
+  awayAbbr: string,
+  homeName: string,
+  awayName: string
+): string {
+  if (!liveConsensus) return rawPick;
+
+  // Extract base team name from rawPick (e.g. "Houston Texans" from "Houston Texans +2.5" or "Houston Texans -2.5")
+  const basePickName = rawPick.split(' (')[0].replace(/[\+\-]\d+(\.\d+)?$/, '').trim();
+
+  // Parse favorite team and spread number from liveConsensus (e.g. "JAX -2.5" -> fav="JAX", spreadVal=2.5)
+  const consensusParts = liveConsensus.split(' ');
+  const favTeamAbbr = consensusParts[0]?.toUpperCase() || '';
+  const spreadNumMatch = liveConsensus.match(/[\+\-]?\d+(\.\d+)?/);
+  const spreadVal = spreadNumMatch ? Math.abs(parseFloat(spreadNumMatch[0])) : 2.5;
+
+  // Determine if picked team is the favorite
+  const isHomePicked = basePickName.toLowerCase().includes(homeName.toLowerCase()) || basePickName.toLowerCase().includes(homeAbbr.toLowerCase());
+  const isAwayPicked = basePickName.toLowerCase().includes(awayName.toLowerCase()) || basePickName.toLowerCase().includes(awayAbbr.toLowerCase());
+
+  const pickedAbbr = isHomePicked ? homeAbbr : isAwayPicked ? awayAbbr : (favTeamAbbr === homeAbbr ? awayAbbr : homeAbbr);
+  const isFavored = pickedAbbr.toUpperCase() === favTeamAbbr;
+
+  const correctSignedLine = isFavored ? `-${spreadVal}` : `+${spreadVal}`;
+  const teamTitle = basePickName || (isFavored ? (favTeamAbbr === homeAbbr ? homeName : awayName) : (favTeamAbbr === homeAbbr ? awayName : homeName));
+
+  return `${teamTitle} ${correctSignedLine} (${liveConsensus})`;
+}
+
+/**
  * UNIVERSAL DYNAMIC MARKET OPINION & LIVE LINE RECONCILIATION ENGINE
  * 
  * Reconciles ANY game (from base slate, ESPN API, or live feeds) dynamically:
@@ -1509,18 +1550,25 @@ export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpin
 
   const awayMoneyPct = game.splits?.spread?.away?.moneyPercentage || 50;
   const awayTicketPct = game.splits?.spread?.away?.ticketPercentage || 50;
-  const awayMoneyDivergence = awayMoneyPct - awayTicketPct;
 
   let spreadPickTeam = homeMoneyPct >= awayMoneyPct ? `${homeCity} ${homeName}` : `${awayCity} ${awayName}`;
   let spreadLineStr = liveSpreadStr || (homeMoneyPct >= awayMoneyPct ? `${homeAbbr} -3.5` : `${awayAbbr} +3.5`);
 
   if (existing) {
-    // Reconcile existing curated opinion with LIVE line numbers
+    const formattedPick = formatDynamicSpreadPick(
+      existing.spreadOpinion.pick,
+      liveSpreadStr,
+      homeAbbr,
+      awayAbbr,
+      `${homeCity} ${homeName}`,
+      `${awayCity} ${awayName}`
+    );
+
     return {
       ...existing,
       spreadOpinion: {
         ...existing.spreadOpinion,
-        pick: liveSpreadStr ? `${existing.spreadOpinion.pick.split(' (')[0]} (${liveSpreadStr})` : existing.spreadOpinion.pick,
+        pick: formattedPick,
       },
       moneylineOpinion: {
         ...existing.moneylineOpinion,
@@ -1534,6 +1582,7 @@ export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpin
   }
 
   // Universal Dynamic Generation for any unmapped game
+  const awayMoneyDivergence = awayMoneyPct - awayTicketPct;
   const modelEdge = Math.min(9.8, Math.max(5.2, 5.0 + Math.abs(homeMoneyDivergence) * 0.15));
   const confidenceScore = Math.min(96, Math.max(82, 85 + Math.round(Math.abs(homeMoneyDivergence) * 0.2)));
   const verdict: 'STRONG_BUY' | 'BUY' | 'NEUTRAL' = Math.abs(homeMoneyDivergence) >= 15 ? 'STRONG_BUY' : 'BUY';

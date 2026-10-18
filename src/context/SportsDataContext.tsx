@@ -4,7 +4,7 @@ import { TrackedBetRecommendation } from '../types/sportsBettingTracker';
 import { MOCK_GAMES_MARKETS } from '../data/sportsBettingData';
 import { purifyAndRealignGame } from '../utils/gameAlignmentGuard';
 import { getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
-import { getTrackedBets } from '../utils/bettingTrackerStore';
+import { getTrackedBets, recalibrateTrackedBetsWithLiveMarket } from '../utils/bettingTrackerStore';
 import { getGameDisplayStatus, GameStatusMetadata, DisplayGameStatus } from '../components/common/GameStatusBadge';
 
 export interface ApiFetchLogEntry {
@@ -243,6 +243,7 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
       );
 
       setGames(finalMergedSlate);
+      setTrackedBets((prev) => recalibrateTrackedBetsWithLiveMarket(prev, finalMergedSlate));
 
       const logEntry: ApiFetchLogEntry = {
         id: `fetch-${cycle}-${Date.now()}`,

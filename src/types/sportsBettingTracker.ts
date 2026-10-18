@@ -9,6 +9,7 @@ export type TrackedBetTier =
 
 export interface TrackedBetLeg {
   id: string;
+  gameId?: string;
   gameMatchup: string;
   league: string;
   gameDate: string;
@@ -21,6 +22,8 @@ export interface TrackedBetLeg {
   status: BetOutcome;
   finalScore?: string;
   rationale: string;
+  currentLiveLine?: string;
+  lastLiveRecalibratedAt?: string;
 }
 
 export type PatternSignalType =
@@ -55,6 +58,8 @@ export interface TrackedBetRecommendation {
   preBetRationale: string;
   postGameAnalysis?: string;
   learnedTakeaway?: string;
+  lastLiveRecalibratedAt?: string;
+  liveRecalibrationNotice?: string;
   appliedWeights?: {
     signal: PatternSignalType;
     weightMultiplier: number;
