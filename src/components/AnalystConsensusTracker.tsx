@@ -18,20 +18,26 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
   onOpenBetTracker,
 }) => {
   const [activeTab, setActiveTab] = useState<'radar' | 'history' | 'roster' | 'theory'>('radar');
-  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-bal-cle-w6');
+  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-wsh-sf-w6');
   const [networkFilter, setNetworkFilter] = useState<string>('ALL');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const upcomingConsensusList = useMemo(() => {
     return Object.values(MOCK_ANALYST_CONSENSUS_DATA).filter(
-      (c) => c.gameId !== 'nfl-sea-den-tnf' && c.gameId !== 'nfl-lar-buf-today'
+      (c) =>
+        c.gameId !== 'nfl-sea-den-tnf' &&
+        c.gameId !== 'nfl-lar-buf-today' &&
+        c.gameId !== 'nfl-bal-cle-w6'
     );
   }, []);
 
   const completedConsensusList = useMemo(() => {
     return Object.values(MOCK_ANALYST_CONSENSUS_DATA).filter(
-      (c) => c.gameId === 'nfl-sea-den-tnf' || c.gameId === 'nfl-lar-buf-today'
+      (c) =>
+        c.gameId === 'nfl-sea-den-tnf' ||
+        c.gameId === 'nfl-lar-buf-today' ||
+        c.gameId === 'nfl-bal-cle-w6'
     );
   }, []);
 

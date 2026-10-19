@@ -531,11 +531,11 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
   },
 
   // ==========================================
-  // SUNDAY DIVISIONAL: Ravens @ Browns
+  // PAST SETTLED ARCHIVE: Ravens @ Browns (FINAL: CLE 13, BAL 10)
   // ==========================================
   'nfl-bal-cle-w6': {
     gameId: 'nfl-bal-cle-w6',
-    gameMatchup: 'Baltimore Ravens @ Cleveland Browns',
+    gameMatchup: 'Baltimore Ravens @ Cleveland Browns [FINAL: CLE 13, BAL 10]',
     league: 'NFL',
     homeTeamName: 'Cleveland Browns',
     awayTeamName: 'Baltimore Ravens',
@@ -563,21 +563,21 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
       publicHomeMoneyPct: 58,
       publicAwayMoneyPct: 42,
       sharpAdvantageSide: 'HOME',
-      sharpHandleDifference: 24, // +24% sharp money divergence on Browns
+      sharpHandleDifference: 24,
     },
     contrarianFadeSignal: {
-      triggered: true,
+      triggered: false, // Settled Game
       severity: 'HIGH',
-      fadeTarget: 'Cleveland Browns +4.5 / Under 41.5',
+      fadeTarget: 'Cleveland Browns +4.5 [WON: Final CLE 13, BAL 10]',
       crowdFavorite: 'Baltimore Ravens -4.5',
       analystChalkPct: 77.8,
       publicTicketPct: 66.0,
       sharpMoneyPct: 58.0,
       echoChamberScore: 84,
       gamblingTheoryRule:
-        'Contrarian Axiom #3 (Divisional Dog & Weather Cross-Current): When 78% of TV pundits pick the road divisional favorite, but 18-24 mph Lake Erie sustained crosswinds ground deep passing games, sharp syndicates buy divisional home dog points (+4.5) and bet Under 41.5.',
+        'Contrarian Axiom #3 (Divisional Dog & Weather Cross-Current): Divisional home dog Browns covered +4.5 and won outright 13-10 in Lake Erie winds. The contrarian fade of 78% analyst chalk was a complete winner.',
       recommendedAction:
-        'EXECUTE CONTRARIAN FADE: Grab Cleveland Browns +4.5 points or tease with Under 41.5. In AFC North divisional matchups with 15+ mph winds, home dogs cover at a 63.8% historical clip.',
+        'RESULT LOGGED (SPREAD & UNDER WON): Browns 13, Ravens 10. Under 41.5 and Browns +4.5 cashed.',
     },
     picks: [
       {
@@ -593,11 +593,96 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         confidenceRating: 5,
         publishedTime: 'Oct 15 · 8:15 AM PST',
         rationale:
-          'Classic situational trap. 18+ mph Lake Erie shoreline gusts eliminate Baltimore deep pass explosive rate. Jim Schwartz defensive line matches up well in short-yardage trench warfare.',
+          '18+ mph Lake Erie shoreline gusts eliminate Baltimore deep pass explosive rate. Jim Schwartz defensive line matches up well.',
+        isContrarianFadeTarget: true,
+      },
+    ],
+  },
+
+  // ==========================================
+  // TONIGHT MONDAY NIGHT FOOTBALL: Commanders @ 49ers
+  // ==========================================
+  'nfl-wsh-sf-w6': {
+    gameId: 'nfl-wsh-sf-w6',
+    gameMatchup: 'Washington Commanders @ San Francisco 49ers (Tonight on MNF · 8:15 PM EDT)',
+    league: 'NFL',
+    homeTeamName: 'San Francisco 49ers',
+    awayTeamName: 'Washington Commanders',
+    totalAnalystsTracked: 10,
+    spread: {
+      homeSelection: '49ers -7.0',
+      awaySelection: 'Commanders +7.0',
+      homeCount: 3,
+      awayCount: 7,
+      homePct: 30.0,
+      awayPct: 70.0,
+      consensusFavoriteSide: 'AWAY',
+    },
+    total: {
+      overSelection: 'Over 47.5',
+      underSelection: 'Under 47.5',
+      overCount: 7,
+      underCount: 3,
+      overPct: 70.0,
+      underPct: 30.0,
+    },
+    publicComparison: {
+      publicHomeTicketPct: 32,
+      publicAwayTicketPct: 68,
+      publicHomeMoneyPct: 78,
+      publicAwayMoneyPct: 22,
+      sharpAdvantageSide: 'HOME',
+      sharpHandleDifference: 46, // +46% sharp money on 49ers -7.0
+    },
+    contrarianFadeSignal: {
+      triggered: true,
+      severity: 'EXTREME',
+      fadeTarget: 'San Francisco 49ers -7.0 (Tonight on MNF)',
+      crowdFavorite: 'Washington Commanders +7.0 (70% Media & Public Dog Slips)',
+      analystChalkPct: 70.0,
+      publicTicketPct: 68.0,
+      sharpMoneyPct: 78.0,
+      echoChamberScore: 91,
+      gamblingTheoryRule:
+        'Contrarian Gambling Axiom #1 (Prime Time Public Dog Trap): 70% of mainstream media analysts and public ticket volume are grabbing Commanders +7.0, falling for Jayden Daniels rookie hype on national TV. Meanwhile, high-stakes whale syndicates have moved 78% of real money onto the 49ers -7.0 at Levi\'s Stadium.',
+      recommendedAction:
+        'EXECUTE CONTRARIAN FADE: Back San Francisco 49ers -7.0 on Monday Night Football. Fading public underdog hype on MNF when sharp handle divergence exceeds +35% yields an outstanding +12.4% net unit ROI.',
+    },
+    picks: [
+      {
+        id: 'pick-sf-1',
+        analystId: 'analyst-warren-sharp',
+        analystName: 'Warren Sharp',
+        network: 'Sharp Football',
+        avatarInitial: 'WS',
+        avatarBg: '#10b981',
+        seasonRecord: '54-26 ATS (67.5%)',
+        betType: 'SPREAD',
+        selection: 'San Francisco 49ers -7.0',
+        confidenceRating: 5,
+        publishedTime: 'Oct 19 · 10:00 AM PST',
+        rationale:
+          'Massive +46% whale money divergence. Public is seduced by Washington\'s record, but San Francisco\'s offensive line metrics and Kyle Shanahan\'s MNF home script dominate this matchup.',
         isContrarianFadeTarget: true,
       },
       {
-        id: 'pick-cle-2',
+        id: 'pick-sf-2',
+        analystId: 'analyst-pff-greenline',
+        analystName: 'PFF Greenline AI',
+        network: 'Pro Football Focus',
+        avatarInitial: 'PF',
+        avatarBg: '#059669',
+        seasonRecord: '52-28 ATS (65.0%)',
+        betType: 'SPREAD',
+        selection: 'San Francisco 49ers -7.0',
+        confidenceRating: 5,
+        publishedTime: 'Oct 19 · 9:15 AM PST',
+        rationale:
+          'Simulated 10,000 times: 49ers cover -7.0 in 62.4% of iterations. True fair line is 49ers -9.5. Substantial +8.2% edge over public dog consensus.',
+        isContrarianFadeTarget: true,
+      },
+      {
+        id: 'pick-sf-3',
         analystId: 'analyst-mina-kimes',
         analystName: 'Mina Kimes',
         network: 'ESPN',
@@ -605,27 +690,27 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         avatarBg: '#d00000',
         seasonRecord: '49-31 ATS (61.3%)',
         betType: 'SPREAD',
-        selection: 'Baltimore Ravens -4.5',
+        selection: 'Washington Commanders +7.0',
         confidenceRating: 4,
-        publishedTime: 'Oct 15 · 7:30 AM PST',
+        publishedTime: 'Oct 19 · 11:30 AM PST',
         rationale:
-          'With Lamar Jackson officially ruled OUT, Todd Monken leans into Derrick Henry power-gap runs to control the clock and wear down Cleveland\'s front seven in 20 mph winds.',
+          'Jayden Daniels\' dual-threat capability keeps Washington within a touchdown on national television.',
         isContrarianFadeTarget: false,
       },
       {
-        id: 'pick-cle-3',
-        analystId: 'analyst-pete-prisco',
-        analystName: 'Pete Prisco',
-        network: 'CBS Sports',
-        avatarInitial: 'PP',
-        avatarBg: '#003366',
-        seasonRecord: '46-34 ATS (57.5%)',
+        id: 'pick-sf-4',
+        analystId: 'analyst-dan-orlovsky',
+        analystName: 'Dan Orlovsky',
+        network: 'ESPN',
+        avatarInitial: 'DO',
+        avatarBg: '#b30000',
+        seasonRecord: '43-37 ATS (53.8%)',
         betType: 'SPREAD',
-        selection: 'Baltimore Ravens -4.5',
+        selection: 'Washington Commanders +7.0',
         confidenceRating: 4,
-        publishedTime: 'Oct 15 · 6:45 AM PST',
+        publishedTime: 'Oct 19 · 11:00 AM PST',
         rationale:
-          'Ravens offense is too balanced. Even in high winds, Derrick Henry gets 25 touches and controls the line of scrimmage.',
+          'Commanders offense has been efficient in early downs. Taking the touchdown hook on the road.',
         isContrarianFadeTarget: false,
       },
     ],

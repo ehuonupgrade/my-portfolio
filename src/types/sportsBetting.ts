@@ -322,6 +322,7 @@ export interface AnalystMarketConsensus {
   gameId: string;
   gameMatchup: string;
   league: SportsLeague;
+  isCompleted?: boolean;
   homeTeamName: string;
   awayTeamName: string;
   totalAnalystsTracked: number;

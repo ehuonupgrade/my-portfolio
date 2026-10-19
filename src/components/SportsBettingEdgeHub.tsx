@@ -59,7 +59,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
   };
   const [hubViewMode, setHubViewMode] = useState<'board' | 'rankings' | 'volume-shifts' | 'news' | 'analysts' | 'tracker' | 'trends' | 'logs'>('board');
   const [selectedLeague, setSelectedLeague] = useState<SportsLeague | 'ALL'>('NFL');
-  const [activeGameId, setActiveGameId] = useState<string>('nfl-sea-den-tnf');
+  const [activeGameId, setActiveGameId] = useState<string>('nfl-wsh-sf-w6');
   const [viewTab, setViewTab] = useState<'opinions' | 'strategy' | 'weather' | 'injuries' | 'news' | 'splits' | 'books' | 'movement'>('opinions');
   const [showVerificationModal, setShowVerificationModal] = useState<boolean>(false);
   const {
@@ -224,10 +224,36 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
     );
   }, [filteredGames, activeGameId, allAvailableGames]);
 
-  // Identify the single game with the 1 prime strategy
+  // Identify the single game with the 1 prime strategy (must ALWAYS be an active/upcoming, unplayed game)
   const primeGame = useMemo(() => {
-    return MOCK_GAMES_MARKETS.find((g) => g.isPrimeOpportunity && g.primeStrategy) || MOCK_GAMES_MARKETS[0];
-  }, []);
+    // 1. Look for unplayed game explicitly marked as prime opportunity in allAvailableGames
+    const activePrime = allAvailableGames.find((g) => {
+      const meta = getGameDisplayStatus(g);
+      return !meta.isCompleted && g.isPrimeOpportunity && g.primeStrategy;
+    });
+    if (activePrime) return activePrime;
+
+    // 2. Look for any unplayed game that has a prime strategy
+    const unplayedWithStrat = allAvailableGames.find((g) => {
+      const meta = getGameDisplayStatus(g);
+      return !meta.isCompleted && g.primeStrategy;
+    });
+    if (unplayedWithStrat) return unplayedWithStrat;
+
+    // 3. Fallback to first unplayed upcoming game on schedule
+    const nextUpcoming = allAvailableGames.find((g) => {
+      const meta = getGameDisplayStatus(g);
+      return !meta.isCompleted;
+    });
+    if (nextUpcoming) return nextUpcoming;
+
+    // 4. Fallback if entire slate concluded
+    return (
+      allAvailableGames.find((g) => g.isPrimeOpportunity && g.primeStrategy) ||
+      allAvailableGames[0] ||
+      MOCK_GAMES_MARKETS[0]
+    );
+  }, [allAvailableGames]);
 
   const totalSlateHandle = useMemo(() => {
     return MOCK_GAMES_MARKETS.reduce((acc, g) => acc + g.totalDollarsWagered, 0);

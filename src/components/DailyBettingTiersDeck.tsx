@@ -31,8 +31,8 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
     { title: string; desc: string }
   > = {
     single: {
-      title: 'Nearest Game Formula: Whale Syndicate Steam on Road Favorite (-3.5)',
-      desc: 'Nearest Upcoming NFL Game: Baltimore -3.5 backed by 74% handle on 42% tickets at Cleveland Browns Stadium (Sunday, Oct 18 · 1:00 PM EDT).',
+      title: 'Nearest Game Formula: Whale Syndicate Steam on Home Favorite (-7.0)',
+      desc: 'Nearest Upcoming NFL Game: San Francisco 49ers -7.0 backed by 78% handle at Levi\'s Stadium (Tonight, Monday Oct 19 · 8:15 PM EDT).',
     },
     parlay: {
       title: 'NFL Week 6 Slate Formula: Sunday Showcase & Monday Night Football',
