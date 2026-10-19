@@ -499,13 +499,13 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
             <div
               onClick={() => {
                 playKeyClick();
-                onSelectGameAndInspect('nfl-bal-cle-w6', 'strategy');
+                onSelectGameAndInspect('live-espn-401873008', 'strategy');
               }}
-              title="Click to inspect Nearest Upcoming Straight Bet: Baltimore Ravens -3.5 (Sunday Oct 18 · 1:00 PM EDT)"
+              title="Click to inspect Nearest Upcoming Straight Bet: San Francisco 49ers -7.0 (Monday Night Football · 8:15 PM EDT)"
               className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/50 transition-all cursor-pointer space-y-0.5 group"
             >
               <span className="text-[10px] text-cyan-400 uppercase font-semibold">Nearest Straight Bet</span>
-              <div className="text-cyan-300 font-bold text-sm">Ravens -3.5 (Sun 1PM)</div>
+              <div className="text-cyan-300 font-bold text-sm">49ers -7.0 (Tonight 8:15 PM)</div>
             </div>
             <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-0.5">
               <span className="text-[10px] text-amber-400 uppercase font-semibold">Radar Alerts</span>

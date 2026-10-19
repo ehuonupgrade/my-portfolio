@@ -101,10 +101,16 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
 
   // Live API Fetch Cycle verification state
   const cycleRef = useRef<number>(0);
+  const inFlightRef = useRef<boolean>(false);
   const [fetchCycleCount, setFetchCycleCount] = useState<number>(0);
   const [apiFetchLogs, setApiFetchLogs] = useState<ApiFetchLogEntry[]>([]);
   const [fetchSummary, setFetchSummary] = useState<FetchSummary | null>(null);
   const [statusFilter, setStatusFilter] = useState<GameStatusFilter>('ALL');
+
+  const gamesRef = useRef<GameMarket[]>(games);
+  useEffect(() => {
+    gamesRef.current = games;
+  }, [games]);
 
   const addFetchLog = useCallback((entry: ApiFetchLogEntry) => {
     setApiFetchLogs((prev) => [entry, ...prev.slice(0, 29)]); // keep last 30 cycles
@@ -115,6 +121,8 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
   }, []);
 
   const fetchLiveGames = useCallback(async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
     const cycle = ++cycleRef.current;
     setFetchCycleCount(cycle);
     const startTime = Date.now();
@@ -318,7 +326,7 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
         lastSuccess: prev?.lastSuccess || null,
         status: 'ERROR',
         latencyMs: durationMs,
-        totalGames: prev?.totalGames || games.length,
+        totalGames: prev?.totalGames || gamesRef.current.length || MOCK_GAMES_MARKETS.length,
         inProgressCount: prev?.inProgressCount || 0,
         completedCount: prev?.completedCount || 0,
         upcomingCount: prev?.upcomingCount || 0,
@@ -326,12 +334,13 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
         source: 'Synchronized Local Fallback Store',
       }));
     } finally {
+      inFlightRef.current = false;
       setIsLoading(false);
       setLastSyncTimestamp(
         new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       );
     }
-  }, [games, addFetchLog]);
+  }, [addFetchLog]);
 
   const syncTrackedBets = useCallback(() => {
     setTrackedBets(getTrackedBets());
@@ -344,11 +353,10 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
     const interval = setInterval(() => {
       fetchLiveGames();
       syncTrackedBets();
-    }, 8000); // 8-second live API polling cycle
+    }, 30000); // Clean 30-second live API polling cycle
 
     const handleBetsEvent = () => syncTrackedBets();
     const handleStorage = () => {
-      fetchLiveGames();
       syncTrackedBets();
     };
 
