@@ -81,9 +81,9 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
         severityLevel: 'HIGH',
       },
       {
-        title: 'McCaffrey Snap Count Management',
+        title: 'McCaffrey & Mason Backfield Workload',
         description:
-          'Christian McCaffrey active in managed workload following Achilles tendinitis rehab. Jordan Mason expected to share 40%+ red-zone touches.',
+          'Christian McCaffrey 100% active at full health. Jordan Mason expected to share 40%+ red-zone touches in Kyle Shanahan rotational packages.',
         severityLevel: 'MEDIUM',
       },
       {
@@ -371,13 +371,30 @@ export interface SuperstarMedicalWireItem {
 export const SUPERSTAR_BREAKING_MEDICAL_WIRE: SuperstarMedicalWireItem[] = [
   // ⚡ ACTIVE TONIGHT & UPCOMING SLATE (Mon Oct 19 MNF & Week 7 Lookaheads)
   {
+    id: 'med-mike-evans-hamstring-20261019',
+    playerName: 'Mike Evans',
+    team: 'Tampa Bay Buccaneers (TB)',
+    teamAbbr: 'TB',
+    position: 'WR #13',
+    status: 'QUESTIONABLE',
+    headline: '🚨 GAME-TIME INJURY DECISION: Mike Evans (hamstring strain) questionable; undergoing pre-game field evaluation.',
+    marketImpact: 'Baker Mayfield target distribution shifts toward Chris Godwin and Cade Otton if Evans is limited or inactive. Spread holding TB +2.5.',
+    lineMovementSummary: 'Buccaneers spread +2.5 / O/U 39.5 at Raymond James Stadium',
+    timeAgo: '12m ago (Live Medical Wire)',
+    publishedAt: new Date(Date.now() - 1000 * 60 * 12).toISOString(),
+    gameStatus: 'UPCOMING',
+    gameMatchup: 'PIT @ TB',
+    isArchived: false,
+    source: 'Buccaneers Medical Staff & Beat Desk',
+  },
+  {
     id: 'med-cmc-active-mnf',
     playerName: 'Christian McCaffrey',
     team: 'San Francisco 49ers (SF)',
     teamAbbr: 'SF',
     position: 'RB #23',
     status: 'ACTIVE_CLEARED',
-    headline: '✅ ROSTER STATUS VERIFIED: Christian McCaffrey (Achilles tendinitis rehab completed) active in managed workload vs Commanders.',
+    headline: '✅ ROSTER STATUS VERIFIED: Christian McCaffrey 100% active at full health vs Commanders.',
     marketImpact: 'Offensive touches split with Jordan Mason. Kyle Shanahan deploying red-zone packages; 49ers consensus spread steady at -7.0.',
     lineMovementSummary: '49ers spread -7.0 / Total settled at 48.5 O/U at Levi\'s Stadium',
     timeAgo: '18m ago (Live Wire)',

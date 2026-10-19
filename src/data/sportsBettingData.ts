@@ -1556,9 +1556,10 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
     injuries: {
       homeInjuries: [
         { player: 'Dre Greenlaw', position: 'LB', status: 'OUT', injury: '1-Game NFL Suspension', gameImpact: 'Appeal rejected by NFL on Tuesday; Dee Winters starts in his place at weakside linebacker.' },
-        { player: 'Christian McCaffrey', position: 'RB', status: 'ACTIVE', injury: 'Achilles Tendinitis (Managed Workload)', gameImpact: 'Active for Monday Night Football in managed workload following Achilles tendinitis rehab; sharing touches with Jordan Mason.' },
+        { player: 'Christian McCaffrey', position: 'RB', status: 'ACTIVE', injury: 'None (100% Full Health)', gameImpact: '100% healthy and active for Monday Night Football; sharing touches with Jordan Mason.' },
         { player: 'Jordan Mason', position: 'RB', status: 'ACTIVE', injury: 'Shoulder sprain', gameImpact: 'Cleared to play without contact restrictions.' },
         { player: 'Deebo Samuel', position: 'WR', status: 'ACTIVE', injury: 'Wrist', gameImpact: 'Full participant in team drills.' },
+        { player: 'Mike Evans', position: 'WR', status: 'QUESTIONABLE', injury: 'Hamstring Strain (Game-Time Decision)', gameImpact: '🚨 GAME-TIME DECISION: Undergoing pre-game evaluation for hamstring strain. Primary red-zone boundary target for Brock Purdy.' },
       ],
       awayInjuries: [
         { player: 'Jayden Daniels', position: 'QB', status: 'ACTIVE', injury: 'Ribs', gameImpact: 'Cleared for Monday Night Football; dual-threat mobility intact.' },
@@ -2083,7 +2084,6 @@ const BASE_MOCK_GAMES_MARKETS: GameMarket[] = [
     injuries: {
       homeInjuries: [
         { player: 'Antoine Winfield Jr.', position: 'S', status: 'ACTIVE', injury: 'Ankle', gameImpact: 'All-Pro safety fully cleared; stabilizes deep safety coverage.' },
-        { player: 'Mike Evans', position: 'WR', status: 'ACTIVE', injury: 'Hamstring', gameImpact: 'Starting wideout active for red zone target share.' },
       ],
       awayInjuries: [
         { player: 'Alex Highsmith', position: 'LB', status: 'ACTIVE', injury: 'Groin', gameImpact: 'Edge rusher active opposite TJ Watt.' },
