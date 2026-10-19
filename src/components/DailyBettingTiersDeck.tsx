@@ -165,9 +165,19 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
               <span className="text-xs text-slate-300 font-bold">
                 🗓️ {currentPackage.daySpanNote}
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-950/80 border border-amber-700 text-amber-300 font-bold text-[10px] animate-pulse">
-                ⚡ Tracked in Ledger (Pending)
-              </span>
+              {currentPackage.badge.includes('WON') ? (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold text-[10px]">
+                  ✅ Cashed in Ledger (Settled Win)
+                </span>
+              ) : currentPackage.badge.includes('CASHED') || currentPackage.badge.includes('IN PROGRESS') ? (
+                <span className="px-2 py-0.5 rounded-full bg-amber-950 border border-amber-500 text-amber-300 font-bold text-[10px] animate-pulse">
+                  ⏳ In Progress (Cashed Legs Protected)
+                </span>
+              ) : (
+                <span className="px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold text-[10px]">
+                  ⚡ Active Upcoming Play
+                </span>
+              )}
             </div>
             <h3 className="text-lg sm:text-xl font-bold text-white font-sans">
               {currentPackage.title}
@@ -251,9 +261,19 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
                   <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 border border-slate-700 text-cyan-300">
                     LEG #{i + 1} &bull; {leg.betType}
                   </span>
-                  <span className="text-emerald-400 font-bold text-[11px]">
-                    +{leg.modelEdge}% Edge
-                  </span>
+                  {leg.rationale?.toLowerCase().startsWith('cashed') || (leg as any).status === 'WON' ? (
+                    <span className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-600 text-emerald-300 font-bold text-[10px]">
+                      ✅ CASHED
+                    </span>
+                  ) : (leg as any).status === 'LOST' ? (
+                    <span className="px-2 py-0.5 rounded bg-rose-950 border border-rose-600 text-rose-300 font-bold text-[10px]">
+                      ❌ FAILED
+                    </span>
+                  ) : (
+                    <span className="text-emerald-400 font-bold text-[11px]">
+                      +{leg.modelEdge}% Edge
+                    </span>
+                  )}
                 </div>
 
                 <div>

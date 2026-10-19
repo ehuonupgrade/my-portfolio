@@ -14,6 +14,7 @@ import {
   simulateTonightOutcome,
   resetTrackedBetsToSeed,
   exportTrackedBetsToCSV,
+  autoGradeTrackedBetsWithLiveGames,
 } from '../utils/bettingTrackerStore';
 import { calculatePerformanceSummary } from '../utils/bettingPatternEngine';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
@@ -62,6 +63,28 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
 
   // Historical Ledger & Ongoing Tracker States
   const [bets, setBets] = useState<TrackedBetRecommendation[]>(() => getTrackedBets());
+
+  // Real-time synchronization with background store updates
+  useEffect(() => {
+    const handleSync = () => {
+      setBets(getTrackedBets());
+    };
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('linepulse_bets_updated', handleSync);
+    window.addEventListener('linepulse_api_cycle_complete', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('linepulse_bets_updated', handleSync);
+      window.removeEventListener('linepulse_api_cycle_complete', handleSync);
+    };
+  }, []);
+
+  // Automatically grade bets when live games slate is received or changes
+  useEffect(() => {
+    if (games && games.length > 0) {
+      setBets((prev) => autoGradeTrackedBetsWithLiveGames(prev, games));
+    }
+  }, [games]);
   const [ledgerStatusFilter, setLedgerStatusFilter] = useState<BetOutcome | 'ALL'>('ALL');
   const [ledgerTierFilter, setLedgerTierFilter] = useState<TrackedBetTier | 'ALL'>('ALL');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -1450,7 +1473,9 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-950 border border-amber-600 text-amber-300">
-                          PENDING &bull; ONGOING
+                          {bet.legs.filter((l) => l.status === 'WON').length > 0
+                            ? `IN PROGRESS • ${bet.legs.filter((l) => l.status === 'WON').length}/${bet.legs.length} CASHED`
+                            : 'PENDING • ONGOING'}
                         </span>
                         <span className="text-xs font-mono text-slate-400">{bet.dateLabel}</span>
                       </div>
@@ -1474,11 +1499,34 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                     {bet.legs.map((leg) => (
                       <div
                         key={leg.id}
-                        className="p-2 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-mono flex items-center justify-between"
+                        className={`p-2 rounded-xl bg-slate-950/80 border text-xs font-mono flex items-center justify-between ${
+                          leg.status === 'WON'
+                            ? 'border-emerald-600/40'
+                            : leg.status === 'LOST'
+                            ? 'border-rose-600/40'
+                            : 'border-slate-800'
+                        }`}
                       >
                         <div>
-                          <span className="font-bold text-white">{leg.targetSelection}</span>
-                          <span className="text-[10px] text-slate-400 block">{leg.gameMatchup} &bull; {leg.gameDate}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-white">{leg.targetSelection}</span>
+                            {leg.status === 'WON' ? (
+                              <span className="px-1.5 py-0.2 rounded bg-emerald-950 border border-emerald-600 text-emerald-300 font-bold text-[9px]">
+                                ✅ CASHED
+                              </span>
+                            ) : leg.status === 'LOST' ? (
+                              <span className="px-1.5 py-0.2 rounded bg-rose-950 border border-rose-600 text-rose-300 font-bold text-[9px]">
+                                ❌ LOST
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.2 rounded bg-amber-950 border border-amber-600 text-amber-300 font-bold text-[9px]">
+                                ⏳ PENDING
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-slate-400 block">
+                            {leg.gameMatchup} &bull; {leg.finalScore || leg.gameDate}
+                          </span>
                         </div>
                         <div className="text-right text-[11px]">
                           <span className="text-emerald-400 font-bold">{leg.bestOdds}</span>
