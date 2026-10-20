@@ -3,6 +3,7 @@ import { GameMarket } from '../types/sportsBetting';
 import { LiveOddsStreamState } from '../utils/useLiveOddsStream';
 import { playKeyClick } from '../utils/audio';
 import { getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 interface LiveOddsStreamModalProps {
   isOpen: boolean;
@@ -183,7 +184,7 @@ export const LiveOddsStreamModal: React.FC<LiveOddsStreamModalProps> = ({
                     <div key={g.id} className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
                         <span className="font-bold text-white">{getCleanTeamName(g.awayTeam.city, g.awayTeam.name)} @ {getCleanTeamName(g.homeTeam.city, g.homeTeam.name)}</span>
-                        <div className="text-[10px] text-slate-400">{g.scheduledTime} &bull; {g.stadium}</div>
+                        <div className="text-[10px] text-slate-400">{formatToLocalUserTime(g.scheduledTime)} &bull; {g.stadium}</div>
                       </div>
 
                       <div className="flex items-center gap-3 text-xs font-mono">

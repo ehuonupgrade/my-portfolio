@@ -28,6 +28,7 @@ import { LiveRosterStreamBadge } from './LiveRosterStreamBadge';
 import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
 import { LiveRosterVerificationModal } from './LiveRosterVerificationModal';
 import { MonteCarloSimulationModal } from './MonteCarloSimulationModal';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { useLiveVerification } from '../utils/useLiveVerification';
 import { useLiveOddsStream } from '../utils/useLiveOddsStream';
@@ -101,10 +102,11 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
       };
     }
     const spreadStr = nearestUpcomingGame?.consensus?.spread || 'Bears -3.0';
-    const timeStr = nearestUpcomingGame?.scheduledTime || 'Thursday, Oct 22 · 8:15 PM EDT';
+    const rawTimeStr = nearestUpcomingGame?.scheduledTime || 'Thursday, Oct 22 · 8:15 PM EDT';
+    const timeStr = formatToLocalUserTime(rawTimeStr);
     return {
       label: `${spreadStr} (${nearestUpcomingGame ? `${nearestUpcomingGame.awayTeam.abbr} @ ${nearestUpcomingGame.homeTeam.abbr}` : 'NE @ CHI'})`,
-      sub: timeStr.includes('EDT') || timeStr.includes('PM') ? timeStr : 'Thursday TNF · 8:15 PM',
+      sub: timeStr,
       gameId: nearestUpcomingGame?.id || 'nfl-ne-chi-w7',
     };
   }, [selectedWeek, nearestUpcomingGame]);
@@ -821,7 +823,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                               </h3>
                               <GameStatusBadge game={game} size="xs" showIcon />
                               <span className="text-xs font-mono text-slate-400">
-                                &bull; {game.scheduledTime}
+                                &bull; {formatToLocalUserTime(game.scheduledTime)}
                               </span>
                             </div>
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { GameMarket } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 interface MonteCarloSimulationModalProps {
   isOpen: boolean;
@@ -127,7 +128,7 @@ export const MonteCarloSimulationModal: React.FC<MonteCarloSimulationModalProps>
             >
               {games.map((g) => (
                 <option key={g.id} value={g.id}>
-                  {getCleanTeamName(g.awayTeam.city, g.awayTeam.name)} @ {getCleanTeamName(g.homeTeam.city, g.homeTeam.name)} ({g.scheduledTime})
+                  {getCleanTeamName(g.awayTeam.city, g.awayTeam.name)} @ {getCleanTeamName(g.homeTeam.city, g.homeTeam.name)} ({formatToLocalUserTime(g.scheduledTime)})
                 </option>
               ))}
             </select>

@@ -14,6 +14,7 @@ import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { playKeyClick } from '../utils/audio';
 import { GameStatusBadge } from './common/GameStatusBadge';
 import { getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 interface GameLineMovementViewProps {
   game: GameMarket;
@@ -73,7 +74,7 @@ export const GameLineMovementView: React.FC<GameLineMovementViewProps> = ({ game
                 <span>{game.league}</span>
                 <span>&bull;</span>
                 <GameStatusBadge game={game} size="xs" showIcon />
-                <span>{game.scheduledTime}</span>
+                <span>{formatToLocalUserTime(game.scheduledTime)}</span>
                 <span>&bull;</span>
                 <span>{game.stadium}</span>
               </div>

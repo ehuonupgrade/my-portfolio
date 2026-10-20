@@ -224,7 +224,7 @@ Integrity: Zero synthetic slates. Grounded in real NFL game outcomes.`;
                   <span>📊</span>
                   <span>All 32 Official NFL Team Standings (Verified Live Today: {formattedDate})</span>
                 </span>
-                <span className="text-[11px] text-slate-500">Entering Week 6 Today</span>
+                <span className="text-[11px] text-slate-500">Entering Week 7 Today</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">

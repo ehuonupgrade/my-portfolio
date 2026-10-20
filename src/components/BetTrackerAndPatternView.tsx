@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 import {
   TrackedBetRecommendation,
   BetOutcome,
@@ -234,7 +235,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
               Live Tracking Baseline &bull; Nearest Upcoming Slate Priority (Active NFL Week 7 Board)
             </strong>
             <p className="text-slate-300 leading-relaxed">
-              Active recommendations prioritize nearest upcoming unplayed games: <strong>Chicago Bears -3.0</strong> vs New England Patriots (Thursday Night Football · Oct 22), <strong>3-Leg All-NFL Value Parlay</strong> (Bears + 49ers + Ravens), and in-progress Week 7 teasers. Week 6 games (including 49ers 23-17 Monday Night Football victory) are fully settled and logged in the historical performance ledger.
+              Active recommendations prioritize nearest upcoming unplayed games: <strong>Chicago Bears -3.0</strong> vs New England Patriots (Thursday Night Football · {formatToLocalUserTime('Thursday, Oct 22 · 8:15 PM EDT')}), <strong>3-Leg All-NFL Value Parlay</strong> (Bears + 49ers + Ravens), and in-progress Week 7 teasers. Week 6 games (including 49ers 23-17 Monday Night Football victory) are fully settled and logged in the historical performance ledger.
             </p>
           </div>
         </div>
@@ -606,7 +607,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                         <div>
                           <div className="text-white font-bold">{leg.targetSelection}</div>
                           <div className="text-slate-400 text-[10px]">
-                            {leg.gameMatchup} &bull; {leg.gameDate}
+                            {leg.gameMatchup} &bull; {formatToLocalUserTime(leg.gameDate)}
                           </div>
                           <div className="text-slate-500 text-[10px]">
                             Original: {leg.originalLine} | {leg.bestSportsbook}
@@ -942,7 +943,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                                 ? `✅ WON (${leg.finalScore || 'Cashed'})`
                                 : leg.status === 'LOST'
                                 ? `❌ LOST (${leg.finalScore || 'Failed'})`
-                                : `⏳ PENDING (${leg.gameDate})`}
+                                : `⏳ PENDING (${formatToLocalUserTime(leg.gameDate)})`}
                             </span>
                           </div>
                         ))}
@@ -1004,7 +1005,7 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
                                 ? `✅ WON (${leg.finalScore || 'Cashed'})`
                                 : leg.status === 'LOST'
                                 ? `❌ LOST (${leg.finalScore || 'Failed'})`
-                                : `⏳ PENDING (${leg.gameDate})`}
+                                : `⏳ PENDING (${formatToLocalUserTime(leg.gameDate)})`}
                             </span>
                           </div>
                         ))}

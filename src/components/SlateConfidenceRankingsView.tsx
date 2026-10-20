@@ -3,6 +3,7 @@ import { GameMarket } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
 import { getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 interface SlateConfidenceRankingsViewProps {
   games: GameMarket[];
@@ -269,7 +270,7 @@ export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewPr
 
                   <div className="flex items-center gap-2 text-xs">
                     <GameStatusBadge game={game} size="xs" showIcon />
-                    <span className="text-slate-400">{game.scheduledTime}</span>
+                    <span className="text-slate-400">{formatToLocalUserTime(game.scheduledTime)}</span>
                   </div>
                 </div>
 

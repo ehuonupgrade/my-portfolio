@@ -3,6 +3,7 @@ import QRCode from 'qrcode';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 import { useSportsData } from '../context/SportsDataContext';
 import { getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 export interface MovementAlertItem {
   id: string;
@@ -94,90 +95,90 @@ export const ACTIVE_MOVEMENT_ALERTS: MovementAlertItem[] = [
     gameStatus: 'UPCOMING',
   },
 
-  // ⚡ 2. WEEK 7 UNPLAYED SHOWCASE (Thursday Night Football - Oct 22)
+  // ⚡ 2. WEEK 7 UNPLAYED SHOWCASE: San Francisco 49ers @ Atlanta Falcons (Sunday, Oct 25)
   {
-    id: 'alert-den-no-w7-tnf',
-    gameId: 'nfl-den-no-w7',
-    matchup: 'Denver Broncos @ New Orleans Saints (Thursday Night Football)',
+    id: 'alert-sf-atl-w7',
+    gameId: '401873017',
+    matchup: 'San Francisco 49ers @ Atlanta Falcons',
     league: 'NFL',
-    scheduledTime: 'Thursday, Oct 22 · 8:15 PM EDT (5:15 PM PDT)',
-    stadium: 'Caesars Superdome, New Orleans, LA',
+    scheduledTime: '2026-10-25T17:00Z',
+    stadium: 'Mercedes-Benz Stadium, Atlanta, GA',
     alertType: 'WHALE_STEAM',
     severity: 'HIGH',
-    headline: 'Week 7 Lookahead: Broncos Defense +3.5 Draws Sharp Early Syndicate Whale Steam at Superdome',
+    headline: 'Week 7 Marquee: 49ers -3.0 Draw Heavy Syndicate Whale Steam at Atlanta',
     spreadShift: {
-      open: 'Saints -4.5',
-      current: 'Saints -3.0',
-      delta: '+1.5 Point Move on Broncos Dog',
-      favoredTeam: 'Denver Broncos (+3.5)',
+      open: '49ers -2.0',
+      current: '49ers -3.0',
+      delta: '-1.0 Point Move on 49ers',
+      favoredTeam: 'San Francisco 49ers (-3.0)',
     },
     totalShift: {
-      open: '41.0 O/U',
-      current: '37.5 O/U',
-      delta: '-3.5 Points Drop',
-      direction: 'UNDER',
+      open: '48.0 O/U',
+      current: '49.5 O/U',
+      delta: '+1.5 Points Up',
+      direction: 'OVER',
     },
     moneyDivergence: {
-      dollarsPct: 79,
-      ticketsPct: 34,
-      divergenceMargin: 45,
-      dollarVolume: '$12.2M Handle',
-      favoredSide: 'Broncos +3.5 / Under 37.5',
+      dollarsPct: 78,
+      ticketsPct: 35,
+      divergenceMargin: 43,
+      dollarVolume: '$14.2M Handle',
+      favoredSide: '49ers -3.0 / Over 49.5',
     },
     riskWarnings: [
       {
-        title: 'Short Week Road Dog Power',
+        title: 'Road Favorite Field Goal Threshold',
         description:
-          'Sean Payton returns to New Orleans on 4 days rest with top-3 defensive pressure rate. Saints offensive line facing multiple injury absences.',
+          '49ers offense facing Falcons indoor dome turf. Heavy sharp money flowing on San Francisco spread.',
         severityLevel: 'HIGH',
       },
     ],
     actionAdvice:
-      'WEEK 7 EARLY VALUE: Lock in Denver Broncos +3.5 before consensus moves across the key field goal number to +2.5.',
+      'WEEK 7 VALUE: Take San Francisco 49ers -3.0 before line pushes past the key field goal margin.',
     isSettled: false,
     gameStatus: 'UPCOMING',
   },
 
-  // ⚡ 3. WEEK 7 SUNDAY LOOKAHEAD (Oct 25)
+  // ⚡ 3. WEEK 7 SUNDAY DIVISIONAL: Cincinnati Bengals @ Baltimore Ravens (Oct 25)
   {
-    id: 'alert-kc-sf-w7',
-    gameId: 'nfl-kc-sf-w7',
-    matchup: 'Kansas City Chiefs @ San Francisco 49ers (Week 7 Marquee)',
+    id: 'alert-cin-bal-w7',
+    gameId: '401873012',
+    matchup: 'Cincinnati Bengals @ Baltimore Ravens',
     league: 'NFL',
-    scheduledTime: 'Sunday, Oct 25 · 4:25 PM EDT',
-    stadium: "Levi's Stadium, Santa Clara, CA",
+    scheduledTime: '2026-10-25T17:00Z',
+    stadium: 'M&T Bank Stadium, Baltimore, MD',
     alertType: 'REVERSE_LINE_MOVEMENT',
     severity: 'CRITICAL',
-    headline: 'Super Bowl Rematch Lookahead: 49ers -1.5 Holding Firm Despite 68% Public Tickets on Chiefs',
+    headline: 'Divisional Rivalry: Ravens -3.5 Holding Firm at Home vs Bengals',
     spreadShift: {
-      open: "Pick'em",
-      current: '49ers -1.5',
-      delta: '-1.5 Points (Toward 49ers)',
-      favoredTeam: 'San Francisco 49ers',
+      open: 'Ravens -3.0',
+      current: 'Ravens -3.5',
+      delta: '-0.5 Points (Toward Ravens)',
+      favoredTeam: 'Baltimore Ravens',
     },
     totalShift: {
-      open: '47.5 O/U',
-      current: '46.5 O/U',
-      delta: '-1.0 Point',
-      direction: 'UNDER',
+      open: '49.5 O/U',
+      current: '51.0 O/U',
+      delta: '+1.5 Points',
+      direction: 'OVER',
     },
     moneyDivergence: {
-      dollarsPct: 62,
-      ticketsPct: 32,
-      divergenceMargin: 30,
-      dollarVolume: '$15.8M Handle',
-      favoredSide: '49ers -1.5',
+      dollarsPct: 74,
+      ticketsPct: 38,
+      divergenceMargin: 36,
+      dollarVolume: '$18.5M Handle',
+      favoredSide: 'Ravens -3.5',
     },
     riskWarnings: [
       {
-        title: 'Public Bias on Undefeated Chiefs',
+        title: 'High-Scoring Divisional Clash',
         description:
-          'Sharp syndicates taking home field advantage in Santa Clara following Shanahan game-plan prep.',
+          'Sharp syndicates favoring Lamar Jackson and Ravens ground attack at M&T Bank Stadium.',
         severityLevel: 'MEDIUM',
       },
     ],
     actionAdvice:
-      'LOOKAHEAD POSITION: Bet 49ers -1.5 early before line crosses key number 2.',
+      'DIVISIONAL VALUE: Lay Baltimore Ravens -3.5 or target Over 51.0 in prime offensive weather.',
     isSettled: false,
     gameStatus: 'UPCOMING',
   },
@@ -1950,7 +1951,7 @@ Time: ${new Date().toLocaleTimeString()} EDT`;
                     </div>
 
                     <div className="text-[12px] text-slate-300">
-                      <strong>Matchup:</strong> {currentAlert.matchup} ({currentAlert.scheduledTime})
+                      <strong>Matchup:</strong> {currentAlert.matchup} ({formatToLocalUserTime(currentAlert.scheduledTime)})
                       <br />
                       <strong>Movement:</strong> {currentAlert.spreadShift.open} &rarr;{' '}
                       {currentAlert.spreadShift.current} ({currentAlert.spreadShift.delta}) | Total{' '}

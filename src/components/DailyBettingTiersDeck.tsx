@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DailySlatePortfolio, DailyBetPackage } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 interface DailyBettingTiersDeckProps {
   portfolio: DailySlatePortfolio;
@@ -32,7 +33,7 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
   > = {
     single: {
       title: 'Nearest Game Formula: Whale Syndicate Steam on Home Favorite (-3.0)',
-      desc: 'Nearest Upcoming NFL Game: Chicago Bears -3.0 backed by 79% handle at Soldier Field (Thursday Night Football, Thursday Oct 22 · 8:15 PM EDT).',
+      desc: `Nearest Upcoming NFL Game: Chicago Bears -3.0 backed by 79% handle at Soldier Field (Thursday Night Football · ${formatToLocalUserTime('Thursday, Oct 22 · 8:15 PM EDT')}).`,
     },
     parlay: {
       title: 'NFL Week 7 Slate Formula: Thursday Night Football + Sunday Showcase',
@@ -325,7 +326,7 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
                   sport: 'NFL Nearest Spread',
                   icon: '🏈',
                   matchup: 'Ravens @ Browns',
-                  gameDate: 'Sunday, Oct 18 · 1:00 PM EDT',
+                  gameDate: formatToLocalUserTime('Sunday, Oct 18 · 1:00 PM EDT'),
                   selection: 'Baltimore Ravens -3.5 Point Spread',
                   odds: '-110 (DraftKings / Circa)',
                   ev: '+9.2%',
@@ -338,7 +339,7 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
                   sport: 'NFL Total Value',
                   icon: '⏱️',
                   matchup: 'Ravens @ Browns',
-                  gameDate: 'Sunday, Oct 18 · 1:00 PM EDT',
+                  gameDate: formatToLocalUserTime('Sunday, Oct 18 · 1:00 PM EDT'),
                   selection: 'Under 41.5 Total Points',
                   odds: '-110 (DraftKings / Circa)',
                   ev: '+8.8%',
@@ -351,7 +352,7 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
                   sport: 'NFL Emergency Value',
                   icon: '🚨',
                   matchup: 'Panthers @ Eagles',
-                  gameDate: 'Sunday, Oct 18 · 1:00 PM EDT',
+                  gameDate: formatToLocalUserTime('Sunday, Oct 18 · 1:00 PM EDT'),
                   selection: 'Carolina Panthers -3.5 Point Spread',
                   odds: '-110 (Circa Sports)',
                   ev: '+8.5%',
@@ -364,7 +365,7 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
                   sport: 'NFL Showcase',
                   icon: '👑',
                   matchup: 'Chargers @ Chiefs',
-                  gameDate: 'Sunday, Oct 18 · 4:25 PM EDT',
+                  gameDate: formatToLocalUserTime('Sunday, Oct 18 · 4:25 PM EDT'),
                   selection: 'Kansas City Chiefs -8.5',
                   odds: '-108 (FanDuel)',
                   ev: '+7.4%',

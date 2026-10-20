@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { playSuccessChime } from './audio';
+import { getUserTimeZoneAbbr } from './timeZoneUtils';
 
 export interface LiveVerificationState {
   lastVerifiedTime: Date;
@@ -49,11 +50,11 @@ export function useLiveVerification(): LiveVerificationState {
     playSuccessChime();
   }, []);
 
-  const formattedTime = lastVerifiedTime.toLocaleTimeString('en-US', {
+  const formattedTime = `${lastVerifiedTime.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-  });
+  })} ${getUserTimeZoneAbbr()}`;
 
   const formattedDate = lastVerifiedTime.toLocaleDateString('en-US', {
     weekday: 'short',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { fetchLiveNewsWithFallback } from '../utils/liveSportsFeed';
+import { formatCurrentTimeWithZone } from '../utils/timeZoneUtils';
 
 export interface LiveNewsArticle {
   id: string;
@@ -41,7 +42,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
       if (data.success && Array.isArray(data.articles)) {
         setArticles(data.articles);
         setFeedSource(data.source);
-        setLastSynced(new Date().toLocaleTimeString());
+        setLastSynced(formatCurrentTimeWithZone());
         if (isManual) {
           playSuccessChime();
         }

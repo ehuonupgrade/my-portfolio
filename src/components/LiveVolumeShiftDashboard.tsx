@@ -3,6 +3,7 @@ import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime, playChime } from '../utils/audio';
 import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
 import { getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 interface LiveVolumeShiftDashboardProps {
   games: GameMarket[];
@@ -352,7 +353,7 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
                       <div className="flex items-center gap-2 flex-wrap pb-1">
                         <GameStatusBadge game={game} size="xs" showIcon />
                         <span className="text-[10px] text-cyan-400 font-bold uppercase">
-                          {game.scheduledTime} &bull; {game.stadium.split(',')[0]}
+                          {formatToLocalUserTime(game.scheduledTime)} &bull; {game.stadium.split(',')[0]}
                         </span>
                       </div>
                       <h4 className="text-base font-bold text-white font-sans flex items-center gap-2">

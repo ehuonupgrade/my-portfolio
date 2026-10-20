@@ -22,6 +22,7 @@ import { purifyAndRealignGame, auditAllGamesInSlate } from '../utils/gameAlignme
 import { useSportsData } from '../context/SportsDataContext';
 import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
 import { ApiFetchDiagnosticsModal } from './common/ApiFetchDiagnosticsModal';
+import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 interface SportsBettingEdgeHubProps {
   onBack?: () => void;
@@ -305,7 +306,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight flex items-center gap-2.5 flex-wrap pt-1">
             <span>EdgeDetect: NFL Intelligence Hub &amp; Markets</span>
             <span className="text-xs font-mono font-medium px-2.5 py-0.5 rounded-full bg-amber-950/80 border border-amber-600/70 text-amber-300">
-              🏈 NFL Sub-Page &bull; Week 6 (2026 Regular Season)
+              🏈 NFL Sub-Page &bull; Week {selectedWeek || weekNumber || 7} (2026 Regular Season)
             </span>
             <button
               onClick={() => {
@@ -906,7 +907,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                         {game.league}
                       </span>
                       <GameStatusBadge game={game} size="xs" showIcon />
-                      <span className="text-[10px] text-slate-400">{game.scheduledTime}</span>
+                      <span className="text-[10px] text-slate-400">{formatToLocalUserTime(game.scheduledTime)}</span>
                     </span>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {meta.isCompleted ? (
@@ -1034,7 +1035,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
               <div>
                 <div className="flex items-center gap-2 flex-wrap pb-1">
                   <span className="text-xs text-cyan-400 font-bold uppercase">
-                    {activeGame.league} &bull; {activeGame.scheduledTime}
+                    {activeGame.league} &bull; {formatToLocalUserTime(activeGame.scheduledTime)}
                   </span>
                   <GameStatusBadge game={activeGame} size="sm" showIcon />
                 </div>
