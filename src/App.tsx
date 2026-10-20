@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { AnimatedRocketScene } from './components/AnimatedRocketScene';
 import { CosmicGame } from './components/CosmicGame';
 import { ChangelogView } from './components/ChangelogView';
@@ -901,6 +902,7 @@ export default function App() {
   return (
     <SportsDataProvider>
       <AppContent />
+      <Analytics />
     </SportsDataProvider>
   );
 }
