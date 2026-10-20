@@ -13,6 +13,7 @@ import { GameMarket } from '../types/sportsBetting';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { playKeyClick } from '../utils/audio';
 import { GameStatusBadge } from './common/GameStatusBadge';
+import { getCleanTeamName } from '../data/nflMarketOpinionsData';
 
 interface GameLineMovementViewProps {
   game: GameMarket;
@@ -77,7 +78,7 @@ export const GameLineMovementView: React.FC<GameLineMovementViewProps> = ({ game
                 <span>{game.stadium}</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight pt-0.5">
-                {game.awayTeam.city} {game.awayTeam.name} @ {game.homeTeam.city} {game.homeTeam.name}
+                {getCleanTeamName(game.awayTeam.city, game.awayTeam.name)} @ {getCleanTeamName(game.homeTeam.city, game.homeTeam.name)}
               </h2>
             </div>
           </div>

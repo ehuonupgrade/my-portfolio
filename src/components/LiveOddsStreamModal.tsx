@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { GameMarket } from '../types/sportsBetting';
 import { LiveOddsStreamState } from '../utils/useLiveOddsStream';
 import { playKeyClick } from '../utils/audio';
+import { getCleanTeamName } from '../data/nflMarketOpinionsData';
 
 interface LiveOddsStreamModalProps {
   isOpen: boolean;
@@ -181,7 +182,7 @@ export const LiveOddsStreamModal: React.FC<LiveOddsStreamModalProps> = ({
                   {games.map((g) => (
                     <div key={g.id} className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
-                        <span className="font-bold text-white">{g.awayTeam.city} {g.awayTeam.name} @ {g.homeTeam.city} {g.homeTeam.name}</span>
+                        <span className="font-bold text-white">{getCleanTeamName(g.awayTeam.city, g.awayTeam.name)} @ {getCleanTeamName(g.homeTeam.city, g.homeTeam.name)}</span>
                         <div className="text-[10px] text-slate-400">{g.scheduledTime} &bull; {g.stadium}</div>
                       </div>
 

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { DAILY_SLATE_PORTFOLIOS, getActiveDailyPortfolio } from '../data/sportsBettingData';
-import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
+import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions, getCleanTeamName } from '../data/nflMarketOpinionsData';
 import { useSportsData } from '../context/SportsDataContext';
 import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, SUPERSTAR_BREAKING_MEDICAL_WIRE, MovementAlertItem } from './LineMovementAlertBanner';
 import {
@@ -817,7 +817,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
                           <div>
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                                {game.awayTeam.city} {game.awayTeam.name} ({game.awayTeam.record}) @ {game.homeTeam.city} {game.homeTeam.name} ({game.homeTeam.record})
+                                {getCleanTeamName(game.awayTeam.city, game.awayTeam.name)} ({game.awayTeam.record}) @ {getCleanTeamName(game.homeTeam.city, game.homeTeam.name)} ({game.homeTeam.record})
                               </h3>
                               <GameStatusBadge game={game} size="xs" showIcon />
                               <span className="text-xs font-mono text-slate-400">

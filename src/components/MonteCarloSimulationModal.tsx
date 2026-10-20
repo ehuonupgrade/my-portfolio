@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GameMarket } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
+import { getCleanTeamName } from '../data/nflMarketOpinionsData';
 
 interface MonteCarloSimulationModalProps {
   isOpen: boolean;
@@ -126,7 +127,7 @@ export const MonteCarloSimulationModal: React.FC<MonteCarloSimulationModalProps>
             >
               {games.map((g) => (
                 <option key={g.id} value={g.id}>
-                  {g.awayTeam.city} {g.awayTeam.name} @ {g.homeTeam.city} {g.homeTeam.name} ({g.scheduledTime})
+                  {getCleanTeamName(g.awayTeam.city, g.awayTeam.name)} @ {getCleanTeamName(g.homeTeam.city, g.homeTeam.name)} ({g.scheduledTime})
                 </option>
               ))}
             </select>

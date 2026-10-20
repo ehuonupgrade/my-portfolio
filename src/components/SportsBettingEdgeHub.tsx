@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, SportsLeague } from '../types/sportsBetting';
 import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS, getActiveDailyPortfolio } from '../data/sportsBettingData';
-import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
+import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions, getCleanTeamName } from '../data/nflMarketOpinionsData';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BetTrackerAndPatternView } from './BetTrackerAndPatternView';
 import { AnalystConsensusTracker } from './AnalystConsensusTracker';
@@ -609,7 +609,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                   ★ ALGORITHM 1-GAME STRATEGY SELECTION
                 </span>
                 <span className="text-xs font-mono text-cyan-300">
-                  {primeGame.awayTeam.city} {primeGame.awayTeam.name} @ {primeGame.homeTeam.city} {primeGame.homeTeam.name}
+                  {getCleanTeamName(primeGame.awayTeam.city, primeGame.awayTeam.name)} @ {getCleanTeamName(primeGame.homeTeam.city, primeGame.homeTeam.name)}
                 </span>
               </div>
               <h3 className="text-xl font-bold text-white tracking-tight">
@@ -1039,7 +1039,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                   <GameStatusBadge game={activeGame} size="sm" showIcon />
                 </div>
                 <h3 className="text-xl font-bold text-white font-sans">
-                  {activeGame.awayTeam.city} {activeGame.awayTeam.name} vs. {activeGame.homeTeam.city} {activeGame.homeTeam.name}
+                  {getCleanTeamName(activeGame.awayTeam.city, activeGame.awayTeam.name)} vs. {getCleanTeamName(activeGame.homeTeam.city, activeGame.homeTeam.name)}
                 </h3>
                 <div className="text-xs text-slate-400">{activeGame.stadium}</div>
               </div>
@@ -1654,7 +1654,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                     <div className="flex items-center justify-between text-xs border-b border-slate-800 pb-2">
                       <span className="font-bold text-white flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: activeGame.homeTeam.logoColor }} />
-                        <span>{activeGame.homeTeam.city} {activeGame.homeTeam.name}</span>
+                        <span>{getCleanTeamName(activeGame.homeTeam.city, activeGame.homeTeam.name)}</span>
                       </span>
                       <span className="text-[10px] text-slate-500">
                         {activeGame.injuries?.homeInjuries.length || 0} Reported
@@ -1699,7 +1699,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                     <div className="flex items-center justify-between text-xs border-b border-slate-800 pb-2">
                       <span className="font-bold text-white flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: activeGame.awayTeam.logoColor }} />
-                        <span>{activeGame.awayTeam.city} {activeGame.awayTeam.name}</span>
+                        <span>{getCleanTeamName(activeGame.awayTeam.city, activeGame.awayTeam.name)}</span>
                       </span>
                       <span className="text-[10px] text-slate-500">
                         {activeGame.injuries?.awayInjuries.length || 0} Reported

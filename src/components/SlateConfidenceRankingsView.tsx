@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { GameMarket } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
+import { getCleanTeamName } from '../data/nflMarketOpinionsData';
 
 interface SlateConfidenceRankingsViewProps {
   games: GameMarket[];
@@ -276,9 +277,9 @@ export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewPr
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-1">
                   <div>
                     <h3 className="text-xl font-bold text-white font-sans flex items-center gap-2">
-                      <span>{game.awayTeam.city} {game.awayTeam.name} ({game.awayTeam.record})</span>
+                      <span>{getCleanTeamName(game.awayTeam.city, game.awayTeam.name)} ({game.awayTeam.record})</span>
                       <span className="text-slate-500 font-normal">at</span>
-                      <span>{game.homeTeam.city} {game.homeTeam.name} ({game.homeTeam.record})</span>
+                      <span>{getCleanTeamName(game.homeTeam.city, game.homeTeam.name)} ({game.homeTeam.record})</span>
                     </h3>
                     <div className="text-xs text-slate-400 flex items-center gap-3 pt-0.5 flex-wrap">
                       <span>🏟️ {game.stadium}</span>

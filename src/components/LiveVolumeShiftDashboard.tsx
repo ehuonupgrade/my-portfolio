@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime, playChime } from '../utils/audio';
 import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
+import { getCleanTeamName } from '../data/nflMarketOpinionsData';
 
 interface LiveVolumeShiftDashboardProps {
   games: GameMarket[];
@@ -355,9 +356,9 @@ export const LiveVolumeShiftDashboard: React.FC<LiveVolumeShiftDashboardProps> =
                         </span>
                       </div>
                       <h4 className="text-base font-bold text-white font-sans flex items-center gap-2">
-                        <span>{game.awayTeam.city} {game.awayTeam.name}</span>
+                        <span>{getCleanTeamName(game.awayTeam.city, game.awayTeam.name)}</span>
                         <span className="text-slate-500 font-normal">@</span>
-                        <span>{game.homeTeam.city} {game.homeTeam.name}</span>
+                        <span>{getCleanTeamName(game.homeTeam.city, game.homeTeam.name)}</span>
                       </h4>
                     </div>
 

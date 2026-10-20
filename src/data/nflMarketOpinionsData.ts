@@ -1488,36 +1488,75 @@ export const NFL_LIVE_VOLUME_SHIFTS_MAP: Record<string, ActiveGameVolumeShifts> 
  * e.g., if Houston Texans are recommended and consensus is JAX -2.5,
  * correctly formats as "Houston Texans +2.5 (JAX -2.5)" rather than "Houston Texans -2.5".
  */
+/**
+ * CLEAN TEAM NAME HELPER
+ * Prevents duplicated city names like "Atlanta Atlanta Falcons" or "New Orleans New Orleans Saints".
+ */
+export function getCleanTeamName(city?: string, name?: string): string {
+  const c = (city || '').trim();
+  const n = (name || '').trim();
+  if (!c) return n;
+  if (!n) return c;
+  if (n.toLowerCase().startsWith(c.toLowerCase())) {
+    return n;
+  }
+  return `${c} ${n}`;
+}
+
+/**
+ * DYNAMIC SPREAD ALIGNMENT GUARD
+ * 
+ * Verifies and constructs mathematically coherent spread pick titles.
+ * Ensures clean formatting without duplicated city names or confusing parenthetical lines.
+ * e.g., "Houston Texans +2.5" or "Baltimore Ravens -3.5"
+ */
 export function formatDynamicSpreadPick(
   rawPick: string,
   liveConsensus: string,
   homeAbbr: string,
   awayAbbr: string,
-  homeName: string,
-  awayName: string
+  homeFullName: string,
+  awayFullName: string
 ): string {
-  if (!liveConsensus) return rawPick;
+  // Strip parentheses and existing trailing spreads from raw pick
+  let cleanName = rawPick
+    .split(' (')[0]
+    .replace(/[\+\-]\d+(\.\d+)?$/, '')
+    .trim();
 
-  // Extract base team name from rawPick (e.g. "Houston Texans" from "Houston Texans +2.5" or "Houston Texans -2.5")
-  const basePickName = rawPick.split(' (')[0].replace(/[\+\-]\d+(\.\d+)?$/, '').trim();
+  // Deduplicate double city/team words if present (e.g. "Atlanta Atlanta Falcons" -> "Atlanta Falcons")
+  const words = cleanName.split(' ');
+  if (words.length >= 3 && words[0].toLowerCase() === words[1].toLowerCase()) {
+    cleanName = words.slice(1).join(' ');
+  }
 
-  // Parse favorite team and spread number from liveConsensus (e.g. "JAX -2.5" -> fav="JAX", spreadVal=2.5)
+  if (!liveConsensus) {
+    const existingLineMatch = rawPick.match(/[\+\-]\d+(\.\d+)?/);
+    if (existingLineMatch) {
+      return `${cleanName} ${existingLineMatch[0]}`;
+    }
+    return cleanName;
+  }
+
+  // Parse favorite team and spread number from liveConsensus (e.g. "JAX -2.5" or "PIT -3.5")
   const consensusParts = liveConsensus.split(' ');
   const favTeamAbbr = consensusParts[0]?.toUpperCase() || '';
   const spreadNumMatch = liveConsensus.match(/[\+\-]?\d+(\.\d+)?/);
   const spreadVal = spreadNumMatch ? Math.abs(parseFloat(spreadNumMatch[0])) : 2.5;
 
-  // Determine if picked team is the favorite
-  const isHomePicked = basePickName.toLowerCase().includes(homeName.toLowerCase()) || basePickName.toLowerCase().includes(homeAbbr.toLowerCase());
-  const isAwayPicked = basePickName.toLowerCase().includes(awayName.toLowerCase()) || basePickName.toLowerCase().includes(awayAbbr.toLowerCase());
+  // Determine if picked team is Home or Away
+  const isHomePicked = cleanName.toLowerCase().includes(homeFullName.toLowerCase()) || 
+                       cleanName.toLowerCase().includes(homeAbbr.toLowerCase());
+  const isAwayPicked = cleanName.toLowerCase().includes(awayFullName.toLowerCase()) || 
+                       cleanName.toLowerCase().includes(awayAbbr.toLowerCase());
 
   const pickedAbbr = isHomePicked ? homeAbbr : isAwayPicked ? awayAbbr : (favTeamAbbr === homeAbbr ? awayAbbr : homeAbbr);
-  const isFavored = pickedAbbr.toUpperCase() === favTeamAbbr;
+  const isFavored = (pickedAbbr.toUpperCase() === favTeamAbbr);
 
   const correctSignedLine = isFavored ? `-${spreadVal}` : `+${spreadVal}`;
-  const teamTitle = basePickName || (isFavored ? (favTeamAbbr === homeAbbr ? homeName : awayName) : (favTeamAbbr === homeAbbr ? awayName : homeName));
+  const teamTitle = isHomePicked ? homeFullName : isAwayPicked ? awayFullName : cleanName;
 
-  return `${teamTitle} ${correctSignedLine} (${liveConsensus})`;
+  return `${teamTitle} ${correctSignedLine}`;
 }
 
 /**
@@ -1531,12 +1570,10 @@ export function formatDynamicSpreadPick(
 export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpinions {
   const existing = NFL_MARKET_OPINIONS_MAP[game.id];
 
-  // Extract live line info from game object
-  const homeName = game.homeTeam?.name || 'Home';
-  const homeCity = game.homeTeam?.city || '';
+  // Extract live line info from game object using clean team names
+  const homeFullName = getCleanTeamName(game.homeTeam?.city, game.homeTeam?.name) || 'Home Team';
   const homeAbbr = game.homeTeam?.abbr || 'HOM';
-  const awayName = game.awayTeam?.name || 'Away';
-  const awayCity = game.awayTeam?.city || '';
+  const awayFullName = getCleanTeamName(game.awayTeam?.city, game.awayTeam?.name) || 'Away Team';
   const awayAbbr = game.awayTeam?.abbr || 'AWY';
 
   const liveSpreadStr = game.consensus?.spread || '';
@@ -1551,17 +1588,14 @@ export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpin
   const awayMoneyPct = game.splits?.spread?.away?.moneyPercentage || 50;
   const awayTicketPct = game.splits?.spread?.away?.ticketPercentage || 50;
 
-  let spreadPickTeam = homeMoneyPct >= awayMoneyPct ? `${homeCity} ${homeName}` : `${awayCity} ${awayName}`;
-  let spreadLineStr = liveSpreadStr || (homeMoneyPct >= awayMoneyPct ? `${homeAbbr} -3.5` : `${awayAbbr} +3.5`);
-
   if (existing) {
     const formattedPick = formatDynamicSpreadPick(
       existing.spreadOpinion.pick,
       liveSpreadStr,
       homeAbbr,
       awayAbbr,
-      `${homeCity} ${homeName}`,
-      `${awayCity} ${awayName}`
+      homeFullName,
+      awayFullName
     );
 
     return {
@@ -1582,12 +1616,29 @@ export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpin
   }
 
   // Universal Dynamic Generation for any unmapped game
+  const isHomePicked = homeMoneyPct >= awayMoneyPct;
+  const pickedTeamFullName = isHomePicked ? homeFullName : awayFullName;
+  const pickedAbbr = isHomePicked ? homeAbbr : awayAbbr;
+
+  let pickSignedLine = '';
+  if (liveSpreadStr) {
+    const consensusParts = liveSpreadStr.split(' ');
+    const favTeamAbbr = consensusParts[0]?.toUpperCase() || '';
+    const spreadNumMatch = liveSpreadStr.match(/[\+\-]?\d+(\.\d+)?/);
+    const spreadVal = spreadNumMatch ? Math.abs(parseFloat(spreadNumMatch[0])) : 3.5;
+    const isFavored = (pickedAbbr.toUpperCase() === favTeamAbbr);
+    pickSignedLine = isFavored ? `-${spreadVal}` : `+${spreadVal}`;
+  } else {
+    pickSignedLine = isHomePicked ? '-3.5' : '+3.5';
+  }
+
+  const spreadPickTeam = `${pickedTeamFullName} ${pickSignedLine}`;
   const awayMoneyDivergence = awayMoneyPct - awayTicketPct;
   const modelEdge = Math.min(9.8, Math.max(5.2, 5.0 + Math.abs(homeMoneyDivergence) * 0.15));
   const confidenceScore = Math.min(96, Math.max(82, 85 + Math.round(Math.abs(homeMoneyDivergence) * 0.2)));
   const verdict: 'STRONG_BUY' | 'BUY' | 'NEUTRAL' = Math.abs(homeMoneyDivergence) >= 15 ? 'STRONG_BUY' : 'BUY';
 
-  const sharpFavoredTeam = homeMoneyPct > awayMoneyPct ? `${homeCity} ${homeName}` : `${awayCity} ${awayName}`;
+  const sharpFavoredTeam = isHomePicked ? homeFullName : awayFullName;
   const sharpDivergenceVal = Math.max(homeMoneyDivergence, awayMoneyDivergence);
 
   return {
@@ -1595,30 +1646,30 @@ export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpin
     overallConfidenceScore: confidenceScore,
     confidenceTier: confidenceScore >= 92 ? 'MAX_LOCK' : confidenceScore >= 88 ? 'HIGH_CONVICTION' : 'STRONG_VALUE',
     primaryRecommendedBet: 'SPREAD',
-    executiveMatchupVerdict: `⚡ DYNAMIC LIVE RECONCILIATION: Sharp syndicates driving ${sharpFavoredTeam} with a +${Math.abs(sharpDivergenceVal)}% whale dollar divergence. Consensus market holding at ${spreadLineStr} with Total at ${liveTotalVal} O/U.`,
+    executiveMatchupVerdict: `⚡ DYNAMIC LIVE RECONCILIATION: Sharp syndicates driving ${sharpFavoredTeam} with a +${Math.abs(sharpDivergenceVal)}% whale dollar divergence. Consensus market holding at ${liveSpreadStr || spreadPickTeam} with Total at ${liveTotalVal} O/U.`,
     spreadOpinion: {
       betType: 'SPREAD',
-      pick: `${spreadPickTeam} (${spreadLineStr})`,
+      pick: spreadPickTeam,
       odds: '-110',
       bestSportsbook: 'Circa Sports / DraftKings',
       modelEdge,
       confidenceRating: confidenceScore,
       confidenceStars: confidenceScore >= 90 ? 5 : 4,
       verdict,
-      selectionSummary: `Whale handle inflow backing ${sharpFavoredTeam} at ${spreadLineStr}.`,
-      rationale: `Live market flow analysis indicates sharp money concentration on ${sharpFavoredTeam}. Public ticket count is spread evenly, but high-dollar syndicate slips favor ${spreadLineStr}.`,
+      selectionSummary: `Whale handle inflow backing ${sharpFavoredTeam} at ${pickSignedLine}.`,
+      rationale: `Live market flow analysis indicates sharp money concentration on ${sharpFavoredTeam}. Public ticket count is spread evenly, but high-dollar syndicate slips favor ${spreadPickTeam}.`,
     },
     moneylineOpinion: {
       betType: 'MONEYLINE',
-      pick: `${homeCity} ${homeName} ML`,
+      pick: `${homeFullName} ML`,
       odds: String(liveHomeMl > 0 ? `+${liveHomeMl}` : liveHomeMl),
       bestSportsbook: 'FanDuel / DraftKings',
       modelEdge: Number(Math.max(4.5, modelEdge - 1.5).toFixed(1)),
       confidenceRating: Math.max(80, confidenceScore - 3),
       confidenceStars: 4,
       verdict: 'BUY',
-      selectionSummary: `Direct moneyline value on ${homeName} at ${liveHomeMl}.`,
-      rationale: `Implied win probability based on live multi-book pricing assigns ${homeName} strong outright equity.`,
+      selectionSummary: `Direct moneyline value on ${homeFullName} at ${liveHomeMl}.`,
+      rationale: `Implied win probability based on live multi-book pricing assigns ${homeFullName} strong outright equity.`,
     },
     totalOpinion: {
       betType: 'TOTAL',
