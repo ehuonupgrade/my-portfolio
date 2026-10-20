@@ -3,10 +3,12 @@ import {
   MOCK_ANALYST_CONSENSUS_DATA,
   TRACKED_SPORTS_ANALYSTS,
   getTriggeredContrarianFades,
+  getUniversalAnalystConsensus,
 } from '../data/sportsAnalystsData';
 import { AnalystMarketConsensus, AnalystPick } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { GameStatusBadge } from './common/GameStatusBadge';
+import { useSportsData } from '../context/SportsDataContext';
 
 interface AnalystConsensusTrackerProps {
   onSelectGame?: (gameId: string) => void;
@@ -18,12 +20,20 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
   onOpenBetTracker,
 }) => {
   const [activeTab, setActiveTab] = useState<'radar' | 'history' | 'roster' | 'theory'>('radar');
-  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-ne-chi-w7');
+  const [selectedGameId, setSelectedGameId] = useState<string>('');
   const [networkFilter, setNetworkFilter] = useState<string>('ALL');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  const { games } = useSportsData();
+
   const upcomingConsensusList = useMemo(() => {
+    if (games && games.length > 0) {
+      const upcomingGames = games.filter((g) => g && g.status !== 'FINAL' && (g.status as string) !== 'STATUS_FINAL' && (g.status as string) !== 'POST');
+      if (upcomingGames.length > 0) {
+        return upcomingGames.map(getUniversalAnalystConsensus);
+      }
+    }
     return Object.values(MOCK_ANALYST_CONSENSUS_DATA).filter(
       (c) =>
         c.gameId !== 'nfl-sea-den-tnf' &&
@@ -31,9 +41,15 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
         c.gameId !== 'nfl-bal-cle-w6' &&
         c.gameId !== 'nfl-wsh-sf-w6'
     );
-  }, []);
+  }, [games]);
 
   const completedConsensusList = useMemo(() => {
+    if (games && games.length > 0) {
+      const completedGames = games.filter((g) => g && (g.status === 'FINAL' || (g.status as string) === 'STATUS_FINAL' || (g.status as string) === 'POST'));
+      if (completedGames.length > 0) {
+        return completedGames.map(getUniversalAnalystConsensus);
+      }
+    }
     return Object.values(MOCK_ANALYST_CONSENSUS_DATA).filter(
       (c) =>
         c.gameId === 'nfl-sea-den-tnf' ||
@@ -41,14 +57,18 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
         c.gameId === 'nfl-bal-cle-w6' ||
         c.gameId === 'nfl-wsh-sf-w6'
     );
-  }, []);
+  }, [games]);
 
   const activeConsensusList = useMemo(() => {
     return activeTab === 'history' ? completedConsensusList : upcomingConsensusList;
   }, [activeTab, completedConsensusList, upcomingConsensusList]);
 
   const activeConsensus = useMemo(() => {
-    return MOCK_ANALYST_CONSENSUS_DATA[selectedGameId] || activeConsensusList[0];
+    if (selectedGameId) {
+      const found = activeConsensusList.find((c) => c.gameId === selectedGameId);
+      if (found) return found;
+    }
+    return activeConsensusList[0] || null;
   }, [selectedGameId, activeConsensusList]);
 
   const triggeredFades = useMemo(() => {

@@ -66,8 +66,8 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   } = useSportsData();
 
   const activePortfolio = useMemo(() => {
-    return getActiveDailyPortfolio(selectedWeek || weekNumber || 7);
-  }, [selectedWeek, weekNumber]);
+    return getActiveDailyPortfolio(selectedWeek || weekNumber || 7, games);
+  }, [selectedWeek, weekNumber, games]);
 
   const nearestUpcomingGame = useMemo(() => {
     return (

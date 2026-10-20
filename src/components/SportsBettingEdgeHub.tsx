@@ -579,7 +579,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-white font-bold uppercase tracking-wider text-sm font-sans">
-                    Daily Algorithmic Portfolio &bull; {getActiveDailyPortfolio(selectedWeek || weekNumber || 7).dateLabel}
+                    Daily Algorithmic Portfolio &bull; {getActiveDailyPortfolio(selectedWeek || weekNumber || 7, allAvailableGames).dateLabel}
                   </span>
                 </div>
                 <span className="text-slate-400 text-[11px] hidden sm:inline">
@@ -588,7 +588,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
               </div>
 
               <DailyBettingTiersDeck
-                portfolio={getActiveDailyPortfolio(selectedWeek || weekNumber || 7)}
+                portfolio={getActiveDailyPortfolio(selectedWeek || weekNumber || 7, allAvailableGames)}
                 onSelectGame={(gameId) => {
                   playKeyClick();
                   setActiveGameId(gameId);

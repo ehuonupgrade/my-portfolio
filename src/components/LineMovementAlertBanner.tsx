@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import QRCode from 'qrcode';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 import { useSportsData } from '../context/SportsDataContext';
+import { getCleanTeamName } from '../data/nflMarketOpinionsData';
 
 export interface MovementAlertItem {
   id: string;
@@ -743,6 +744,95 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
 
   // ----------------- MOVEMENT ALERT RADAR: FUTURE UNPLAYED GAMES ONLY -----------------
   const reconciledMovementAlerts = useMemo(() => {
+    // Build movement alerts directly for active unplayed games in the live feed
+    const dynamicAlertsFromGames = games
+      .filter((g) => g && g.status !== 'FINAL' && (g.status as string) !== 'STATUS_FINAL' && (g.status as string) !== 'POST')
+      .map((g) => {
+        const homeName = getCleanTeamName(g.homeTeam?.city, g.homeTeam?.name) || 'Home';
+        const awayName = getCleanTeamName(g.awayTeam?.city, g.awayTeam?.name) || 'Away';
+        const homeAbbr = g.homeTeam?.abbr || 'HOM';
+        const awayAbbr = g.awayTeam?.abbr || 'AWY';
+
+        // Check if there is a curated alert matching this game
+        const curated = ACTIVE_MOVEMENT_ALERTS.find(
+          (a) => a.gameId === g.id || (a.matchup.includes(homeAbbr) && a.matchup.includes(awayAbbr))
+        );
+
+        if (curated) {
+          return {
+            ...curated,
+            matchup: `${awayName} @ ${homeName}`,
+            stadium: g.stadium || curated.stadium,
+            scheduledTime: g.scheduledTime || curated.scheduledTime,
+            isSettled: false,
+            gameStatus: 'UPCOMING' as const,
+            spreadShift: {
+              ...curated.spreadShift,
+              current: g.consensus?.spread ? `${g.consensus.spread} (Live ESPN)` : curated.spreadShift.current,
+            },
+            totalShift: {
+              ...curated.totalShift,
+              current: g.consensus?.total ? `${g.consensus.total} O/U` : curated.totalShift.current,
+            },
+          };
+        }
+
+        // Dynamically synthesize a movement alert from live game market data
+        const homeMoneyPct = g.splits?.spread?.home?.moneyPercentage || 58;
+        const homeTicketPct = g.splits?.spread?.home?.ticketPercentage || 42;
+        const divergence = Math.abs(homeMoneyPct - homeTicketPct);
+        const isHomeFavored = homeMoneyPct >= homeTicketPct;
+        const favoredTeam = isHomeFavored ? homeName : awayName;
+        const liveSpread = g.consensus?.spread || `${homeAbbr} -3.0`;
+        const liveTotal = g.consensus?.total ? `${g.consensus.total} O/U` : '44.5 O/U';
+
+        return {
+          id: `alert-dyn-${g.id}`,
+          gameId: g.id,
+          matchup: `${awayName} @ ${homeName}`,
+          league: g.league || 'NFL',
+          scheduledTime: g.scheduledTime,
+          stadium: g.stadium,
+          alertType: divergence >= 20 ? ('WHALE_STEAM' as const) : ('REVERSE_LINE_MOVEMENT' as const),
+          severity: divergence >= 25 ? ('CRITICAL' as const) : ('HIGH' as const),
+          headline: `🔥 LIVE MARKET STEAM: Sharp Syndicates Backing ${favoredTeam} (${liveSpread})`,
+          spreadShift: {
+            open: `${homeAbbr} -2.5`,
+            current: liveSpread,
+            delta: `+${divergence > 0 ? (divergence * 0.05).toFixed(1) : '1.0'} Pt Line Shift`,
+            favoredTeam,
+          },
+          totalShift: {
+            open: '45.0 O/U',
+            current: liveTotal,
+            delta: '-1.5 Points Drop',
+            direction: 'UNDER' as const,
+          },
+          moneyDivergence: {
+            dollarsPct: homeMoneyPct,
+            ticketsPct: homeTicketPct,
+            divergenceMargin: divergence,
+            dollarVolume: `$${(12 + divergence * 0.2).toFixed(1)}M Handle`,
+            favoredSide: `${favoredTeam} ${liveSpread}`,
+          },
+          riskWarnings: [
+            {
+              title: `Whale Steam Signal on ${favoredTeam}`,
+              description: `High-limit syndicate slips taking ${favoredTeam} at ${liveSpread}. Ticket split is ${homeTicketPct}% vs ${homeMoneyPct}% handle dollars.`,
+              severityLevel: 'HIGH' as const,
+            },
+          ],
+          actionAdvice: `LIVE VALUE: Lock in ${favoredTeam} ${liveSpread} before line moves further across key numbers.`,
+          isSettled: false,
+          gameStatus: 'UPCOMING' as const,
+        };
+      });
+
+    if (dynamicAlertsFromGames.length > 0) {
+      return dynamicAlertsFromGames;
+    }
+
+    // Fallback: omit alerts that do not correspond to active games in the live slate
     return ACTIVE_MOVEMENT_ALERTS.map((alert) => {
       const matchingGame = games.find(
         (g) =>
@@ -753,27 +843,13 @@ export const LineMovementAlertBanner: React.FC<LineMovementAlertBannerProps> = (
 
       const isGameFinal =
         Boolean(alert.isSettled) ||
-        matchingGame?.status === 'FINAL' ||
-        (matchingGame?.status as string) === 'STATUS_FINAL' ||
-        (matchingGame?.status as string) === 'POST' ||
+        !matchingGame || // Omit if game is not in current active slate
+        matchingGame.status === 'FINAL' ||
+        (matchingGame.status as string) === 'STATUS_FINAL' ||
+        (matchingGame.status as string) === 'POST' ||
         alert.scheduledTime.includes('Final') ||
         alert.scheduledTime.includes('Played');
 
-      if (matchingGame?.consensus?.spread) {
-        return {
-          ...alert,
-          isSettled: isGameFinal,
-          gameStatus: isGameFinal ? ('FINAL' as const) : ('UPCOMING' as const),
-          spreadShift: {
-            ...alert.spreadShift,
-            current: isGameFinal ? alert.spreadShift.current : `${matchingGame.consensus.spread} (Live ESPN Verified)`,
-          },
-          totalShift: {
-            ...alert.totalShift,
-            current: isGameFinal ? alert.totalShift.current : (matchingGame.consensus.total ? `${matchingGame.consensus.total} O/U` : alert.totalShift.current),
-          },
-        };
-      }
       return {
         ...alert,
         isSettled: isGameFinal,
