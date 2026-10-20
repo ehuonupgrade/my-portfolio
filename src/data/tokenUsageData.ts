@@ -75,6 +75,72 @@ export const SUPPORTED_LLM_APPLICATIONS: LLMApplicationInfo[] = [
 
 export const SUPPORTED_LLM_MODELS: LLMModelInfo[] = [
   {
+    id: 'gemini-3.6-flash',
+    name: 'Gemini 3.6 Flash',
+    provider: 'Google',
+    color: '#0284c7', // Sky Blue
+    badgeBg: 'bg-sky-950/80',
+    badgeBorder: 'border-sky-500/80',
+    badgeText: 'text-sky-300',
+    costPerMillionPrompt: 0.10,
+    costPerMillionCompletion: 0.40,
+  },
+  {
+    id: 'gemini-3.6-pro',
+    name: 'Gemini 3.6 Pro',
+    provider: 'Google',
+    color: '#6366f1', // Indigo
+    badgeBg: 'bg-indigo-950/80',
+    badgeBorder: 'border-indigo-500/80',
+    badgeText: 'text-indigo-300',
+    costPerMillionPrompt: 1.25,
+    costPerMillionCompletion: 5.0,
+  },
+  {
+    id: 'gemini-3.5-flash',
+    name: 'Gemini 3.5 Flash',
+    provider: 'Google',
+    color: '#06b6d4', // Cyan
+    badgeBg: 'bg-cyan-950/80',
+    badgeBorder: 'border-cyan-500/80',
+    badgeText: 'text-cyan-300',
+    costPerMillionPrompt: 0.12,
+    costPerMillionCompletion: 0.45,
+  },
+  {
+    id: 'gemini-3.5-pro',
+    name: 'Gemini 3.5 Pro',
+    provider: 'Google',
+    color: '#a855f7', // Purple
+    badgeBg: 'bg-purple-950/80',
+    badgeBorder: 'border-purple-500/80',
+    badgeText: 'text-purple-300',
+    costPerMillionPrompt: 1.25,
+    costPerMillionCompletion: 5.0,
+  },
+  {
+    id: 'gemini-3.1-pro',
+    name: 'Gemini 3.1 Pro',
+    provider: 'Google',
+    color: '#14b8a6', // Teal
+    badgeBg: 'bg-teal-950/80',
+    badgeBorder: 'border-teal-500/80',
+    badgeText: 'text-teal-300',
+    costPerMillionPrompt: 1.25,
+    costPerMillionCompletion: 5.0,
+  },
+  {
+    id: 'gemini-3.1-flash',
+    name: 'Gemini 3.1 Flash',
+    provider: 'Google',
+    color: '#10b981', // Emerald
+    badgeBg: 'bg-emerald-950/80',
+    badgeBorder: 'border-emerald-500/80',
+    badgeText: 'text-emerald-300',
+    costPerMillionPrompt: 0.15,
+    costPerMillionCompletion: 0.60,
+  },
+  {
     id: 'gemini-3.8-flash',
     name: 'Gemini 3.8 Flash',
     provider: 'Google',
@@ -100,7 +166,7 @@ export const SUPPORTED_LLM_MODELS: LLMModelInfo[] = [
     id: 'gemini-2.5-flash',
     name: 'Gemini 2.5 Flash',
     provider: 'Google',
-    color: '#06b6d4', // Cyan
+    color: '#38bdf8', // Light Blue
     badgeBg: 'bg-cyan-950/70',
     badgeBorder: 'border-cyan-700/80',
     badgeText: 'text-cyan-300',
@@ -213,7 +279,7 @@ export function getLiveTodayDate(): LiveTodayDateInfo {
 }
 
 export const SEED_DAILY_TOKEN_RECORDS: DailyTokenRecord[] = [
-  // Today: Dynamic Active Live Session (Friday, Oct 16, 2026)
+  // Today: Dynamic Active Live Session
   {
     date: '2026-10-16',
     dateLabel: 'Oct 16 (Today)',
@@ -222,7 +288,7 @@ export const SEED_DAILY_TOKEN_RECORDS: DailyTokenRecord[] = [
     totalTokens: 1_084_200,
     isFullyUtilized: true,
     utilizationPercentage: 108.4,
-    workloadNote: '⚡ LIVE ACTIVE SESSION (108.4%): Google AI Studio live sessions — Lamar Jackson breaking injury wire, active Week 6 live volume telemetry & token tracking engine with Gemini 3.8 Flash',
+    workloadNote: '⚡ LIVE ACTIVE SESSION (108.4%): Google AI Studio quota rotation sessions across Gemini 3.6 Flash (primary), Gemini 3.5 Flash & Gemini 3.1 Pro on rate limit triggers — active Week 7 live volume telemetry & token tracking engine',
     peakTimePST: '12:47 PM PDT (Active Live Session)',
     isRealTelemetry: true,
     applications: {
@@ -231,9 +297,10 @@ export const SEED_DAILY_TOKEN_RECORDS: DailyTokenRecord[] = [
       'cursor-ide': { promptTokens: 22_000, completionTokens: 9_000, totalTokens: 31_000 },
     },
     models: {
-      'gemini-3.8-flash': { promptTokens: 705_000, completionTokens: 175_000, totalTokens: 880_000 },
-      'gemini-3.8-pro': { promptTokens: 98_000, completionTokens: 23_000, totalTokens: 121_000 },
-      'gemini-2.5-flash': { promptTokens: 45_000, completionTokens: 15_200, totalTokens: 60_200 },
+      'gemini-3.6-flash': { promptTokens: 480_000, completionTokens: 120_000, totalTokens: 600_000 },
+      'gemini-3.5-flash': { promptTokens: 215_000, completionTokens: 55_000, totalTokens: 270_000 },
+      'gemini-3.1-pro': { promptTokens: 98_000, completionTokens: 25_000, totalTokens: 123_000 },
+      'gemini-3.8-flash': { promptTokens: 45_000, completionTokens: 15_200, totalTokens: 60_200 },
       'claude-3.7-sonnet': { promptTokens: 22_000, completionTokens: 9_000, totalTokens: 31_000 },
     },
   },
@@ -246,7 +313,7 @@ export const SEED_DAILY_TOKEN_RECORDS: DailyTokenRecord[] = [
     totalTokens: 1_068_400,
     isFullyUtilized: true,
     utilizationPercentage: 106.8,
-    workloadNote: '⚡ Google AI Studio build sessions — Week 6 TNF (Seahawks @ Broncos) live odds sync, roster verification & injury wire algorithms with Gemini 3.8',
+    workloadNote: '⚡ Google AI Studio build sessions — Quota rotation across Gemini 3.6 Flash & 3.5 Flash for Week 7 TNF live odds sync, roster verification & injury wire algorithms',
     peakTimePST: '01:55 PM PDT',
     isRealTelemetry: true,
     applications: {
@@ -256,8 +323,9 @@ export const SEED_DAILY_TOKEN_RECORDS: DailyTokenRecord[] = [
       'roboinvestor': { promptTokens: 6_000, completionTokens: 2_000, totalTokens: 8_000 },
     },
     models: {
-      'gemini-3.8-flash': { promptTokens: 690_000, completionTokens: 170_000, totalTokens: 860_000 },
-      'gemini-3.8-pro': { promptTokens: 95_000, completionTokens: 22_000, totalTokens: 117_000 },
+      'gemini-3.6-flash': { promptTokens: 460_000, completionTokens: 115_000, totalTokens: 575_000 },
+      'gemini-3.5-flash': { promptTokens: 220_000, completionTokens: 55_000, totalTokens: 275_000 },
+      'gemini-3.1-pro': { promptTokens: 105_000, completionTokens: 22_000, totalTokens: 127_000 },
       'gemini-2.5-flash': { promptTokens: 42_000, completionTokens: 14_200, totalTokens: 56_200 },
       'claude-3.7-sonnet': { promptTokens: 20_000, completionTokens: 7_200, totalTokens: 27_200 },
       'gpt-4o': { promptTokens: 6_000, completionTokens: 2_000, totalTokens: 8_000 },
