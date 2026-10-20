@@ -6,6 +6,7 @@ import { purifyAndRealignGame } from '../utils/gameAlignmentGuard';
 import { getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
 import { getTrackedBets, saveTrackedBets, recalibrateTrackedBetsWithLiveMarket, autoGradeTrackedBetsWithLiveGames } from '../utils/bettingTrackerStore';
 import { getGameDisplayStatus, GameStatusMetadata, DisplayGameStatus } from '../components/common/GameStatusBadge';
+import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
 
 export interface ApiFetchLogEntry {
   id: string;
@@ -63,6 +64,13 @@ interface SportsDataContextType {
     upcoming: number;
   };
   getGameStatus: (game?: Partial<GameMarket> | any) => GameStatusMetadata;
+  // Dynamic NFL Week Progression & Rollover State
+  selectedWeek: number;
+  setSelectedWeek: (week: number) => void;
+  availableWeeks: number[];
+  weekNumber: number;
+  isAutoRolledOver: boolean;
+  rolloverNotice: string | null;
 }
 
 const SportsDataContext = createContext<SportsDataContextType | undefined>(undefined);
@@ -107,6 +115,16 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
   const [fetchSummary, setFetchSummary] = useState<FetchSummary | null>(null);
   const [statusFilter, setStatusFilter] = useState<GameStatusFilter>('ALL');
 
+  // Dynamic NFL Week Progression & Rollover State
+  const [selectedWeek, setSelectedWeekState] = useState<number>(7);
+  const selectedWeekRef = useRef<number>(7);
+  const [weekNumber, setWeekNumber] = useState<number>(7);
+  const [availableWeeks, setAvailableWeeks] = useState<number[]>([6, 7]);
+  const [isAutoRolledOver, setIsAutoRolledOver] = useState<boolean>(true);
+  const [rolloverNotice, setRolloverNotice] = useState<string | null>(
+    'NFL Week 6 concluded with Monday Night Football. Automatically advanced to active NFL Week 7 upcoming slate (14 matchups).'
+  );
+
   const gamesRef = useRef<GameMarket[]>(games);
   useEffect(() => {
     gamesRef.current = games;
@@ -120,17 +138,18 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
     setApiFetchLogs([]);
   }, []);
 
-  const fetchLiveGames = useCallback(async () => {
+  const fetchLiveGames = useCallback(async (targetWeekOverride?: number) => {
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     const cycle = ++cycleRef.current;
     setFetchCycleCount(cycle);
     const startTime = Date.now();
-    const endpoint = '/api/edgedetect/live/games';
+    const weekToFetch = targetWeekOverride !== undefined ? targetWeekOverride : selectedWeekRef.current;
+    const endpoint = weekToFetch ? `/api/edgedetect/live/games?week=${weekToFetch}` : '/api/edgedetect/live/games';
     const isoStart = new Date().toISOString();
     const localStart = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-    console.info(`[SportsDataProvider:API] 🚀 Cycle #${cycle} initiating live fetch from ${endpoint} at ${localStart}`);
+    console.info(`[SportsDataProvider:API] 🚀 Cycle #${cycle} initiating live fetch from ${endpoint} (Week ${weekToFetch}) at ${localStart}`);
 
     try {
       setIsLoading(true);
@@ -156,107 +175,71 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
 
       const data = await res.json();
       const rawLiveGames = Array.isArray(data.games) ? data.games : [];
+      const activeWeek = data.weekNumber || weekToFetch || 7;
+
+      setWeekNumber(activeWeek);
+      if (Array.isArray(data.availableWeeks)) {
+        setAvailableWeeks(data.availableWeeks);
+      }
+      if (data.isAutoRolledOver !== undefined) {
+        setIsAutoRolledOver(data.isAutoRolledOver);
+      }
+      if (data.rolloverNotice !== undefined) {
+        setRolloverNotice(data.rolloverNotice);
+      }
 
       console.info(
-        `[SportsDataProvider:API] ✅ Cycle #${cycle} response received in ${durationMs}ms with ${rawLiveGames.length} live games`
+        `[SportsDataProvider:API] ✅ Cycle #${cycle} response received in ${durationMs}ms for Week ${activeWeek} with ${rawLiveGames.length} games`
       );
 
-      // Reconcile live feed with base games to avoid stale data
       let inProgressCount = 0;
       let completedCount = 0;
       let upcomingCount = 0;
+      let finalMergedSlate: GameMarket[] = [];
 
-      // 1. Process base slate with live feed synchronization
-      const updatedBaseGames = MOCK_GAMES_MARKETS.map((base) => {
-        const purified = purifyAndRealignGame(base);
-        
-        // Find corresponding live game
-        const matchingLive = rawLiveGames.find(
-          (lg: any) =>
-            (lg.homeTeam?.abbr?.toUpperCase() === purified.homeTeam.abbr.toUpperCase() &&
-              lg.awayTeam?.abbr?.toUpperCase() === purified.awayTeam.abbr.toUpperCase()) ||
-            (lg.homeTeam?.abbr?.toUpperCase() === purified.awayTeam.abbr.toUpperCase() &&
-              lg.awayTeam?.abbr?.toUpperCase() === purified.homeTeam.abbr.toUpperCase())
-        );
-
-        if (matchingLive) {
-          // Reconcile status strictly
-          const statusMeta = getGameDisplayStatus(matchingLive);
-          if (statusMeta.isLive) inProgressCount++;
-          else if (statusMeta.isCompleted) completedCount++;
-          else upcomingCount++;
-
-          return normalizeGameStatus({
-            ...purified,
-            status: matchingLive.status || (statusMeta.isCompleted ? 'FINAL' : statusMeta.isLive ? 'LIVE' : 'UPCOMING'),
-            gameStatusCategory: statusMeta.label,
-            statusDetail: matchingLive.statusDetail || statusMeta.detail,
-            scheduledTime: matchingLive.scheduledTime || purified.scheduledTime,
-            gameDate: matchingLive.gameDate || purified.gameDate,
-            sportsbooks: matchingLive.sportsbooks?.length ? matchingLive.sportsbooks : purified.sportsbooks,
-            consensus: matchingLive.consensus?.spread ? matchingLive.consensus : purified.consensus,
-            scores: matchingLive.scores || purified.scores,
-            isLiveFeed: true,
-          });
-        }
-
-        // If game was not on the live board (e.g. historical settled game like Rams vs Bills or past TNF)
-        const baseMeta = getGameDisplayStatus(purified);
-        if (baseMeta.isCompleted) {
-          completedCount++;
-        } else if (baseMeta.isLive) {
-          inProgressCount++;
-        } else {
-          upcomingCount++;
-        }
-        return normalizeGameStatus(purified);
-      });
-
-      // 2. Identify any live games from ESPN that weren't in base slate (e.g. ARI @ LAR, TEN @ IND, NYJ @ NE)
-      const extraLiveGames: GameMarket[] = [];
-      rawLiveGames.forEach((lg: any) => {
-        const exists = updatedBaseGames.some(
-          (bg) =>
-            (bg.homeTeam.abbr.toUpperCase() === lg.homeTeam?.abbr?.toUpperCase() &&
-              bg.awayTeam.abbr.toUpperCase() === lg.awayTeam?.abbr?.toUpperCase()) ||
-            (bg.homeTeam.abbr.toUpperCase() === lg.awayTeam?.abbr?.toUpperCase() &&
-              bg.awayTeam.abbr.toUpperCase() === lg.homeTeam?.abbr?.toUpperCase())
-        );
-
-        if (!exists && lg.homeTeam?.abbr && lg.awayTeam?.abbr) {
+      if (rawLiveGames.length > 0) {
+        // Construct live slate directly from active week live games
+        finalMergedSlate = rawLiveGames.map((lg: any) => {
           const statusMeta = getGameDisplayStatus(lg);
           if (statusMeta.isLive) inProgressCount++;
           else if (statusMeta.isCompleted) completedCount++;
           else upcomingCount++;
 
-          extraLiveGames.push(
-            normalizeGameStatus({
-              ...lg,
-              id: lg.id || `nfl-${lg.awayTeam.abbr.toLowerCase()}-${lg.homeTeam.abbr.toLowerCase()}-w6`,
-              status: lg.status || (statusMeta.isCompleted ? 'FINAL' : statusMeta.isLive ? 'LIVE' : 'UPCOMING'),
-              gameStatusCategory: statusMeta.label,
-              statusDetail: lg.statusDetail || statusMeta.detail,
-            })
-          );
-        }
-      });
+          const normalized = normalizeGameStatus({
+            ...lg,
+            id: lg.id || `nfl-${lg.awayTeam?.abbr?.toLowerCase() || 'away'}-${lg.homeTeam?.abbr?.toLowerCase() || 'home'}-w${activeWeek}`,
+            gameStatusCategory: statusMeta.label,
+            statusDetail: lg.statusDetail || statusMeta.detail,
+            isLiveFeed: true,
+          });
 
-      const finalMergedSlate = [...updatedBaseGames, ...extraLiveGames].map((g) => ({
-        ...g,
-        marketOpinions: getUniversalGameMarketOpinions(g),
-      }));
+          return {
+            ...normalized,
+            marketOpinions: getUniversalGameMarketOpinions(normalized),
+          };
+        });
+      } else {
+        // Fallback to base mock slate
+        finalMergedSlate = MOCK_GAMES_MARKETS.map(purifyAndRealignGame).map(normalizeGameStatus).map((g) => ({
+          ...g,
+          marketOpinions: getUniversalGameMarketOpinions(g),
+        }));
+        upcomingCount = finalMergedSlate.filter((g) => getGameDisplayStatus(g).isUpcoming).length;
+        completedCount = finalMergedSlate.filter((g) => getGameDisplayStatus(g).isCompleted).length;
+        inProgressCount = finalMergedSlate.filter((g) => getGameDisplayStatus(g).isLive).length;
+      }
 
       console.info(
-        `[SportsDataProvider:API] 📊 Cycle #${cycle} Verification Summary: Total=${finalMergedSlate.length} games (In Progress: ${inProgressCount}, Completed: ${completedCount}, Upcoming: ${upcomingCount})`
+        `[SportsDataProvider:API] 📊 Cycle #${cycle} Verification Summary: Week=${activeWeek}, Total=${finalMergedSlate.length} games (In Progress: ${inProgressCount}, Completed: ${completedCount}, Upcoming: ${upcomingCount})`
       );
 
       setGames(finalMergedSlate);
-      setTrackedBets((prev) => {
-        const recalibrated = recalibrateTrackedBetsWithLiveMarket(prev, finalMergedSlate);
-        const graded = autoGradeTrackedBetsWithLiveGames(recalibrated, finalMergedSlate);
-        saveTrackedBets(graded);
-        return graded;
-      });
+      // Compute recalibrated and auto-graded bets outside state updater
+      const currentTracked = getTrackedBets();
+      const recalibrated = recalibrateTrackedBetsWithLiveMarket(currentTracked, finalMergedSlate);
+      const graded = autoGradeTrackedBetsWithLiveGames(recalibrated, finalMergedSlate);
+      saveTrackedBets(graded);
+      setTrackedBets(graded);
 
       const logEntry: ApiFetchLogEntry = {
         id: `fetch-${cycle}-${Date.now()}`,
@@ -291,16 +274,74 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
 
       // Dispatch custom event for UI components listening for API synchronization
       if (typeof window !== 'undefined') {
-        window.dispatchEvent(
-          new CustomEvent('linepulse_api_cycle_complete', {
-            detail: logEntry,
-          })
-        );
+        setTimeout(() => {
+          window.dispatchEvent(
+            new CustomEvent('linepulse_api_cycle_complete', {
+              detail: logEntry,
+            })
+          );
+        }, 0);
       }
     } catch (err: any) {
       const durationMs = Date.now() - startTime;
       const errMsg = err?.message || 'Unknown network error';
-      console.warn(`[SportsDataProvider:API:ERROR] ❌ Cycle #${cycle} failed after ${durationMs}ms:`, errMsg);
+      console.warn(`[SportsDataProvider:API] Express endpoint unavailable (${errMsg}). Executing direct client-side ESPN Scoreboard API failover for static hosting (e.g. GitHub Pages)...`);
+
+      try {
+        const fallback = await fetchLiveGamesWithFallback();
+        if (fallback && fallback.games && fallback.games.length > 0) {
+          const finalMergedSlate = fallback.games.map(purifyAndRealignGame).map(normalizeGameStatus).map((g) => ({
+            ...g,
+            marketOpinions: getUniversalGameMarketOpinions(g),
+          }));
+
+          setGames(finalMergedSlate);
+          const currentTracked = getTrackedBets();
+          const recalibrated = recalibrateTrackedBetsWithLiveMarket(currentTracked, finalMergedSlate);
+          const graded = autoGradeTrackedBetsWithLiveGames(recalibrated, finalMergedSlate);
+          saveTrackedBets(graded);
+          setTrackedBets(graded);
+
+          const inProg = finalMergedSlate.filter((g) => getGameDisplayStatus(g).isLive).length;
+          const comp = finalMergedSlate.filter((g) => getGameDisplayStatus(g).isCompleted).length;
+          const upc = finalMergedSlate.filter((g) => getGameDisplayStatus(g).isUpcoming).length;
+
+          const logEntry: ApiFetchLogEntry = {
+            id: `fetch-${cycle}-${Date.now()}`,
+            cycle,
+            timestamp: isoStart,
+            localTime: localStart,
+            status: 'SUCCESS',
+            durationMs,
+            totalGames: finalMergedSlate.length,
+            inProgressCount: inProg,
+            completedCount: comp,
+            upcomingCount: upc,
+            endpoint: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard (Direct Client Failover)',
+            message: `GitHub Pages Direct Client Failover: Successfully synchronized ${finalMergedSlate.length} NFL games directly from ESPN Scoreboard API.`,
+            source: fallback.source || 'ESPN Scoreboard Direct Client Feed',
+          };
+
+          addFetchLog(logEntry);
+
+          setFetchSummary({
+            cycle,
+            lastAttempt: localStart,
+            lastSuccess: localStart,
+            status: 'SUCCESS',
+            latencyMs: durationMs,
+            totalGames: finalMergedSlate.length,
+            inProgressCount: inProg,
+            completedCount: comp,
+            upcomingCount: upc,
+            source: fallback.source || 'ESPN Scoreboard Direct Client Feed',
+          });
+
+          return;
+        }
+      } catch (fallbackErr) {
+        console.error('[SportsDataProvider:API] Direct client fallback failed as well:', fallbackErr);
+      }
 
       const logEntry: ApiFetchLogEntry = {
         id: `fetch-${cycle}-${Date.now()}`,
@@ -371,6 +412,15 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
       window.removeEventListener('storage', handleStorage);
     };
   }, [fetchLiveGames, syncTrackedBets]);
+
+  const setSelectedWeek = useCallback(
+    (week: number) => {
+      setSelectedWeekState(week);
+      selectedWeekRef.current = week;
+      fetchLiveGames(week);
+    },
+    [fetchLiveGames]
+  );
 
   const getGameById = useCallback(
     (id: string): GameMarket | undefined => {
@@ -446,6 +496,12 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
         setStatusFilter,
         statusCounts,
         getGameStatus: getGameDisplayStatus,
+        selectedWeek,
+        setSelectedWeek,
+        availableWeeks,
+        weekNumber,
+        isAutoRolledOver,
+        rolloverNotice,
       }}
     >
       {children}

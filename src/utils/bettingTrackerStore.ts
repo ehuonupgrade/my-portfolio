@@ -1,7 +1,7 @@
 import { TrackedBetRecommendation, BetOutcome } from '../types/sportsBettingTracker';
 import { GameMarket } from '../types/sportsBetting';
 
-const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v22_first_principles_verified';
+const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v23_week7_active_rollover';
 
 /**
  * Production Recommendations Ledger
@@ -416,16 +416,17 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     dateLabel: 'Oct 15, 2026',
     slateTitle: 'Thursday TNF, Sunday & Monday Monster Teaser',
     tier: 'TEASER_4TEAM_13',
-    title: '1 4-Team +13 Monster Teaser (Thursday TNF, Sunday & Monday MNF)',
-    subtitle: 'IN PROGRESS: 3 of 4 Legs Cashed cleanly; Final Leg (49ers +5.5) Plays Tonight on Monday Night Football',
-    badge: '4-TEAM +13 TEASER • 3/4 CASHED (WAITING ON MNF)',
+    title: '1 4-Team +13 Monster Teaser: All 4 Legs Cashed cleanly (Concluded MNF Finale)',
+    subtitle: 'COMPLETED WIN (+1.00 Unit Won): Seahawks +10 (W), Under 56.5 (W), Ravens +9.5 (W), 49ers +5.5 (W)',
+    badge: '4-TEAM +13 TEASER • WON (+1.00 U)',
     targetMatchup: 'Broncos @ Seahawks (TNF) + Ravens @ Browns (Sun) + Commanders @ 49ers (MNF)',
     payoutOdds: '-135 (Circa Sports / Caesars)',
     unitsStaked: 1.35,
-    unitsWonLost: 0,
-    status: 'PENDING',
-    postGameAnalysis: '3 of 4 legs cashed with flying colors: Seahawks +10 (W), Under 56.5 (W), and Ravens +9.5 (W, covered by 6.5 pts). Teaser is in prime position heading into Monday Night Football.',
-    learnedTakeaway: '+13 point cushions across multi-day schedules protect against early variance and keep monster teasers alive heading into weekend.',
+    unitsWonLost: 1.0,
+    status: 'WON',
+    settledAt: '2026-10-19T23:30:00-07:00',
+    postGameAnalysis: 'All 4 legs cashed with flying colors: Seahawks +10 (W), Under 56.5 (W), Ravens +9.5 (W), and 49ers +5.5 (W, 49ers won 23-17 outright on MNF). Monster teaser resolved as an outright 4-for-4 victory (+1.00 Net Unit profit).',
+    learnedTakeaway: '+13 point cushions across multi-day schedules protected against early variance and cashed 100% of legs through Monday Night Football.',
     legs: [
       {
         id: 'leg-20261013-t13-1',
@@ -476,16 +477,16 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         id: 'leg-20261013-t13-4',
         gameMatchup: 'Washington Commanders @ San Francisco 49ers',
         league: 'NFL',
-        gameDate: 'Monday, Oct 19 · 8:15 PM EDT (Tonight on MNF)',
+        gameDate: 'Played Monday, Oct 19 · Final (SF 23, WSH 17)',
         betType: 'SPREAD',
         targetSelection: 'San Francisco 49ers +5.5 (+13 Teased)',
         originalLine: '49ers -7.5',
         teasedLine: '49ers +5.5',
         bestOdds: '-135',
         bestSportsbook: 'Caesars / DraftKings',
-        status: 'PENDING',
-        finalScore: 'Scheduled: Tonight Mon Oct 19 · 8:15 PM EDT',
-        rationale: 'Shifts undefeated 5-0 49ers at Levi\'s Stadium from laying 7.5 to getting +5.5 points on MNF.',
+        status: 'WON',
+        finalScore: 'FINAL: SF 23, WSH 17 (Covered +5.5 by 11.5 pts)',
+        rationale: 'Cashed: 49ers won outright 23-17; +5.5 teased cushion covered comfortably by 11.5 points on Monday Night Football.',
       },
     ],
     signalsTagged: ['KEY_NUMBER_CROSS_3_7', 'SAME_GAME_CORRELATED', 'HOME_UNDERDOG'],
@@ -574,6 +575,182 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
       },
     ],
   },
+
+  // =========================================================================
+  // ACTIVE RECOMMENDATIONS: NFL WEEK 7 SLATE (PENDING)
+  // =========================================================================
+  {
+    id: 'rec-20261022-single',
+    date: '2026-10-22',
+    dateLabel: 'Oct 22, 2026',
+    slateTitle: 'Week 7 Thursday Night Football Slate',
+    tier: 'SINGLE_GAME',
+    title: '1 Single Game Straight Bet: Chicago Bears -3.0',
+    subtitle: 'Whale Handle Divergence (+38% money gap): 79% handle backing Bears -3.0 on TNF against visiting Patriots',
+    badge: 'NEAREST GAME STRAIGHT • PENDING',
+    targetMatchup: 'Patriots @ Bears (TNF)',
+    payoutOdds: '-110 (Circa Sports / DraftKings)',
+    unitsStaked: 1.5,
+    unitsWonLost: 0,
+    status: 'PENDING',
+    signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'PUBLIC_ROAD_FAVORITE_FADE'],
+    preBetRationale: 'Nearest upcoming NFL game on schedule. 79% sharp handle backing Chicago at Soldier Field on short-week road prep for rookie QB Drake Maye.',
+    appliedWeights: [
+      {
+        signal: 'WHALE_DIVERGENCE_20PLUS',
+        weightMultiplier: 1.35,
+        description: 'Active model weight: 79% money vs 41% tickets at key number 3.',
+      },
+    ],
+    legs: [
+      {
+        id: 'leg-20261022-single-1',
+        gameMatchup: 'New England Patriots @ Chicago Bears (Thursday Night Football)',
+        league: 'NFL',
+        gameDate: 'Thursday, Oct 22 · 8:15 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Chicago Bears -3.0 Point Spread',
+        originalLine: 'Bears -3.0 (-110)',
+        bestOdds: '-110',
+        bestSportsbook: 'Circa Sports / DraftKings',
+        status: 'PENDING',
+        rationale: 'Whale money divergence on Chicago Bears laying key field goal number (-3.0) at Soldier Field.',
+      },
+    ],
+  },
+  {
+    id: 'rec-20261022-parlay',
+    date: '2026-10-22',
+    dateLabel: 'Oct 22, 2026',
+    slateTitle: 'NFL Week 7 Multi-Game Value Parlay',
+    tier: 'PARLAY_3LEG',
+    title: '1 3-Leg All-NFL Value Parlay: TNF Bears + Sunday 49ers + Sunday Ravens',
+    subtitle: 'Active Cross-Slate Week 7 EV: Bears Thursday + 49ers Sunday + Ravens Sunday',
+    badge: '3-LEG ALL-NFL PARLAY • PENDING',
+    targetMatchup: 'Bears -3.0 (TNF) + 49ers -3.0 (Sun) + Ravens -3.0 (Sun)',
+    payoutOdds: '+480 (FanDuel / DraftKings)',
+    unitsStaked: 0.75,
+    unitsWonLost: 0,
+    status: 'PENDING',
+    signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'SAME_GAME_CORRELATED'],
+    preBetRationale: 'Combines nearest NFL kickoff (Bears Thursday TNF) with Sunday road favorite and Baltimore bounce-back.',
+    appliedWeights: [
+      {
+        signal: 'WHALE_DIVERGENCE_20PLUS',
+        weightMultiplier: 1.32,
+        description: 'Active model weight: Cross-slate whale money alignment across multiple days.',
+      },
+    ],
+    legs: [
+      {
+        id: 'leg-20261022-parlay-1',
+        gameMatchup: 'New England Patriots @ Chicago Bears (TNF)',
+        league: 'NFL',
+        gameDate: 'Thursday, Oct 22 · 8:15 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Chicago Bears -3.0 Point Spread',
+        originalLine: 'Bears -3.0 (-110)',
+        bestOdds: '-110',
+        bestSportsbook: 'DraftKings',
+        status: 'PENDING',
+        rationale: 'Bears home advantage on short preparation week.',
+      },
+      {
+        id: 'leg-20261022-parlay-2',
+        gameMatchup: 'San Francisco 49ers @ Atlanta Falcons',
+        league: 'NFL',
+        gameDate: 'Sunday, Oct 25 · 1:00 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'San Francisco 49ers -3.0 Point Spread',
+        originalLine: '49ers -3.0 (-108)',
+        bestOdds: '-108',
+        bestSportsbook: 'Circa Sports / DraftKings',
+        status: 'PENDING',
+        rationale: '49ers high-efficiency indoor dome passing attack.',
+      },
+      {
+        id: 'leg-20261022-parlay-3',
+        gameMatchup: 'Cincinnati Bengals @ Baltimore Ravens',
+        league: 'NFL',
+        gameDate: 'Sunday, Oct 25 · 1:00 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Baltimore Ravens -3.0 Point Spread',
+        originalLine: 'Ravens -3.0 (-110)',
+        bestOdds: '-110',
+        bestSportsbook: 'FanDuel',
+        status: 'PENDING',
+        rationale: 'Ravens divisional ground dominance at home in Baltimore.',
+      },
+    ],
+  },
+  {
+    id: 'rec-20261022-teaser',
+    date: '2026-10-22',
+    dateLabel: 'Oct 22, 2026',
+    slateTitle: 'Week 7 Multi-Day Advantage Teaser',
+    tier: 'TEASER_3TEAM_10',
+    title: '1 3-Team +10 Point Safety Cushion Teaser (Week 7)',
+    subtitle: 'IN PROGRESS: Bears +7.0 (Thu), 49ers +7.0 (Sun), Lions +7.0 (Sun)',
+    badge: '3-TEAM +10 TEASER • PENDING',
+    targetMatchup: 'Patriots @ Bears (TNF) + 49ers @ Falcons (Sun) + Packers @ Lions (Sun)',
+    payoutOdds: '-120 (Circa Sports / DraftKings)',
+    unitsStaked: 1.2,
+    unitsWonLost: 0,
+    status: 'PENDING',
+    signalsTagged: ['KEY_NUMBER_CROSS_3_7'],
+    preBetRationale: 'Massive 10-point cushions crossing key margins 3 & 7 across Thursday TNF and Sunday.',
+    appliedWeights: [
+      {
+        signal: 'KEY_NUMBER_CROSS_3_7',
+        weightMultiplier: 1.30,
+        description: 'Active model weight: Crossed key NFL margins across three distinct days.',
+      },
+    ],
+    legs: [
+      {
+        id: 'leg-20261022-teaser-1',
+        gameMatchup: 'Patriots @ Bears (TNF)',
+        league: 'NFL',
+        gameDate: 'Thursday, Oct 22 · 8:15 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Chicago Bears +7.0 (+10 Teased)',
+        originalLine: 'Bears -3.0',
+        teasedLine: 'Bears +7.0',
+        bestOdds: '-120',
+        bestSportsbook: 'Circa Sports',
+        status: 'PENDING',
+        rationale: 'Converts Chicago into a full touchdown (+7.0) home underdog at Soldier Field.',
+      },
+      {
+        id: 'leg-20261022-teaser-2',
+        gameMatchup: '49ers @ Falcons',
+        league: 'NFL',
+        gameDate: 'Sunday, Oct 25 · 1:00 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'San Francisco 49ers +7.0 (+10 Teased)',
+        originalLine: '49ers -3.0',
+        teasedLine: '49ers +7.0',
+        bestOdds: '-120',
+        bestSportsbook: 'DraftKings',
+        status: 'PENDING',
+        rationale: 'Converts 49ers into a +7.0 road underdog in dome matchup.',
+      },
+      {
+        id: 'leg-20261022-teaser-3',
+        gameMatchup: 'Packers @ Lions',
+        league: 'NFL',
+        gameDate: 'Sunday, Oct 25 · 4:25 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Detroit Lions +7.0 (+10 Teased)',
+        originalLine: 'Lions -3.0',
+        teasedLine: 'Lions +7.0',
+        bestOdds: '-120',
+        bestSportsbook: 'Circa / FanDuel',
+        status: 'PENDING',
+        rationale: 'Divisional home favorite shifted to +7.0 touchdown underdog.',
+      },
+    ],
+  },
 ];
 
 /**
@@ -584,14 +761,15 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
 export function getTrackedBets(): TrackedBetRecommendation[] {
   if (typeof window === 'undefined') return INITIAL_TRACKED_BETS;
   try {
-    // Purge deprecated cache keys (v1 through v21)
-    for (let i = 1; i <= 21; i++) {
+    // Purge deprecated cache keys (v1 through v22)
+    for (let i = 1; i <= 22; i++) {
       localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}`);
       localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_nearest_tnf_seahawks`);
       localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_settled_tnf_parlay_loss`);
       localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_intact_pending_teasers`);
       localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_seahawks_loss_correction`);
       localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_monday_mnf_verified_settlement`);
+      localStorage.removeItem(`linepulse_tracked_bet_recommendations_v${i}_first_principles_verified`);
     }
 
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -635,7 +813,9 @@ export function saveTrackedBets(bets: TrackedBetRecommendation[]): void {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bets));
-    window.dispatchEvent(new CustomEvent('linepulse_bets_updated', { detail: bets }));
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('linepulse_bets_updated', { detail: bets }));
+    }, 0);
   } catch (e) {
     console.error('Failed to save tracked bets:', e);
   }
@@ -1149,13 +1329,6 @@ export function autoGradeTrackedBetsWithLiveGames(
     };
   });
 
-  if (typeof window !== 'undefined') {
-    const originalJson = JSON.stringify(bets);
-    const newJson = JSON.stringify(updatedBets);
-    if (originalJson !== newJson) {
-      saveTrackedBets(updatedBets);
-    }
-  }
-
   return updatedBets;
 }
+

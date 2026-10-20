@@ -29,8 +29,9 @@ export const OFFICIAL_ACTIVE_PLAYER_TEAM_MAP: Record<string, { teamName: string;
   'Patrick Mahomes': { teamName: 'Kansas City Chiefs', teamAbbr: 'KC', position: 'QB' },
   'Travis Kelce': { teamName: 'Kansas City Chiefs', teamAbbr: 'KC', position: 'TE' },
   'Geno Smith': { teamName: 'Seattle Seahawks', teamAbbr: 'SEA', position: 'QB' },
-  'Kenneth Walker III': { teamName: 'Seattle Seahawks', teamAbbr: 'SEA', position: 'RB' },
   'Bo Nix': { teamName: 'Denver Broncos', teamAbbr: 'DEN', position: 'QB' },
+  'Mike Evans': { teamName: 'San Francisco 49ers', teamAbbr: 'SF', position: 'WR' },
+  'Baker Mayfield': { teamName: 'Tampa Bay Buccaneers', teamAbbr: 'TB', position: 'QB' },
 };
 
 /**

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, SportsLeague } from '../types/sportsBetting';
-import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
+import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS, getActiveDailyPortfolio } from '../data/sportsBettingData';
 import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BetTrackerAndPatternView } from './BetTrackerAndPatternView';
@@ -75,44 +75,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
   const [calculatorStake, setCalculatorStake] = useState<number>(100);
   const [copiedStrategy, setCopiedStrategy] = useState<boolean>(false);
 
-  // Live Data & Multi-Book Feed State
-  const [liveGames, setLiveGames] = useState<GameMarket[]>([]);
-  const [isSyncingLive, setIsSyncingLive] = useState<boolean>(false);
-  const [lastLiveSyncTime, setLastLiveSyncTime] = useState<string | null>(null);
-  const [liveFeedSource, setLiveFeedSource] = useState<string>('Multi-Book Feed');
-  const [liveAutoSync, setLiveAutoSync] = useState<boolean>(true);
-
-  const fetchLiveGames = useCallback(async (isManual: boolean = false) => {
-    setIsSyncingLive(true);
-    try {
-      const data = await fetchLiveGamesWithFallback();
-      if (data.success && Array.isArray(data.games) && data.games.length > 0) {
-        setLiveGames(data.games);
-        setLiveFeedSource(data.source);
-        setLastLiveSyncTime(new Date().toLocaleTimeString());
-        if (isManual) {
-          playSuccessChime();
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch live games:', err);
-    } finally {
-      setIsSyncingLive(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchLiveGames(false);
-  }, [fetchLiveGames]);
-
-  useEffect(() => {
-    if (!liveAutoSync) return;
-    const interval = setInterval(() => {
-      fetchLiveGames(false);
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [liveAutoSync, fetchLiveGames]);
-
+  // Context-bound live data from SportsDataProvider
   const {
     games: contextGames,
     fetchCycleCount,
@@ -122,62 +85,23 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
     statusCounts,
     refreshLiveData,
     isLoading: isContextLoading,
+    weekNumber,
+    selectedWeek,
+    setSelectedWeek,
+    isAutoRolledOver,
+    rolloverNotice,
   } = useSportsData();
+
   const [isApiDiagnosticsOpen, setIsApiDiagnosticsOpen] = useState<boolean>(false);
+  const [liveAutoSync, setLiveAutoSync] = useState<boolean>(true);
 
-  // Merge live ESPN & DraftKings feed data into market games with Alignment Guard
+  // Market games synchronized with SportsDataContext single source of truth
   const allAvailableGames = useMemo(() => {
-    // 1. First purify each base game through the Alignment Guard
-    const purifiedBase = contextGames.map(purifyAndRealignGame);
-    if (!liveGames.length) return purifiedBase;
-
-    // 2. Synchronize all games dynamically with live sportsbook feeds by team abbreviations
-    const updatedBase = purifiedBase.map((base) => {
-      // Guard: Keep recalibrated final games protected (do not overwrite with different opponents)
-      if (base.status === 'FINAL') {
-        return base;
-      }
-
-      // Match live game strictly by team abbreviations
-      const matchingLiveGame = liveGames.find(
-        (lg) =>
-          (lg.homeTeam.abbr.toUpperCase() === base.homeTeam.abbr.toUpperCase() &&
-            lg.awayTeam.abbr.toUpperCase() === base.awayTeam.abbr.toUpperCase()) ||
-          (lg.homeTeam.abbr.toUpperCase() === base.awayTeam.abbr.toUpperCase() &&
-            lg.awayTeam.abbr.toUpperCase() === base.homeTeam.abbr.toUpperCase())
-      );
-
-      if (matchingLiveGame) {
-        return {
-          ...base,
-          status: matchingLiveGame.status || base.status,
-          scheduledTime: matchingLiveGame.scheduledTime || base.scheduledTime,
-          sportsbooks: matchingLiveGame.sportsbooks?.length ? matchingLiveGame.sportsbooks : base.sportsbooks,
-          consensus: matchingLiveGame.consensus?.spread ? matchingLiveGame.consensus : base.consensus,
-          isLiveFeed: true,
-          scores: (matchingLiveGame as any).scores || base.scores,
-        };
-      }
-      return base;
-    });
-
-    // 3. Append extra games from live scoreboard feed if they do not yet exist
-    const extraLive = liveGames.filter(
-      (lg) =>
-        !updatedBase.some(
-          (b) =>
-            (b.homeTeam.abbr.toUpperCase() === lg.homeTeam.abbr.toUpperCase() &&
-              b.awayTeam.abbr.toUpperCase() === lg.awayTeam.abbr.toUpperCase()) ||
-            (b.homeTeam.abbr.toUpperCase() === lg.awayTeam.abbr.toUpperCase() &&
-              b.awayTeam.abbr.toUpperCase() === lg.homeTeam.abbr.toUpperCase())
-        )
-    );
-
-    return [...updatedBase, ...extraLive].map((g) => ({
+    return contextGames.map(purifyAndRealignGame).map((g) => ({
       ...g,
-      marketOpinions: getUniversalGameMarketOpinions(g),
+      marketOpinions: g.marketOpinions || getUniversalGameMarketOpinions(g),
     }));
-  }, [liveGames, contextGames]);
+  }, [contextGames]);
 
   // Filter games with Status Classification & Upcoming Slate Priority
   const filteredGames = useMemo(() => {
@@ -649,13 +573,13 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
       ) : (
         <>
           {/* DAILY BETTING PORTFOLIO: 1 Single, 1 Parlay (Up to 3), 1 3-Team +10 Tease, 1 4-Team +13 Tease */}
-          {showDailyPortfolio && DAILY_SLATE_PORTFOLIOS[0] && (
+          {showDailyPortfolio && (
             <div className="space-y-3">
               <div className="flex items-center justify-between font-mono text-xs px-1">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-white font-bold uppercase tracking-wider text-sm font-sans">
-                    Daily Algorithmic Portfolio &bull; {DAILY_SLATE_PORTFOLIOS[0].dateLabel}
+                    Daily Algorithmic Portfolio &bull; {getActiveDailyPortfolio(selectedWeek || weekNumber || 7).dateLabel}
                   </span>
                 </div>
                 <span className="text-slate-400 text-[11px] hidden sm:inline">
@@ -664,7 +588,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
               </div>
 
               <DailyBettingTiersDeck
-                portfolio={DAILY_SLATE_PORTFOLIOS[0]}
+                portfolio={getActiveDailyPortfolio(selectedWeek || weekNumber || 7)}
                 onSelectGame={(gameId) => {
                   playKeyClick();
                   setActiveGameId(gameId);
@@ -822,14 +746,14 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
 
           <button
             onClick={() => {
-              fetchLiveGames(true);
+              playSuccessChime();
               refreshLiveData();
             }}
-            disabled={isSyncingLive || isContextLoading}
+            disabled={isContextLoading}
             className="px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow disabled:opacity-50"
           >
-            <span className={isSyncingLive || isContextLoading ? 'animate-spin' : ''}>🔄</span>
-            <span>{isSyncingLive || isContextLoading ? 'Syncing...' : 'Sync Live'}</span>
+            <span className={isContextLoading ? 'animate-spin' : ''}>🔄</span>
+            <span>{isContextLoading ? 'Syncing...' : 'Sync Live'}</span>
           </button>
 
           <button
@@ -847,9 +771,9 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
             <span>Auto-Sync {liveAutoSync ? '(30s)' : 'Off'}</span>
           </button>
 
-          {lastLiveSyncTime && (
+          {fetchSummary?.lastSuccess && (
             <span className="text-[11px] text-slate-400 hidden lg:inline">
-              Synced {lastLiveSyncTime}
+              Synced {fetchSummary.lastSuccess}
             </span>
           )}
         </div>
@@ -868,7 +792,7 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
               className="px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 bg-cyan-500 text-slate-950 shadow-md flex items-center gap-1.5"
             >
               <span>🏈</span>
-              <span>NFL Week 6 (Active Focus)</span>
+              <span>NFL Week {selectedWeek || weekNumber || 7} (Active Focus)</span>
               <span className="px-1.5 py-0.2 rounded bg-cyan-900/40 text-[10px] text-slate-950 font-black">LIVE</span>
             </button>
             <span className="text-[11px] text-slate-500 hidden md:inline px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800/80">
@@ -2001,11 +1925,11 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
                   </div>
 
                   <button
-                    onClick={() => fetchLiveGames(true)}
-                    disabled={isSyncingLive}
+                    onClick={() => refreshLiveData()}
+                    disabled={isContextLoading}
                     className="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer shrink-0"
                   >
-                    <span className={isSyncingLive ? 'animate-spin' : ''}>🔄</span>
+                    <span className={isContextLoading ? 'animate-spin' : ''}>🔄</span>
                     <span>Refresh Books</span>
                   </button>
                 </div>

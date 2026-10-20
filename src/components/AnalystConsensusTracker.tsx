@@ -18,7 +18,7 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
   onOpenBetTracker,
 }) => {
   const [activeTab, setActiveTab] = useState<'radar' | 'history' | 'roster' | 'theory'>('radar');
-  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-wsh-sf-w6');
+  const [selectedGameId, setSelectedGameId] = useState<string>('nfl-ne-chi-w7');
   const [networkFilter, setNetworkFilter] = useState<string>('ALL');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -28,7 +28,8 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
       (c) =>
         c.gameId !== 'nfl-sea-den-tnf' &&
         c.gameId !== 'nfl-lar-buf-today' &&
-        c.gameId !== 'nfl-bal-cle-w6'
+        c.gameId !== 'nfl-bal-cle-w6' &&
+        c.gameId !== 'nfl-wsh-sf-w6'
     );
   }, []);
 
@@ -37,7 +38,8 @@ export const AnalystConsensusTracker: React.FC<AnalystConsensusTrackerProps> = (
       (c) =>
         c.gameId === 'nfl-sea-den-tnf' ||
         c.gameId === 'nfl-lar-buf-today' ||
-        c.gameId === 'nfl-bal-cle-w6'
+        c.gameId === 'nfl-bal-cle-w6' ||
+        c.gameId === 'nfl-wsh-sf-w6'
     );
   }, []);
 

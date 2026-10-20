@@ -444,5 +444,23 @@ export function purifyAndRealignGame(game: GameMarket): GameMarket {
     }
   }
 
+  // Preventative Active Roster Integrity Guard:
+  // 1. Mike Evans is strictly with San Francisco 49ers (SF), NEVER Tampa Bay (TB)
+  if (cleaned.injuries) {
+    if (cleaned.homeTeam.abbr !== 'SF') {
+      cleaned.injuries.homeInjuries = cleaned.injuries.homeInjuries.filter((p) => p.player !== 'Mike Evans');
+    }
+    if (cleaned.awayTeam.abbr !== 'SF') {
+      cleaned.injuries.awayInjuries = cleaned.injuries.awayInjuries.filter((p) => p.player !== 'Mike Evans');
+    }
+    // 2. Baker Mayfield is strictly with Tampa Bay Buccaneers (TB), NEVER Cleveland (CLE)
+    if (cleaned.homeTeam.abbr !== 'TB') {
+      cleaned.injuries.homeInjuries = cleaned.injuries.homeInjuries.filter((p) => p.player !== 'Baker Mayfield');
+    }
+    if (cleaned.awayTeam.abbr !== 'TB') {
+      cleaned.injuries.awayInjuries = cleaned.injuries.awayInjuries.filter((p) => p.player !== 'Baker Mayfield');
+    }
+  }
+
   return cleaned;
 }

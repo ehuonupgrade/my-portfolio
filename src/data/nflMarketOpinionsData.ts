@@ -73,7 +73,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
     overallConfidenceScore: 94,
     confidenceTier: 'MAX_LOCK',
     primaryRecommendedBet: 'SPREAD',
-    executiveMatchupVerdict: '⚡ SUPERSTAR WR1 RETURN: With A.J. Brown officially activated from IR (high ankle sprain 100% healed), Mike Vrabel gets his premier boundary alpha receiver back on the field. Brown commands immediate bracket coverage, unlocking Drake Maye\'s intermediate passing efficiency and opening wide running lanes for Rhamondre Stevenson. Consensus market steamed across key number 7 to Patriots -7.5 with strong closing line value at -7.0.',
+    executiveMatchupVerdict: '⚡ PATRIOT HOME ADVANTAGE: Drake Maye and the Patriots offense enter Gillette Stadium with full health across the starting roster. Maye commands immediate efficiency against the Jets defense, unlocking intermediate passing routes and opening running lanes for Rhamondre Stevenson. Consensus market steamed across key number 7 to Patriots -7.5.',
     spreadOpinion: {
       betType: 'SPREAD',
       pick: 'New England Patriots -7.0 (or -7.5 Live)',
@@ -83,8 +83,8 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceRating: 94,
       confidenceStars: 5,
       verdict: 'STRONG_BUY',
-      selectionSummary: 'Lay the touchdown on New England at Gillette Stadium with A.J. Brown back as WR1.',
-      rationale: 'Brown\'s activation is a massive offensive catalyst. The Jets lack the perimeter speed to mirror Brown on intermediate digs and deep posts without rolling safety help, creating wide gaps in run defense for Rhamondre Stevenson. Back the Patriots at -7.0 before consensus books push to -8.0.',
+      selectionSummary: 'Lay the touchdown on New England at Gillette Stadium.',
+      rationale: 'Drake Maye\'s efficiency is a strong catalyst. The Jets pass protection unit faces continuous pressure in Foxborough, creating opportunity for Rhamondre Stevenson on the ground. Back the Patriots at -7.0.',
     },
     moneylineOpinion: {
       betType: 'MONEYLINE',
@@ -96,7 +96,7 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceStars: 5,
       verdict: 'BUY',
       selectionSummary: 'High-conviction parlay anchor on the Patriots outright at Gillette Stadium.',
-      rationale: 'Mike Vrabel teams are 18-6 straight-up as home favorites of 6+ points. The Patriots defense under Vrabel matches up favorably against Aaron Rodgers and an inconsistent Jets pass protection unit.',
+      rationale: 'Patriots defense matches up favorably against Aaron Rodgers and an inconsistent Jets pass protection unit at home.',
     },
     totalOpinion: {
       betType: 'TOTAL',
@@ -108,13 +108,13 @@ export const NFL_MARKET_OPINIONS_MAP: Record<string, GameMarketOpinions> = {
       confidenceStars: 4,
       verdict: 'BUY',
       selectionSummary: 'Over 43.5 cash flow with restored Patriots red-zone efficiency.',
-      rationale: 'A.J. Brown provides an elite red-zone contested-catch target, converting New England field-goal drives into touchdowns. Total has climbed from 41.5 to 43.5 with sharp over volume.',
+      rationale: 'Drake Maye provides strong red-zone efficiency, converting New England field-goal drives into touchdowns. Total has climbed from 41.5 to 43.5 with sharp volume.',
     },
     keyFactors: {
       weatherImpactFactor: 'Standard autumn Foxborough afternoon (52°F, 9-14 mph breeze, clear passing conditions).',
-      injuryAdvantage: '⚡ SUPERSTAR ACTIVATION: A.J. Brown officially activated from IR (fully cleared); full WR corps active for Drake Maye.',
+      injuryAdvantage: '⚡ FULL OFFENSIVE HEALTH: Full active roster for Drake Maye at Gillette Stadium.',
       sharpMoneySignal: 'Whale handle (84% of spread money) driving Patriots from -6.0 across key number 7 to -7.5.',
-      schemeEdge: 'Jets press-man secondary vs A.J. Brown physicality; light boxes for Rhamondre Stevenson.',
+      schemeEdge: 'Patriots offensive line protection vs Jets front; balanced attack for Rhamondre Stevenson.',
     },
   },
 

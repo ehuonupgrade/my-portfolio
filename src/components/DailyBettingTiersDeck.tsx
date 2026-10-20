@@ -31,20 +31,20 @@ export const DailyBettingTiersDeck: React.FC<DailyBettingTiersDeckProps> = ({
     { title: string; desc: string }
   > = {
     single: {
-      title: 'Nearest Game Formula: Whale Syndicate Steam on Home Favorite (-7.0)',
-      desc: 'Nearest Upcoming NFL Game: San Francisco 49ers -7.0 backed by 78% handle at Levi\'s Stadium (Tonight, Monday Oct 19 · 8:15 PM EDT).',
+      title: 'Nearest Game Formula: Whale Syndicate Steam on Home Favorite (-3.0)',
+      desc: 'Nearest Upcoming NFL Game: Chicago Bears -3.0 backed by 79% handle at Soldier Field (Thursday Night Football, Thursday Oct 22 · 8:15 PM EDT).',
     },
     parlay: {
-      title: 'NFL Week 6 Slate Formula: Sunday Showcase & Monday Night Football',
-      desc: 'Active NFL Week 6 parlay: Sunday Ravens -3.5 in Cleveland lake winds paired with Lions -2.5 dome offense and 49ers -7.5 at Levi\'s Stadium on MNF.',
+      title: 'NFL Week 7 Slate Formula: Thursday Night Football + Sunday Showcase',
+      desc: 'Active NFL Week 7 parlay: Bears -3.0 on TNF paired with 49ers -3.0 dome attack at Atlanta and Ravens -3.0 at M&T Bank Stadium vs Cincinnati.',
     },
     teaser10: {
-      title: 'Upcoming Window Formula: Sunday Key Margins + Monday Night Football',
-      desc: 'Spanning Sunday (Oct 18) and Monday (Oct 19), moving Ravens to +6.5, Under to 51.5, and Chiefs to +1.5.',
+      title: 'Week 7 Cushion Formula: Thursday Key Margins + Sunday Showcase',
+      desc: 'Spanning Thursday Night Football (Oct 22) and Sunday (Oct 25), teasing Bears to +7.0, 49ers to +7.0, and Lions to +7.0.',
     },
     teaser13: {
-      title: 'Maximum +13 Cushion Across Sunday Showcase & Monday Night Football',
-      desc: 'Spanning Sunday afternoon and Monday night, moving lines past two converted scores (+13 cushion across 4 key matchups).',
+      title: 'Maximum +13 Cushion Across Thursday Night Football & Sunday Week 7',
+      desc: 'Spanning Thursday night and Sunday slate, moving lines past two converted scores (+13 cushion across 4 key Week 7 matchups).',
     },
   };
 

@@ -231,10 +231,10 @@ export const BetTrackerAndPatternView: React.FC<BetTrackerAndPatternViewProps> =
           <span className="text-xl shrink-0">🎯</span>
           <div className="space-y-1">
             <strong className="font-mono text-cyan-300 uppercase block text-[11px]">
-              Live Tracking Baseline &bull; Nearest Upcoming Slate Priority (Monday, October 19, 2026 Board)
+              Live Tracking Baseline &bull; Nearest Upcoming Slate Priority (Active NFL Week 7 Board)
             </strong>
             <p className="text-slate-300 leading-relaxed">
-              Active recommendations prioritize nearest upcoming unplayed games: <strong>San Francisco 49ers -7.5</strong> vs Washington Commanders (Tonight on Monday Night Football · Oct 19), <strong>Dodgers ML</strong> (World Series), 3-Leg Value Parlay, and in-progress 4-Team Monster Teaser (3 of 4 legs cashed, waiting on tonight&apos;s 49ers kickoff). Completed Sunday games (Ravens @ Browns 10-13, Chiefs 22 LAC 6) and Thursday Night Football (Denver 17, Seattle 14) are settled and logged in the historical performance ledger.
+              Active recommendations prioritize nearest upcoming unplayed games: <strong>Chicago Bears -3.0</strong> vs New England Patriots (Thursday Night Football · Oct 22), <strong>3-Leg All-NFL Value Parlay</strong> (Bears + 49ers + Ravens), and in-progress Week 7 teasers. Week 6 games (including 49ers 23-17 Monday Night Football victory) are fully settled and logged in the historical performance ledger.
             </p>
           </div>
         </div>

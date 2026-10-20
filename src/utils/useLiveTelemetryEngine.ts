@@ -28,7 +28,9 @@ export function useLiveTelemetryEngine(pollingIntervalMs: number = 3000) {
 
     // Dispatch global event for cross-component React state synchronization
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('linepulse_live_sync', { detail: { timestamp: nowStr } }));
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('linepulse_live_sync', { detail: { timestamp: nowStr } }));
+      }, 0);
     }
   }, []);
 

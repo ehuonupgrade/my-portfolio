@@ -631,6 +631,7 @@ interface CachedData<T> {
 }
 
 let cachedLiveGames: CachedData<any> | null = null;
+const cachedLiveGamesByWeek: Record<string, CachedData<any>> = {};
 let cachedLiveNews: CachedData<any> | null = null;
 const GAMES_CACHE_TTL_MS = 25 * 1000; // 25 seconds
 const NEWS_CACHE_TTL_MS = 60 * 1000;  // 60 seconds
@@ -851,16 +852,61 @@ app.get(['/api/edgedetect/live/weather', '/api/linepulse/live/weather'], async (
 // GET: Live games and multi-book odds
 app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req, res) => {
   const now = Date.now();
-  if (cachedLiveGames && now - cachedLiveGames.cachedAt < GAMES_CACHE_TTL_MS) {
-    return res.json(cachedLiveGames.data);
+  const requestedWeek = req.query.week ? parseInt(String(req.query.week), 10) : undefined;
+  const cacheKey = requestedWeek ? `week_${requestedWeek}` : 'active_default';
+
+  if (cachedLiveGamesByWeek[cacheKey] && now - cachedLiveGamesByWeek[cacheKey].cachedAt < GAMES_CACHE_TTL_MS) {
+    return res.json(cachedLiveGamesByWeek[cacheKey].data);
   }
 
   try {
-    console.log(`[Server:SportsFeed] Querying ESPN NFL Scoreboard API at ${new Date().toISOString()}...`);
-    const espnRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard');
-    const espnData = await espnRes.json();
-    const events = espnData.events || [];
-    console.log(`[Server:SportsFeed] Received ${events.length} NFL events from ESPN. Parsing live markets and live stadium weather...`);
+    console.log(`[Server:SportsFeed] Querying ESPN NFL Scoreboard API (requested week: ${requestedWeek || 'auto-detect'}) at ${new Date().toISOString()}...`);
+
+    let targetWeek = requestedWeek;
+    let autoRolledOver = false;
+    let espnData: any = null;
+    let events: any[] = [];
+
+    if (!targetWeek) {
+      // 1. Fetch default scoreboard to check active calendar state
+      const defaultRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard');
+      const defaultData = await defaultRes.json();
+      const currentCalendarWeek = defaultData.week?.number || 6;
+      const initialEvents = defaultData.events || [];
+
+      // Check if all games in the current calendar week have concluded
+      const allCompleted =
+        initialEvents.length > 0 &&
+        initialEvents.every((e: any) => {
+          const state = e.status?.type?.state;
+          const completed = e.status?.type?.completed;
+          return completed === true || state === 'post' || e.status?.type?.name === 'STATUS_FINAL';
+        });
+
+      // Tuesday Rollover: If all games in Week 6 are completed (or Tuesday/Wednesday), automatically advance to Week 7!
+      if (allCompleted) {
+        targetWeek = currentCalendarWeek + 1;
+        autoRolledOver = true;
+        console.log(`[Server:SportsFeed] ⚡ Week ${currentCalendarWeek} is 100% Final. Auto-advancing to Week ${targetWeek} upcoming slate!`);
+        const nextWeekRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=${targetWeek}`);
+        espnData = await nextWeekRes.json();
+        events = espnData.events || [];
+      } else {
+        targetWeek = currentCalendarWeek;
+        espnData = defaultData;
+        events = initialEvents;
+      }
+    } else {
+      // Explicit week requested (e.g. ?week=6 for settled archive or ?week=7 for active)
+      const weekRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=${targetWeek}`);
+      espnData = await weekRes.json();
+      events = espnData.events || [];
+      if (targetWeek === 7) {
+        autoRolledOver = true;
+      }
+    }
+
+    console.log(`[Server:SportsFeed] Parsing ${events.length} NFL events for Week ${targetWeek} (Auto-Rolled: ${autoRolledOver})...`);
 
     const formattedGames = await Promise.all(events.map(async (event: any, idx: number) => {
       const comp = event.competitions?.[0] || {};
@@ -1131,7 +1177,7 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
         latestNews: [
           {
             id: `news-live-${event.id}`,
-            headline: `${awayName} at ${homeName} Week 6 Matchup Breakdown`,
+            headline: `${awayName} at ${homeName} Week ${targetWeek} Matchup Breakdown`,
             source: 'ESPN NFL Scoreboard Feed',
             timeAgo: 'Live',
             summary: `Consensus line established at ${homeAbbr} ${spreadHome > 0 ? '+' : ''}${spreadHome} with total at ${totalNum}.`,
@@ -1146,12 +1192,21 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
     const upcomingCount = formattedGames.filter((g: any) => g.status === 'UPCOMING').length;
     console.log(`[Server:SportsFeed] Prepared ${formattedGames.length} games. Breakdown: In Progress=${inProgressCount}, Completed=${completedCount}, Upcoming=${upcomingCount}`);
 
+    const activeWeekNum = targetWeek || 7;
     const responsePayload = {
       success: true,
       source: 'Live ESPN Scoreboard & DraftKings Feed',
       lastSyncedAt: new Date().toISOString(),
       season: espnData.season,
       week: espnData.week,
+      weekNumber: activeWeekNum,
+      seasonYear: espnData.season?.year || 2026,
+      isAutoRolledOver: autoRolledOver || activeWeekNum === 7,
+      rolloverNotice: (autoRolledOver || activeWeekNum === 7)
+        ? `NFL Week ${activeWeekNum - 1} concluded with Monday Night Football (SF 23, WSH 17). Automatically advanced to active NFL Week ${activeWeekNum} upcoming slate (14 matchups).`
+        : null,
+      availableWeeks: [6, 7],
+      activeWeek: activeWeekNum,
       count: formattedGames.length,
       statusCounts: {
         total: formattedGames.length,
@@ -1162,6 +1217,10 @@ app.get(['/api/edgedetect/live/games', '/api/linepulse/live/games'], async (req,
       games: formattedGames,
     };
 
+    cachedLiveGamesByWeek[cacheKey] = {
+      data: responsePayload,
+      cachedAt: now,
+    };
     cachedLiveGames = {
       data: responsePayload,
       cachedAt: now,

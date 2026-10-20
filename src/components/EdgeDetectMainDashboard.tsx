@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
-import { DAILY_SLATE_PORTFOLIOS } from '../data/sportsBettingData';
+import { DAILY_SLATE_PORTFOLIOS, getActiveDailyPortfolio } from '../data/sportsBettingData';
 import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
+import { useSportsData } from '../context/SportsDataContext';
 import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, SUPERSTAR_BREAKING_MEDICAL_WIRE, MovementAlertItem } from './LineMovementAlertBanner';
 import {
   TrackedBetRecommendation,
@@ -24,7 +25,7 @@ import { LiveVerificationModal } from './LiveVerificationModal';
 import { LiveOddsStreamBadge } from './LiveOddsStreamBadge';
 import { LiveOddsStreamModal } from './LiveOddsStreamModal';
 import { LiveRosterStreamBadge } from './LiveRosterStreamBadge';
-import { GameStatusBadge } from './common/GameStatusBadge';
+import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
 import { LiveRosterVerificationModal } from './LiveRosterVerificationModal';
 import { MonteCarloSimulationModal } from './MonteCarloSimulationModal';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
@@ -52,6 +53,62 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   const [confidenceFilter, setConfidenceFilter] = useState<'ALL' | 'TOP_3' | 'LOCKS' | 'SPREAD' | 'MONEYLINE' | 'TOTAL'>('ALL');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  // Sports Data Context (Dynamic Week Progression & Rollover State)
+  const {
+    selectedWeek,
+    setSelectedWeek,
+    availableWeeks,
+    weekNumber,
+    isAutoRolledOver,
+    rolloverNotice,
+    refreshLiveData,
+    trackedBets,
+  } = useSportsData();
+
+  const activePortfolio = useMemo(() => {
+    return getActiveDailyPortfolio(selectedWeek || weekNumber || 7);
+  }, [selectedWeek, weekNumber]);
+
+  const nearestUpcomingGame = useMemo(() => {
+    return (
+      games.find((g) => getGameDisplayStatus(g).isUpcoming) ||
+      games.find((g) => getGameDisplayStatus(g).isLive) ||
+      games[0]
+    );
+  }, [games]);
+
+  const topLockInfo = useMemo(() => {
+    if (selectedWeek === 6) {
+      return {
+        label: '49ers -7.0 (Covered 23-17)',
+        sub: 'Week 6 MNF Finale Final',
+        gameId: 'nfl-wsh-sf-w6',
+      };
+    }
+    return {
+      label: 'Bears -3.0 (95%)',
+      sub: 'Thursday Night Football',
+      gameId: nearestUpcomingGame?.id || 'nfl-ne-chi-w7',
+    };
+  }, [selectedWeek, nearestUpcomingGame]);
+
+  const nearestStraightInfo = useMemo(() => {
+    if (selectedWeek === 6) {
+      return {
+        label: 'Week 6 Concluded',
+        sub: 'All 14 Games Final',
+        gameId: 'nfl-wsh-sf-w6',
+      };
+    }
+    const spreadStr = nearestUpcomingGame?.consensus?.spread || 'Bears -3.0';
+    const timeStr = nearestUpcomingGame?.scheduledTime || 'Thursday, Oct 22 · 8:15 PM EDT';
+    return {
+      label: `${spreadStr} (${nearestUpcomingGame ? `${nearestUpcomingGame.awayTeam.abbr} @ ${nearestUpcomingGame.homeTeam.abbr}` : 'NE @ CHI'})`,
+      sub: timeStr.includes('EDT') || timeStr.includes('PM') ? timeStr : 'Thursday TNF · 8:15 PM',
+      gameId: nearestUpcomingGame?.id || 'nfl-ne-chi-w7',
+    };
+  }, [selectedWeek, nearestUpcomingGame]);
+
   // Radar States
   const [radarTimeframe, setRadarTimeframe] = useState<'5M' | '15M' | '1H'>('15M');
   const [radarSeverityFilter, setRadarSeverityFilter] = useState<'ALL' | 'CRITICAL' | 'HIGH' | 'MODERATE'>('ALL');
@@ -61,8 +118,16 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   const [radarVolumeDeltas, setRadarVolumeDeltas] = useState<Record<string, { units: number; dollars: number }>>({});
   const [activeRadarAlertIndex, setActiveRadarAlertIndex] = useState<number>(0);
 
-  // Historical Ledger & Ongoing Tracker States
-  const [bets, setBets] = useState<TrackedBetRecommendation[]>(() => getTrackedBets());
+  // Historical Ledger & Ongoing Tracker States (synced with single source of truth)
+  const [bets, setBets] = useState<TrackedBetRecommendation[]>(() =>
+    trackedBets && trackedBets.length > 0 ? trackedBets : getTrackedBets()
+  );
+
+  useEffect(() => {
+    if (trackedBets && trackedBets.length > 0) {
+      setBets(trackedBets);
+    }
+  }, [trackedBets]);
 
   // Real-time synchronization with background store updates
   useEffect(() => {
@@ -71,20 +136,11 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
     };
     window.addEventListener('storage', handleSync);
     window.addEventListener('linepulse_bets_updated', handleSync);
-    window.addEventListener('linepulse_api_cycle_complete', handleSync);
     return () => {
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('linepulse_bets_updated', handleSync);
-      window.removeEventListener('linepulse_api_cycle_complete', handleSync);
     };
   }, []);
-
-  // Automatically grade bets when live games slate is received or changes
-  useEffect(() => {
-    if (games && games.length > 0) {
-      setBets((prev) => autoGradeTrackedBetsWithLiveGames(prev, games));
-    }
-  }, [games]);
   const [ledgerStatusFilter, setLedgerStatusFilter] = useState<BetOutcome | 'ALL'>('ALL');
   const [ledgerTierFilter, setLedgerTierFilter] = useState<TrackedBetTier | 'ALL'>('ALL');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -483,29 +539,86 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
             </button>
           </div>
 
+          {/* Active NFL Week Selector & Tuesday Auto-Rollover Banner */}
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-cyan-950/70 via-slate-900 to-indigo-950/70 border border-cyan-500/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-lg">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-full bg-cyan-500 text-slate-950 font-black text-[11px] tracking-wider uppercase font-mono shadow">
+                  Active NFL Week {weekNumber}
+                </span>
+                {isAutoRolledOver && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-500/60 text-emerald-300 font-bold text-[10px] font-mono flex items-center gap-1.5 shadow-sm">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Tuesday Auto-Rollover Active
+                  </span>
+                )}
+                <span className="text-slate-400 text-xs font-mono">
+                  {selectedWeek === 7 ? 'Active Upcoming Slate (14 Matchups)' : 'Settled Historical Slate (14 Matchups Final)'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                {rolloverNotice || 'NFL Week 6 concluded with Monday Night Football (SF 23, WSH 17). Automatically advanced to active NFL Week 7 upcoming slate (14 matchups).'}
+              </p>
+            </div>
+
+            {/* Week Selection Toggle Buttons */}
+            <div className="flex items-center gap-1.5 font-mono text-xs shrink-0 bg-slate-950/90 p-1.5 rounded-xl border border-slate-800">
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  setSelectedWeek(7);
+                }}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedWeek === 7
+                    ? 'bg-cyan-500 text-slate-950 font-black shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>🏈</span>
+                <span>Week 7 (Active Slate)</span>
+              </button>
+              <button
+                onClick={() => {
+                  playKeyClick();
+                  setSelectedWeek(6);
+                }}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedWeek === 6
+                    ? 'bg-slate-700 text-white font-black shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>📦</span>
+                <span>Week 6 (Archive)</span>
+              </button>
+            </div>
+          </div>
+
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-3 font-mono text-xs border-t border-slate-800/80">
             <div
               onClick={() => {
                 playKeyClick();
-                onSelectGameAndInspect('nfl-bal-cle-w6', 'opinions');
+                onSelectGameAndInspect(topLockInfo.gameId, 'opinions');
               }}
-              title="Click to inspect #1 Lock: Baltimore Ravens -3.5"
+              title={`Click to inspect #1 Lock: ${topLockInfo.label}`}
               className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-emerald-500/50 transition-all cursor-pointer space-y-0.5 group"
             >
               <span className="text-[10px] text-slate-400 group-hover:text-emerald-300 uppercase font-semibold transition-colors">Today&apos;s #1 Lock</span>
-              <div className="text-emerald-400 font-bold text-sm">Ravens -3.5 (96%)</div>
+              <div className="text-emerald-400 font-bold text-sm truncate">{topLockInfo.label}</div>
+              <div className="text-[10px] text-slate-400 truncate">{topLockInfo.sub}</div>
             </div>
             <div
               onClick={() => {
                 playKeyClick();
-                onSelectGameAndInspect('live-espn-401873008', 'strategy');
+                onSelectGameAndInspect(nearestStraightInfo.gameId, 'strategy');
               }}
-              title="Click to inspect Nearest Upcoming Straight Bet: San Francisco 49ers -7.0 (Monday Night Football · 8:15 PM EDT)"
+              title={`Click to inspect Nearest Upcoming Straight Bet: ${nearestStraightInfo.label}`}
               className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/50 transition-all cursor-pointer space-y-0.5 group"
             >
               <span className="text-[10px] text-cyan-400 uppercase font-semibold">Nearest Straight Bet</span>
-              <div className="text-cyan-300 font-bold text-sm">49ers -7.0 (Tonight 8:15 PM)</div>
+              <div className="text-cyan-300 font-bold text-sm truncate">{nearestStraightInfo.label}</div>
+              <div className="text-[10px] text-slate-400 truncate">{nearestStraightInfo.sub}</div>
             </div>
             <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-0.5">
               <span className="text-[10px] text-amber-400 uppercase font-semibold">Radar Alerts</span>
@@ -522,7 +635,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
             <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-0.5">
               <span className="text-[10px] text-rose-400 uppercase font-semibold">League Focus</span>
               <div className="text-white font-bold text-sm flex items-center gap-1">
-                <span>🏈 NFL (Active)</span>
+                <span>🏈 NFL (Week {selectedWeek || 7})</span>
               </div>
             </div>
           </div>
@@ -601,7 +714,7 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               </div>
 
               <DailyBettingTiersDeck
-                portfolio={DAILY_SLATE_PORTFOLIOS[0]}
+                portfolio={activePortfolio}
                 onSelectGame={(gameId) => onSelectGameAndInspect(gameId, 'strategy')}
               />
             </div>

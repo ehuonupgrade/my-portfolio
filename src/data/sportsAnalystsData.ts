@@ -600,11 +600,11 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
   },
 
   // ==========================================
-  // TONIGHT MONDAY NIGHT FOOTBALL: Commanders @ 49ers
+  // PAST SETTLED ARCHIVE: Commanders @ 49ers (FINAL: SF 27, WSH 17)
   // ==========================================
   'nfl-wsh-sf-w6': {
     gameId: 'nfl-wsh-sf-w6',
-    gameMatchup: 'Washington Commanders @ San Francisco 49ers (Tonight on MNF · 8:15 PM EDT)',
+    gameMatchup: 'Washington Commanders @ San Francisco 49ers [FINAL: SF 27, WSH 17]',
     league: 'NFL',
     homeTeamName: 'San Francisco 49ers',
     awayTeamName: 'Washington Commanders',
@@ -632,21 +632,21 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
       publicHomeMoneyPct: 78,
       publicAwayMoneyPct: 22,
       sharpAdvantageSide: 'HOME',
-      sharpHandleDifference: 46, // +46% sharp money on 49ers -7.0
+      sharpHandleDifference: 46,
     },
     contrarianFadeSignal: {
-      triggered: true,
-      severity: 'EXTREME',
-      fadeTarget: 'San Francisco 49ers -7.0 (Tonight on MNF)',
-      crowdFavorite: 'Washington Commanders +7.0 (70% Media & Public Dog Slips)',
+      triggered: false, // Settled Game
+      severity: 'HIGH',
+      fadeTarget: 'San Francisco 49ers -7.0 [WON: Final SF 27, WSH 17]',
+      crowdFavorite: 'Washington Commanders +7.0',
       analystChalkPct: 70.0,
       publicTicketPct: 68.0,
       sharpMoneyPct: 78.0,
       echoChamberScore: 91,
       gamblingTheoryRule:
-        'Contrarian Gambling Axiom #1 (Prime Time Public Dog Trap): 70% of mainstream media analysts and public ticket volume are grabbing Commanders +7.0, falling for Jayden Daniels rookie hype on national TV. Meanwhile, high-stakes whale syndicates have moved 78% of real money onto the 49ers -7.0 at Levi\'s Stadium.',
+        'Contrarian Axiom #1 (Prime Time Public Dog Trap): 70% of mainstream media analysts took Commanders +7.0 on national TV. 49ers dominated line of scrimmage and covered 27-17.',
       recommendedAction:
-        'EXECUTE CONTRARIAN FADE: Back San Francisco 49ers -7.0 on Monday Night Football. Fading public underdog hype on MNF when sharp handle divergence exceeds +35% yields an outstanding +12.4% net unit ROI.',
+        'RESULT LOGGED: 49ers won 27-17 and covered -7.0 spread. Whale divergence signal cashed cleanly.',
     },
     picks: [
       {
@@ -661,56 +661,124 @@ export const MOCK_ANALYST_CONSENSUS_DATA: Record<string, AnalystMarketConsensus>
         selection: 'San Francisco 49ers -7.0',
         confidenceRating: 5,
         publishedTime: 'Oct 19 · 10:00 AM PST',
+        rationale: 'Massive +46% whale money divergence on 49ers at Levi\'s Stadium.',
+        isContrarianFadeTarget: true,
+      },
+    ],
+  },
+
+  // ==========================================
+  // ACTIVE UPCOMING CONTRARIAN FADE: Patriots @ Bears (TNF Week 7)
+  // ==========================================
+  'nfl-ne-chi-w7': {
+    gameId: 'nfl-ne-chi-w7',
+    gameMatchup: 'New England Patriots @ Chicago Bears (Thursday Night Football · 8:15 PM EDT)',
+    league: 'NFL',
+    homeTeamName: 'Chicago Bears',
+    awayTeamName: 'New England Patriots',
+    totalAnalystsTracked: 11,
+    spread: {
+      homeSelection: 'Bears -3.0',
+      awaySelection: 'Patriots +3.0',
+      homeCount: 3,
+      awayCount: 8,
+      homePct: 27.3,
+      awayPct: 72.7,
+      consensusFavoriteSide: 'AWAY',
+    },
+    total: {
+      overSelection: 'Over 50.5',
+      underSelection: 'Under 50.5',
+      overCount: 4,
+      underCount: 7,
+      overPct: 36.4,
+      underPct: 63.6,
+    },
+    publicComparison: {
+      publicHomeTicketPct: 32,
+      publicAwayTicketPct: 68,
+      publicHomeMoneyPct: 79,
+      publicAwayMoneyPct: 21,
+      sharpAdvantageSide: 'HOME',
+      sharpHandleDifference: 47, // +47% sharp money backing Bears -3.0
+    },
+    contrarianFadeSignal: {
+      triggered: true,
+      severity: 'EXTREME',
+      fadeTarget: 'Chicago Bears -3.0 (Thursday Night Football)',
+      crowdFavorite: 'New England Patriots +3.0 (72% Media & Public Underdog Slips)',
+      analystChalkPct: 72.7,
+      publicTicketPct: 68.0,
+      sharpMoneyPct: 79.0,
+      echoChamberScore: 94,
+      gamblingTheoryRule:
+        'Contrarian Gambling Axiom #1 (Short-Week Road Dog Trap): Over 70% of recreational tickets are piling on Patriots +3.0 following Drake Maye rookie hype. However, visiting teams playing on Thursday Night Football with short preparation cover at under 41% historically. Syndicates have hammered Bears -3.0 with 79% of total handle.',
+      recommendedAction:
+        'EXECUTE CONTRARIAN FADE: Lay the field goal with Chicago Bears -3.0 at Soldier Field on Thursday Night Football. Fading public short-week road dogs when syndicate handle exceeds 75% has produced a +14.8% historical ROI.',
+    },
+    picks: [
+      {
+        id: 'pick-chi-1',
+        analystId: 'analyst-warren-sharp',
+        analystName: 'Warren Sharp',
+        network: 'Sharp Football',
+        avatarInitial: 'WS',
+        avatarBg: '#10b981',
+        seasonRecord: '55-26 ATS (67.9%)',
+        betType: 'SPREAD',
+        selection: 'Chicago Bears -3.0',
+        confidenceRating: 5,
+        publishedTime: 'Tuesday Oct 20 · 9:00 AM CST',
         rationale:
-          'Massive +46% whale money divergence. Public is seduced by Washington\'s record, but San Francisco\'s offensive line metrics and Kyle Shanahan\'s MNF home script dominate this matchup.',
+          'Classic short-week Thursday trap. New England traveling on 3 days rest with rookie QB facing Chicago\'s top-ranked home pass rush.',
         isContrarianFadeTarget: true,
       },
       {
-        id: 'pick-sf-2',
+        id: 'pick-chi-2',
         analystId: 'analyst-pff-greenline',
         analystName: 'PFF Greenline AI',
         network: 'Pro Football Focus',
         avatarInitial: 'PF',
         avatarBg: '#059669',
-        seasonRecord: '52-28 ATS (65.0%)',
+        seasonRecord: '53-28 ATS (65.4%)',
         betType: 'SPREAD',
-        selection: 'San Francisco 49ers -7.0',
+        selection: 'Chicago Bears -3.0',
         confidenceRating: 5,
-        publishedTime: 'Oct 19 · 9:15 AM PST',
+        publishedTime: 'Tuesday Oct 20 · 8:30 AM CST',
         rationale:
-          'Simulated 10,000 times: 49ers cover -7.0 in 62.4% of iterations. True fair line is 49ers -9.5. Substantial +8.2% edge over public dog consensus.',
+          '10,000 simulations give Chicago 64.1% probability to win by 4+ points at Soldier Field. Fair market line is Bears -5.0.',
         isContrarianFadeTarget: true,
       },
       {
-        id: 'pick-sf-3',
+        id: 'pick-chi-3',
         analystId: 'analyst-mina-kimes',
         analystName: 'Mina Kimes',
         network: 'ESPN',
         avatarInitial: 'MK',
         avatarBg: '#d00000',
-        seasonRecord: '49-31 ATS (61.3%)',
+        seasonRecord: '50-31 ATS (61.7%)',
         betType: 'SPREAD',
-        selection: 'Washington Commanders +7.0',
+        selection: 'New England Patriots +3.0',
         confidenceRating: 4,
-        publishedTime: 'Oct 19 · 11:30 AM PST',
+        publishedTime: 'Tuesday Oct 20 · 10:15 AM EST',
         rationale:
-          'Jayden Daniels\' dual-threat capability keeps Washington within a touchdown on national television.',
+          'Drake Maye\'s rushing ability gives the Patriots backdoor potential.',
         isContrarianFadeTarget: false,
       },
       {
-        id: 'pick-sf-4',
+        id: 'pick-chi-4',
         analystId: 'analyst-dan-orlovsky',
         analystName: 'Dan Orlovsky',
         network: 'ESPN',
         avatarInitial: 'DO',
         avatarBg: '#b30000',
-        seasonRecord: '43-37 ATS (53.8%)',
+        seasonRecord: '44-37 ATS (54.3%)',
         betType: 'SPREAD',
-        selection: 'Washington Commanders +7.0',
+        selection: 'New England Patriots +3.0',
         confidenceRating: 4,
-        publishedTime: 'Oct 19 · 11:00 AM PST',
+        publishedTime: 'Tuesday Oct 20 · 11:00 AM EST',
         rationale:
-          'Commanders offense has been efficient in early downs. Taking the touchdown hook on the road.',
+          'Patriots defense matches up well against Caleb Williams in cold October Chicago air.',
         isContrarianFadeTarget: false,
       },
     ],
