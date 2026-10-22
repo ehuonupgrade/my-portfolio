@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 
@@ -211,7 +212,7 @@ app.post('/api/feedback', (req, res) => {
   const items = readFeedback();
   const fullItem = {
     ...newItem,
-    id: newItem.id || `fb-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
+    id: newItem.id || `fb-${Date.now().toString(36)}-${crypto.randomBytes(2).toString('hex')}`,
     submittedAt: newItem.submittedAt || new Date().toISOString(),
     upvotes: newItem.upvotes || 1,
     status: newItem.status || 'submitted',
@@ -500,7 +501,7 @@ app.post(['/api/edgedetect/alerts/sms', '/api/linepulse/alerts/sms'], async (req
   const currentSettings = readSmsSettings();
   const targetPhone = (phoneNumber || currentSettings.phoneNumber || '').trim();
 
-  const messageId = `sms-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+  const messageId = `sms-${Date.now().toString(36)}-${crypto.randomBytes(2).toString('hex')}`;
   const timestamp = new Date().toISOString();
 
   const formattedText = `[EDGEDETECT ALERT] 🚨 ${alertTitle || 'LARGE LINE & MONEY MOVEMENT'}
