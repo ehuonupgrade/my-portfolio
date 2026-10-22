@@ -745,6 +745,9 @@ function synthesizeMultiBookOdds(
   ];
 }
 
+const WEATHER_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const weatherCache: Record<string, { cachedAt: number; promise: Promise<any> }> = {};
+
 const NFL_STADIUM_COORDINATES: Record<string, { lat: number; lon: number; isDome: boolean; name: string }> = {
   CLE: { lat: 41.5061, lon: -81.6995, isDome: false, name: 'Huntington Bank Field, Cleveland, OH' },
   PHI: { lat: 39.9008, lon: -75.1675, isDome: false, name: 'Lincoln Financial Field, Philadelphia, PA' },
@@ -768,78 +771,94 @@ const NFL_STADIUM_COORDINATES: Record<string, { lat: number; lon: number; isDome
 };
 
 async function fetchLiveStadiumWeather(homeAbbr: string) {
-  const stadium = NFL_STADIUM_COORDINATES[homeAbbr?.toUpperCase()];
-  if (!stadium) {
-    return {
-      isDome: false,
-      temperature: '58°F',
-      conditions: 'Partly Cloudy',
-      wind: '8-12 mph',
-      humidity: '50%',
-      precipitationChance: '10%',
-      impactLevel: 'LOW' as const,
-      impactSummary: 'Live weather: Standard mild autumn conditions.',
-    };
+  const teamCode = homeAbbr?.toUpperCase() || 'UNKNOWN';
+  const now = Date.now();
+
+  if (weatherCache[teamCode] && (now - weatherCache[teamCode].cachedAt < WEATHER_CACHE_TTL_MS)) {
+    return weatherCache[teamCode].promise;
   }
 
-  if (stadium.isDome) {
-    return {
-      isDome: true,
-      temperature: '72°F (Climate Controlled)',
-      conditions: 'Indoor Dome',
-      wind: '0 mph',
-      humidity: '45%',
-      precipitationChance: '0%',
-      impactLevel: 'LOW' as const,
-      impactSummary: 'Indoor climate controlled dome; zero weather impact.',
-    };
-  }
-
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${stadium.lat}&longitude=${stadium.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const curr = data.current || {};
-
-    const temp = Math.round(curr.temperature_2m || 58);
-    const windSpeed = Math.round(curr.wind_speed_10m || 9);
-    const windGusts = Math.round(curr.wind_gusts_10m || 14);
-    const humidity = Math.round(curr.relative_humidity_2m || 50);
-
-    let impactLevel: 'LOW' | 'MODERATE' | 'HIGH' = 'LOW';
-    let impactSummary = `Mild ${windSpeed} mph breeze (gusts ${windGusts} mph); minimal impact on deep passing and kicking game.`;
-
-    if (windSpeed >= 18 || windGusts >= 25) {
-      impactLevel = 'HIGH';
-      impactSummary = `Sustained ${windSpeed} mph winds (gusts ${windGusts} mph) degrade deep passing completion rates.`;
-    } else if (windSpeed >= 12) {
-      impactLevel = 'MODERATE';
-      impactSummary = `Moderate ${windSpeed} mph breeze (gusts ${windGusts} mph); slight impact on 50+ yard field goals.`;
+  const fetchWeather = async () => {
+    const stadium = NFL_STADIUM_COORDINATES[teamCode];
+    if (!stadium) {
+      return {
+        isDome: false,
+        temperature: '58°F',
+        conditions: 'Partly Cloudy',
+        wind: '8-12 mph',
+        humidity: '50%',
+        precipitationChance: '10%',
+        impactLevel: 'LOW' as const,
+        impactSummary: 'Live weather: Standard mild autumn conditions.',
+      };
     }
 
-    return {
-      isDome: false,
-      temperature: `${temp}°F`,
-      conditions: windSpeed >= 18 ? 'Windy' : temp >= 65 ? 'Clear' : 'Autumn Crisp',
-      wind: `${windSpeed} mph (Gusts ${windGusts} mph)`,
-      humidity: `${humidity}%`,
-      precipitationChance: curr.precipitation > 0 ? '40%' : '10%',
-      impactLevel,
-      impactSummary,
-    };
-  } catch (e) {
-    console.error(`[WeatherAPI] Error fetching live weather for ${homeAbbr}:`, e);
-    return {
-      isDome: false,
-      temperature: '56°F',
-      conditions: 'Partly Cloudy',
-      wind: '9 mph',
-      humidity: '48%',
-      precipitationChance: '10%',
-      impactLevel: 'LOW' as const,
-      impactSummary: 'Live weather fallback: Mild 9 mph breeze.',
-    };
-  }
+    if (stadium.isDome) {
+      return {
+        isDome: true,
+        temperature: '72°F (Climate Controlled)',
+        conditions: 'Indoor Dome',
+        wind: '0 mph',
+        humidity: '45%',
+        precipitationChance: '0%',
+        impactLevel: 'LOW' as const,
+        impactSummary: 'Indoor climate controlled dome; zero weather impact.',
+      };
+    }
+
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${stadium.lat}&longitude=${stadium.lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_gusts_10m&temperature_unit=fahrenheit&wind_speed_unit=mph`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const curr = data.current || {};
+
+      const temp = Math.round(curr.temperature_2m || 58);
+      const windSpeed = Math.round(curr.wind_speed_10m || 9);
+      const windGusts = Math.round(curr.wind_gusts_10m || 14);
+      const humidity = Math.round(curr.relative_humidity_2m || 50);
+
+      let impactLevel: 'LOW' | 'MODERATE' | 'HIGH' = 'LOW';
+      let impactSummary = `Mild ${windSpeed} mph breeze (gusts ${windGusts} mph); minimal impact on deep passing and kicking game.`;
+
+      if (windSpeed >= 18 || windGusts >= 25) {
+        impactLevel = 'HIGH';
+        impactSummary = `Sustained ${windSpeed} mph winds (gusts ${windGusts} mph) degrade deep passing completion rates.`;
+      } else if (windSpeed >= 12) {
+        impactLevel = 'MODERATE';
+        impactSummary = `Moderate ${windSpeed} mph breeze (gusts ${windGusts} mph); slight impact on 50+ yard field goals.`;
+      }
+
+      return {
+        isDome: false,
+        temperature: `${temp}°F`,
+        conditions: windSpeed >= 18 ? 'Windy' : temp >= 65 ? 'Clear' : 'Autumn Crisp',
+        wind: `${windSpeed} mph (Gusts ${windGusts} mph)`,
+        humidity: `${humidity}%`,
+        precipitationChance: curr.precipitation > 0 ? '40%' : '10%',
+        impactLevel,
+        impactSummary,
+      };
+    } catch (e) {
+      console.error(`[WeatherAPI] Error fetching live weather for ${teamCode}:`, e);
+      return {
+        isDome: false,
+        temperature: '56°F',
+        conditions: 'Partly Cloudy',
+        wind: '9 mph',
+        humidity: '48%',
+        precipitationChance: '10%',
+        impactLevel: 'LOW' as const,
+        impactSummary: 'Live weather fallback: Mild 9 mph breeze.',
+      };
+    }
+  };
+
+  weatherCache[teamCode] = {
+    cachedAt: now,
+    promise: fetchWeather(),
+  };
+
+  return weatherCache[teamCode].promise;
 }
 
 // GET: Live stadium weather endpoint
