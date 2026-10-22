@@ -381,27 +381,44 @@ app.post('/api/tokens/real-count', async (req, res) => {
   });
 });
 
+let syncLogQueue = Promise.resolve();
+
 app.post('/api/tokens/sync-log', (req, res) => {
   const record = req.body;
   if (!record || !record.date) {
     return res.status(400).json({ error: 'Invalid record' });
   }
-  try {
-    let logs: any[] = [];
-    if (fs.existsSync(TOKEN_LOGS_FILE)) {
-      logs = JSON.parse(fs.readFileSync(TOKEN_LOGS_FILE, 'utf-8'));
+
+  syncLogQueue = syncLogQueue.then(async () => {
+    try {
+      let logs: any[] = [];
+      try {
+        await fs.promises.access(TOKEN_LOGS_FILE);
+        const data = await fs.promises.readFile(TOKEN_LOGS_FILE, 'utf-8');
+        logs = JSON.parse(data);
+      } catch (e) {
+        // File doesn't exist or is invalid, use empty array
+      }
+
+      const existingIndex = logs.findIndex((l) => l.date === record.date);
+      if (existingIndex >= 0) {
+        logs[existingIndex] = { ...logs[existingIndex], ...record, syncedAt: new Date().toISOString() };
+      } else {
+        logs.unshift({ ...record, syncedAt: new Date().toISOString() });
+      }
+
+      await fs.promises.writeFile(TOKEN_LOGS_FILE, JSON.stringify(logs.slice(0, 100), null, 2), 'utf-8');
+      res.json({ success: true, count: logs.length });
+    } catch (err) {
+      console.error('Failed to write token logs', err);
+      res.status(500).json({ error: 'Failed to write token logs' });
     }
-    const existingIndex = logs.findIndex((l) => l.date === record.date);
-    if (existingIndex >= 0) {
-      logs[existingIndex] = { ...logs[existingIndex], ...record, syncedAt: new Date().toISOString() };
-    } else {
-      logs.unshift({ ...record, syncedAt: new Date().toISOString() });
+  }).catch(err => {
+    console.error('Queue error', err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Queue error' });
     }
-    fs.writeFileSync(TOKEN_LOGS_FILE, JSON.stringify(logs.slice(0, 100), null, 2), 'utf-8');
-    res.json({ success: true, count: logs.length });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to write token logs' });
-  }
+  });
 });
 
 // ----------------- LINEPULSE SMS ALERTS -----------------
