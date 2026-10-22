@@ -306,6 +306,12 @@ app.get('/api/tokens/live-telemetry', (req, res) => {
 });
 
 app.post('/api/tokens/pulse', (req, res) => {
+  const authHeader = req.headers.authorization;
+  const expectedToken = process.env.PULSE_API_KEY;
+  if (!expectedToken || !authHeader || authHeader !== `Bearer ${expectedToken}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const { promptInc = 600, completionInc = 180 } = req.body || {};
   liveStreamSession.promptTokens += promptInc;
   liveStreamSession.completionTokens += completionInc;
