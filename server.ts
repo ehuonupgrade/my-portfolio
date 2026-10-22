@@ -475,6 +475,11 @@ app.get(['/api/edgedetect/alerts/settings', '/api/linepulse/alerts/settings'], (
 
 // POST: Update Auto-Alert Settings
 app.post(['/api/edgedetect/alerts/settings', '/api/linepulse/alerts/settings'], (req, res) => {
+  const apiKey = req.header('x-api-key');
+  if (!apiKey || apiKey !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+
   const current = readSmsSettings();
   const updated = {
     ...current,
