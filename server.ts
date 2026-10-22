@@ -185,6 +185,11 @@ app.post('/api/traffic/record', (req, res) => {
 
 // Global Traffic: Reset endpoint
 app.post('/api/traffic/reset', (req, res) => {
+  const apiKey = req.headers['x-api-key'] || req.headers['X-API-Key'];
+  if (!apiKey || apiKey !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const resetData = {
     totalPageViews: 0,
     totalSessions: 0,

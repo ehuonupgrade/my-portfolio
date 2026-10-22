@@ -104,9 +104,22 @@ export async function recordDwellTime(projectId: string, seconds: number): Promi
 
 export async function resetTrafficData(): Promise<void> {
   try {
-    await fetch('/api/traffic/reset', { method: 'POST' }).catch(() => null);
-    sessionStorage.removeItem(SESSION_FLAG_KEY);
-    window.dispatchEvent(new Event('site_traffic_updated'));
+    const adminSecret = window.prompt('Enter Admin Secret:');
+    if (!adminSecret) return;
+
+    const res = await fetch('/api/traffic/reset', {
+      method: 'POST',
+      headers: {
+        'x-api-key': adminSecret
+      }
+    }).catch(() => null);
+
+    if (res && res.ok) {
+      sessionStorage.removeItem(SESSION_FLAG_KEY);
+      window.dispatchEvent(new Event('site_traffic_updated'));
+    } else {
+      window.alert('Unauthorized: Failed to reset traffic data.');
+    }
   } catch {
     // Non-blocking telemetry
   }
