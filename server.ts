@@ -1642,6 +1642,11 @@ app.get(['/api/edgedetect/live/medical-wire', '/api/linepulse/live/medical-wire'
 // POST: Ingest new medical wire report directly
 app.post(['/api/edgedetect/live/medical-wire/ingest', '/api/linepulse/live/medical-wire/ingest'], (req, res) => {
   try {
+    const authHeader = req.headers.authorization;
+    if (!process.env.INGEST_API_KEY || authHeader !== `Bearer ${process.env.INGEST_API_KEY}`) {
+      return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+
     const {
       playerName,
       team,
