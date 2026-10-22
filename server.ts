@@ -496,6 +496,13 @@ app.post(['/api/edgedetect/alerts/settings', '/api/linepulse/alerts/settings'], 
 
 // POST: Send/Log SMS Alert to user's phone
 app.post(['/api/edgedetect/alerts/sms', '/api/linepulse/alerts/sms'], async (req, res) => {
+  const adminSecret = process.env.ADMIN_SECRET;
+  const clientApiKey = req.headers['x-api-key'];
+
+  if (adminSecret && clientApiKey !== adminSecret) {
+    return res.status(401).json({ success: false, error: 'Unauthorized: Invalid or missing API key' });
+  }
+
   const { phoneNumber, alertTitle, matchup, movementSummary, riskWarnings, actionRecommendation } = req.body;
   const currentSettings = readSmsSettings();
   const targetPhone = (phoneNumber || currentSettings.phoneNumber || '').trim();
