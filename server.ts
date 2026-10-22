@@ -239,6 +239,12 @@ app.post('/api/feedback/:id/upvote', (req, res) => {
 
 // Global Feedback: Update status / notes by site owner / staff
 app.post('/api/feedback/:id/status', (req, res) => {
+  const adminSecret = process.env.ADMIN_SECRET;
+  const authHeader = req.headers.authorization;
+  if (!adminSecret || authHeader !== `Bearer ${adminSecret}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   const { id } = req.params;
   const { status, ownerNotes, deployedCommit } = req.body;
   const items = readFeedback();

@@ -27,6 +27,7 @@ export const FeedbackInventoryView: React.FC<FeedbackInventoryViewProps> = ({ on
   const [reviewNotesDraft, setReviewNotesDraft] = useState<string>('');
   const [commitDraft, setCommitDraft] = useState<string>('');
   const [adminFeedbackNotice, setAdminFeedbackNotice] = useState<string | null>(null);
+  const [adminSecret, setAdminSecret] = useState<string>('');
 
   const loadData = async () => {
     const data = await getFeedbackInventory();
@@ -97,7 +98,8 @@ export const FeedbackInventoryView: React.FC<FeedbackInventoryViewProps> = ({ on
       id,
       newStatus,
       reviewNotesDraft.trim() || undefined,
-      commitDraft.trim() || undefined
+      commitDraft.trim() || undefined,
+      adminSecret
     );
     if (updated) {
       playSuccessChime();
@@ -561,6 +563,17 @@ export const FeedbackInventoryView: React.FC<FeedbackInventoryViewProps> = ({ on
                 <div className="font-bold text-purple-300 flex items-center justify-between">
                   <span>🛡️ Site Owner &amp; Development Staff Gate:</span>
                   <span className="text-[10px] text-purple-400">One-click deployment pipeline</span>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-slate-400 text-[10px] block">Admin Secret Token</label>
+                  <input
+                    type="password"
+                    value={adminSecret}
+                    onChange={(e) => setAdminSecret(e.target.value)}
+                    placeholder="Enter Admin Secret"
+                    className="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 text-xs mb-2"
+                  />
                 </div>
 
                 <div className="space-y-1">

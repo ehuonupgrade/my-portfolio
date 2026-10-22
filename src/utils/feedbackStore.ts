@@ -112,12 +112,17 @@ export async function updateFeedbackStatusByOwner(
   id: string,
   status: FeedbackStatus,
   ownerNotes?: string,
-  deployedCommit?: string
+  deployedCommit?: string,
+  secret?: string
 ): Promise<FeedbackItem | null> {
   try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (secret) {
+      headers['Authorization'] = `Bearer ${secret}`;
+    }
     const res = await fetch(`/api/feedback/${id}/status`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ status, ownerNotes, deployedCommit }),
     });
     if (res.ok) {
