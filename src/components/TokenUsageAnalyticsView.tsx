@@ -31,6 +31,16 @@ import {
 } from '../types/tokenUsage';
 import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
 
+const APP_DEF_MAP = SUPPORTED_LLM_APPLICATIONS.reduce((acc, app) => {
+  acc[app.id] = app;
+  return acc;
+}, {} as Record<string, typeof SUPPORTED_LLM_APPLICATIONS[0]>);
+
+const MODEL_DEF_MAP = SUPPORTED_LLM_MODELS.reduce((acc, model) => {
+  acc[model.id] = model;
+  return acc;
+}, {} as Record<string, typeof SUPPORTED_LLM_MODELS[0]>);
+
 interface TokenUsageAnalyticsViewProps {
   onBack?: () => void;
 }
@@ -453,7 +463,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
       }
     });
     const dominantApp =
-      SUPPORTED_LLM_APPLICATIONS.find((a) => a.id === dominantAppId) || SUPPORTED_LLM_APPLICATIONS[0];
+      APP_DEF_MAP[dominantAppId] || SUPPORTED_LLM_APPLICATIONS[0];
 
     // Model breakdown
     const modelTotals: Record<string, number> = {};
@@ -474,13 +484,13 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
       }
     });
     const dominantModel =
-      SUPPORTED_LLM_MODELS.find((m) => m.id === dominantModelId) || SUPPORTED_LLM_MODELS[0];
+      MODEL_DEF_MAP[dominantModelId] || SUPPORTED_LLM_MODELS[0];
 
     // Estimated total cost
     let estimatedCost = 0;
     list.forEach((r) => {
       Object.entries(r.models || {}).forEach(([mId, u]) => {
-        const modelDef = SUPPORTED_LLM_MODELS.find((m) => m.id === mId);
+        const modelDef = MODEL_DEF_MAP[mId];
         if (modelDef) {
           estimatedCost +=
             (u.promptTokens / 1_000_000) * modelDef.costPerMillionPrompt +
@@ -1639,7 +1649,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-1 flex-wrap">
                         {Object.entries(r.applications || {}).map(([appId, u]) => {
-                          const appDef = SUPPORTED_LLM_APPLICATIONS.find((a) => a.id === appId);
+                          const appDef = APP_DEF_MAP[appId];
                           if (!appDef || u.totalTokens <= 0) return null;
                           return (
                             <span
@@ -1656,7 +1666,7 @@ export const TokenUsageAnalyticsView: React.FC<TokenUsageAnalyticsViewProps> = (
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-1 flex-wrap">
                         {Object.entries(r.models || {}).map(([mId, u]) => {
-                          const mDef = SUPPORTED_LLM_MODELS.find((m) => m.id === mId);
+                          const mDef = MODEL_DEF_MAP[mId];
                           if (!mDef || u.totalTokens <= 0) return null;
                           return (
                             <span
