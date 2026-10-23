@@ -34,6 +34,7 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
   const [ingestHeadline, setIngestHeadline] = useState<string>('');
   const [ingestDescription, setIngestDescription] = useState<string>('');
   const [isSubmittingIngest, setIsSubmittingIngest] = useState<boolean>(false);
+  const [ingestApiKey, setIngestApiKey] = useState<string>('');
 
   const fetchNews = useCallback(async (isManual: boolean = false) => {
     setIsLoading(true);
@@ -128,7 +129,10 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
     try {
       const res = await fetch('/api/edgedetect/live/alerts/ingest', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ingestApiKey}`,
+        },
         body: JSON.stringify({
           headline: ingestHeadline.trim(),
           description: ingestDescription.trim(),
@@ -617,6 +621,18 @@ export const LiveNewsWireView: React.FC<LiveNewsWireViewProps> = () => {
 
             {/* Ingest Form */}
             <form onSubmit={handleIngestAlert} className="space-y-3">
+              <div>
+                <label className="text-xs text-slate-300 block mb-1 font-bold">API Key *</label>
+                <input
+                  type="password"
+                  required
+                  value={ingestApiKey}
+                  onChange={(e) => setIngestApiKey(e.target.value)}
+                  placeholder="Enter ingest API key..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-400 mb-3"
+                />
+              </div>
+
               <div>
                 <label className="text-xs text-slate-300 block mb-1 font-bold">Breaking Alert Headline *</label>
                 <input
