@@ -1275,6 +1275,129 @@ Time: ${new Date().toLocaleTimeString()} EDT`;
         )}
       </div>
 
+      {/* INGEST BREAKING MEDICAL WIRE MODAL */}
+      {showIngestModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-slate-900 border-2 border-red-500 shadow-2xl p-6 space-y-4 font-mono text-slate-100 animate-scaleIn">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🚑</span>
+                <div>
+                  <h3 className="text-base font-bold text-white">Live Medical Wire Ingestion</h3>
+                  <span className="text-[11px] text-red-300">Push Breaking Injury Alerts Directly into Pipeline</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowIngestModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-950 text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!ingestForm.playerName.trim() || !ingestForm.headline.trim()) return;
+                setIsSubmittingIngest(true);
+                try {
+                  const ingestApiKey = (document.getElementById('medical-ingest-api-key') as HTMLInputElement)?.value || '';
+                  const res = await fetch('/api/edgedetect/live/medical-wire/ingest', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${ingestApiKey}`,
+                    },
+                    body: JSON.stringify(ingestForm),
+                  });
+                  if (res.ok) {
+                    playSuccessChime();
+                    setIngestForm({
+                      playerName: '',
+                      team: '',
+                      position: 'WR #1',
+                      status: 'QUESTIONABLE',
+                      headline: '',
+                      marketImpact: '',
+                    });
+                    setShowIngestModal(false);
+                    await fetchMedicalWire(true);
+                  }
+                } catch (err) {
+                  console.error('Failed to ingest medical alert:', err);
+                } finally {
+                  setIsSubmittingIngest(false);
+                }
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="text-xs text-slate-300 block mb-1 font-bold">API Key *</label>
+                <input
+                  id="medical-ingest-api-key"
+                  type="password"
+                  required
+                  placeholder="Enter ingest API key..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-400 mb-3"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-300 block mb-1 font-bold">Player Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={ingestForm.playerName}
+                  onChange={(e) => setIngestForm({ ...ingestForm, playerName: e.target.value })}
+                  placeholder="e.g. Christian McCaffrey"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-400"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-300 block mb-1 font-bold">Breaking Alert Headline *</label>
+                <input
+                  type="text"
+                  required
+                  value={ingestForm.headline}
+                  onChange={(e) => setIngestForm({ ...ingestForm, headline: e.target.value })}
+                  placeholder="e.g. 49ers activate Christian McCaffrey..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-400"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-slate-300 block mb-1 font-bold">Market Impact</label>
+                <textarea
+                  rows={2}
+                  value={ingestForm.marketImpact}
+                  onChange={(e) => setIngestForm({ ...ingestForm, marketImpact: e.target.value })}
+                  placeholder="Describe how the market is reacting..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-400"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowIngestModal(false)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingIngest || !ingestForm.headline.trim() || !ingestForm.playerName.trim()}
+                  className="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {isSubmittingIngest ? 'Ingesting...' : 'Broadcast to Medical Wire'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* DETAILED MEDICAL WIRE INSPECTOR MODAL */}
       {selectedWireModalItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn font-mono">

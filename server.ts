@@ -1381,6 +1381,12 @@ app.get(['/api/edgedetect/live/news', '/api/linepulse/live/news'], async (req, r
 // POST: Ingest external breaking news/alert directly into the live feed
 app.post(['/api/edgedetect/live/alerts/ingest', '/api/linepulse/live/alerts/ingest'], (req, res) => {
   try {
+    const authHeader = req.headers.authorization;
+    const expectedKey = process.env.INGEST_API_KEY;
+    if (!expectedKey || authHeader !== `Bearer ${expectedKey}`) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: Invalid or missing API Key' });
+    }
+
     const { headline, description, league = 'NFL', wireType = 'ROSTER_ACTIVATION', impactLevel = 'CRITICAL' } = req.body;
     if (!headline) {
       return res.status(400).json({ success: false, error: 'Headline is required' });
@@ -1642,6 +1648,12 @@ app.get(['/api/edgedetect/live/medical-wire', '/api/linepulse/live/medical-wire'
 // POST: Ingest new medical wire report directly
 app.post(['/api/edgedetect/live/medical-wire/ingest', '/api/linepulse/live/medical-wire/ingest'], (req, res) => {
   try {
+    const authHeader = req.headers.authorization;
+    const expectedKey = process.env.INGEST_API_KEY;
+    if (!expectedKey || authHeader !== `Bearer ${expectedKey}`) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: Invalid or missing API Key' });
+    }
+
     const {
       playerName,
       team,
