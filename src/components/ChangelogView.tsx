@@ -24,27 +24,49 @@ export const ChangelogView: React.FC = () => {
   );
   const [refreshCount, setRefreshCount] = useState<number>(0);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string>('');
   const [showRefreshToast, setShowRefreshToast] = useState<boolean>(false);
 
-  const fetchLiveChangelog = async () => {
+  const fetchLiveChangelog = async (isBackground = false) => {
     try {
-      setIsSyncing(true);
+      if (!isBackground) setIsSyncing(true);
       const res = await fetch(`/api/changelog?_t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.versions) && data.versions.length > 0) {
           setVersions(data.versions);
+          setLastSyncedAt(new Date().toLocaleTimeString());
         }
       }
     } catch {
       // Fallback to static bundled changelogData
     } finally {
-      setIsSyncing(false);
+      if (!isBackground) setIsSyncing(false);
     }
   };
 
   useEffect(() => {
+    // Initial fetch on mount
     fetchLiveChangelog();
+
+    // Periodic live auto-polling every 8 seconds
+    const intervalId = setInterval(() => {
+      fetchLiveChangelog(true);
+    }, 8000);
+
+    // Refetch on window focus / tab visibility change
+    const handleFocus = () => {
+      fetchLiveChangelog(true);
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
   }, []);
 
   const tags = ['ALL', ...Array.from(new Set(versions.map((v) => v.tag || 'FEATURE').filter(Boolean)))];
@@ -96,6 +118,12 @@ export const ChangelogView: React.FC = () => {
             <span className="px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400 font-mono text-[10px]">
               {versions.length} TOTAL RELEASES
             </span>
+            {lastSyncedAt && (
+              <span className="px-2 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-800 text-emerald-300 font-mono text-[10px] flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span>Auto-Synced {lastSyncedAt}</span>
+              </span>
+            )}
             <button
               onClick={handleManualRefresh}
               disabled={isSyncing}

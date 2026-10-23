@@ -12,6 +12,7 @@ import { InvestmentAgentView } from './components/InvestmentAgentView';
 import { BartPlannerView } from './components/BartPlannerView';
 import { ToddlerActivityHub } from './components/ToddlerActivityHub';
 import { SportsBettingEdgeHub } from './components/SportsBettingEdgeHub';
+import { OmniSendGatewayHub } from './components/omnisend/OmniSendGatewayHub';
 import { FeedbackInventoryView } from './components/FeedbackInventoryView';
 import { TokenUsageAnalyticsView } from './components/TokenUsageAnalyticsView';
 import { FeedbackModal } from './components/FeedbackModal';
@@ -64,6 +65,7 @@ const getPathForState = (tab: Tab, project: string | null): string => {
   let sub = '/';
   if (tab === 'projects') {
     if (project === 'roboinvestor') sub = '/myprojects/roboinvestor';
+    else if (project === 'omnisend' || project === 'messaging') sub = '/myprojects/omnisend';
     else if (project === 'bart') sub = '/myprojects/bart';
     else if (project === 'toddler-activities' || project === 'activities') sub = '/myprojects/toddler-activities';
     else if (project === 'edgedetect-nfl' || project === 'edgedetect/nfl') sub = '/myprojects/edgedetect/nfl';
@@ -92,6 +94,10 @@ const getStateForPath = (pathname: string): RouteState => {
 
   if (clean.includes('/edgedetect/nfl') || clean.endsWith('/edgedetect-nfl')) {
     return { tab: 'projects', project: 'edgedetect-nfl' };
+  }
+
+  if (clean === '/myprojects/omnisend' || clean.endsWith('/myprojects/omnisend') || clean.endsWith('/omnisend') || clean.endsWith('/messaging')) {
+    return { tab: 'projects', project: 'omnisend' };
   }
 
   if (
@@ -299,6 +305,18 @@ function AppContent() {
 
                 <div className="pl-6 space-y-1">
                   <button
+                    onClick={() => navigateTo('projects', 'omnisend')}
+                    className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
+                      activeProject === 'omnisend'
+                        ? 'bg-cyan-950/70 border border-cyan-800 text-cyan-300 font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>&rarr; OmniSend Gateway (FB &amp; Multi-Channel)</span>
+                    {activeProject === 'omnisend' && <span className="text-cyan-400 text-[10px]">CURRENT</span>}
+                  </button>
+
+                  <button
                     onClick={() => navigateTo('projects', 'bart')}
                     className={`text-left px-3 py-2 rounded-lg text-xs font-mono transition-colors cursor-pointer w-full flex items-center justify-between ${
                       activeProject === 'bart'
@@ -479,6 +497,16 @@ function AppContent() {
                 {activeTab === 'projects' && (
                   <div className="pl-5 space-y-1 pt-1 animate-fadeIn">
                     <button
+                      onClick={() => navigateTo('projects', 'omnisend')}
+                      className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
+                        activeProject === 'omnisend'
+                          ? 'text-cyan-400 font-semibold'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      &rarr; OmniSend Gateway
+                    </button>
+                    <button
                       onClick={() => navigateTo('projects', 'roboinvestor')}
                       className={`text-sm py-1 cursor-pointer block text-left transition-colors ${
                         activeProject === 'roboinvestor'
@@ -631,6 +659,11 @@ function AppContent() {
             {/* TAB: MY PROJECTS */}
             {activeTab === 'projects' && (
               <>
+                {/* Sub-Project: OmniSend Messaging Gateway */}
+                {activeProject === 'omnisend' && (
+                  <OmniSendGatewayHub onBack={() => navigateTo('projects', null)} />
+                )}
+
                 {/* Sub-Project 1: RoboInvestor */}
                 {activeProject === 'roboinvestor' && (
                   <InvestmentAgentView onBack={() => navigateTo('projects', null)} />
@@ -674,6 +707,40 @@ function AppContent() {
                     </div>
 
                     <div className="space-y-4">
+                      {/* Project 0: OmniSend Messaging Gateway */}
+                      <div
+                        onClick={() => navigateTo('projects', 'omnisend')}
+                        className="p-6 rounded-2xl bg-gradient-to-r from-slate-900/90 via-cyan-950/20 to-slate-900/90 border border-slate-800/90 hover:border-cyan-500/60 transition-all duration-200 cursor-pointer backdrop-blur-md space-y-4 group"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-3">
+                          <div>
+                            <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider font-semibold">
+                              Universal Multi-Channel Notification Router
+                            </span>
+                            <h3 className="text-xl font-bold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
+                              OmniSend Messaging Gateway
+                            </h3>
+                          </div>
+                          <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/60 text-cyan-400 self-start sm:self-auto font-medium">
+                            ⚡ GRAPH API v19.0 READY
+                          </span>
+                        </div>
+
+                        <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                          Universal messaging gateway service allowing any application to dispatch alerts, rich cards, CTA buttons, and transaction updates through Facebook Messenger, Slack, Telegram, WhatsApp, and Twilio SMS. Features live payload builder, webhook handshake verification, client app API keys, and real-time audit logs.
+                        </p>
+
+                        <div className="flex items-center justify-between pt-2 text-xs font-mono">
+                          <span className="text-slate-400">
+                            Facebook Messenger &bull; Slack &bull; Telegram &bull; WhatsApp &bull; Twilio SMS
+                          </span>
+                          <span className="text-cyan-400 font-semibold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                            <span>Open OmniSend Gateway</span>
+                            <span>&rarr;</span>
+                          </span>
+                        </div>
+                      </div>
+
                       {/* Project 1: RoboInvestor */}
                       <div
                         onClick={() => navigateTo('projects', 'roboinvestor')}

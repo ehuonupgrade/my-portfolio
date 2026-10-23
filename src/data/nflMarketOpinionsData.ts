@@ -1568,13 +1568,26 @@ export function formatDynamicSpreadPick(
  * 3. Dynamically generates authoritative 3-way market opinions for unmapped games.
  */
 export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpinions {
-  const existing = NFL_MARKET_OPINIONS_MAP[game.id];
-
   // Extract live line info from game object using clean team names
   const homeFullName = getCleanTeamName(game.homeTeam?.city, game.homeTeam?.name) || 'Home Team';
   const homeAbbr = game.homeTeam?.abbr || 'HOM';
   const awayFullName = getCleanTeamName(game.awayTeam?.city, game.awayTeam?.name) || 'Away Team';
   const awayAbbr = game.awayTeam?.abbr || 'AWY';
+
+  // 1. Check exact ID match or team abbreviation match in mapped opinions
+  let existing = NFL_MARKET_OPINIONS_MAP[game.id];
+  if (!existing) {
+    // Find mapped opinion by matching home & away team abbreviations
+    const mappedKey = Object.keys(NFL_MARKET_OPINIONS_MAP).find((key) => {
+      const k = key.toLowerCase();
+      const h = homeAbbr.toLowerCase();
+      const a = awayAbbr.toLowerCase();
+      return (k.includes(h) && k.includes(a)) || (k.includes(a) && k.includes(h));
+    });
+    if (mappedKey) {
+      existing = NFL_MARKET_OPINIONS_MAP[mappedKey];
+    }
+  }
 
   const liveSpreadStr = game.consensus?.spread || '';
   const liveTotalVal = game.consensus?.total || 43.5;
@@ -1634,15 +1647,17 @@ export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpin
 
   const spreadPickTeam = `${pickedTeamFullName} ${pickSignedLine}`;
   const awayMoneyDivergence = awayMoneyPct - awayTicketPct;
-  const modelEdge = Math.min(9.8, Math.max(5.2, 5.0 + Math.abs(homeMoneyDivergence) * 0.15));
-  const confidenceScore = Math.min(96, Math.max(82, 85 + Math.round(Math.abs(homeMoneyDivergence) * 0.2)));
-  const verdict: 'STRONG_BUY' | 'BUY' | 'NEUTRAL' = Math.abs(homeMoneyDivergence) >= 15 ? 'STRONG_BUY' : 'BUY';
+  const maxDivergence = Math.max(Math.abs(homeMoneyDivergence), Math.abs(awayMoneyDivergence));
+  const baseEdge = 5.2 + maxDivergence * 0.12 + ((game.totalBetsPlaced || 10000) % 7) * 0.3;
+  const modelEdge = Number(Math.min(9.8, Math.max(5.1, baseEdge)).toFixed(1));
+  const confidenceScore = Math.min(96, Math.max(78, Math.round(82 + modelEdge * 1.5)));
+  const verdict: 'STRONG_BUY' | 'BUY' | 'NEUTRAL' = maxDivergence >= 15 ? 'STRONG_BUY' : 'BUY';
 
   const sharpFavoredTeam = isHomePicked ? homeFullName : awayFullName;
   const sharpDivergenceVal = Math.max(homeMoneyDivergence, awayMoneyDivergence);
 
   return {
-    overallConfidenceRank: 5,
+    overallConfidenceRank: 5, // Preliminary default; slate-wide reassignSlateRanks assigns final 1..N order
     overallConfidenceScore: confidenceScore,
     confidenceTier: confidenceScore >= 92 ? 'MAX_LOCK' : confidenceScore >= 88 ? 'HIGH_CONVICTION' : 'STRONG_VALUE',
     primaryRecommendedBet: 'SPREAD',
@@ -1691,3 +1706,54 @@ export function getUniversalGameMarketOpinions(game: GameMarket): GameMarketOpin
     },
   };
 }
+
+/**
+ * REASSIGN SLATE RANKS
+ * Calibrates a slate of games so that every game carries a UNIQUE, 1-indexed rank (#1 to #N)
+ * based strictly on overall model confidence, EV edge, and handle volume.
+ */
+export function reassignSlateRanks(games: GameMarket[]): GameMarket[] {
+  if (!games || games.length === 0) return games;
+
+  // 1. Ensure marketOpinions exist on every game
+  const slateWithOpinions = games.map((game) => ({
+    ...game,
+    marketOpinions: game.marketOpinions || getUniversalGameMarketOpinions(game),
+  }));
+
+  // 2. Sort games by model confidence (confidenceScore desc, modelEdge desc, handle desc)
+  const sorted = [...slateWithOpinions].sort((a, b) => {
+    const scoreA = a.marketOpinions?.overallConfidenceScore || 80;
+    const scoreB = b.marketOpinions?.overallConfidenceScore || 80;
+    if (scoreB !== scoreA) return scoreB - scoreA;
+
+    const edgeA = a.marketOpinions?.spreadOpinion?.modelEdge || 5.0;
+    const edgeB = b.marketOpinions?.spreadOpinion?.modelEdge || 5.0;
+    if (edgeB !== edgeA) return edgeB - edgeA;
+
+    const handleA = a.totalDollarsWagered || 0;
+    const handleB = b.totalDollarsWagered || 0;
+    return handleB - handleA;
+  });
+
+  // 3. Create a map of game ID to unique rank
+  const rankMap = new Map<string, number>();
+  sorted.forEach((g, index) => {
+    rankMap.set(g.id, index + 1);
+  });
+
+  // 4. Return original slate list with overallConfidenceRank and displayRank updated
+  return slateWithOpinions.map((game) => {
+    const rank = rankMap.get(game.id) || 1;
+    const updatedOpinions: GameMarketOpinions = {
+      ...game.marketOpinions,
+      overallConfidenceRank: rank,
+    };
+    return {
+      ...game,
+      displayRank: rank,
+      marketOpinions: updatedOpinions,
+    };
+  });
+}
+

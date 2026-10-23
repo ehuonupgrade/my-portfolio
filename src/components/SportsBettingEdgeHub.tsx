@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, SportsLeague } from '../types/sportsBetting';
 import { MOCK_GAMES_MARKETS, PUBLIC_SPORTSBOOKS, DAILY_SLATE_PORTFOLIOS, getActiveDailyPortfolio } from '../data/sportsBettingData';
-import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions, getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions, getCleanTeamName, reassignSlateRanks } from '../data/nflMarketOpinionsData';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BetTrackerAndPatternView } from './BetTrackerAndPatternView';
 import { AnalystConsensusTracker } from './AnalystConsensusTracker';
@@ -98,10 +98,12 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
 
   // Market games synchronized with SportsDataContext single source of truth
   const allAvailableGames = useMemo(() => {
-    return contextGames.map(purifyAndRealignGame).map((g) => ({
-      ...g,
-      marketOpinions: g.marketOpinions || getUniversalGameMarketOpinions(g),
-    }));
+    return reassignSlateRanks(
+      contextGames.map(purifyAndRealignGame).map((g) => ({
+        ...g,
+        marketOpinions: g.marketOpinions || getUniversalGameMarketOpinions(g),
+      }))
+    );
   }, [contextGames]);
 
   // Filter games with Status Classification & Upcoming Slate Priority

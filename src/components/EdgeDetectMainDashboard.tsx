@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { DAILY_SLATE_PORTFOLIOS, getActiveDailyPortfolio } from '../data/sportsBettingData';
-import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions, getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions, getCleanTeamName, reassignSlateRanks } from '../data/nflMarketOpinionsData';
 import { useSportsData } from '../context/SportsDataContext';
 import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, SUPERSTAR_BREAKING_MEDICAL_WIRE, MovementAlertItem } from './LineMovementAlertBanner';
 import {
@@ -43,11 +43,13 @@ interface EdgeDetectMainDashboardProps {
 }
 
 export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = ({
-  games,
+  games: rawGames,
   onNavigateToLeague,
   onSelectGameAndInspect,
   onBackToProjects,
 }) => {
+  const games = useMemo(() => reassignSlateRanks(rawGames), [rawGames]);
+
   // Navigation / Filter states
   const [activeMainSection, setActiveMainSection] = useState<'all' | 'recommendations' | 'radar' | 'ledger'>('all');
   const [recommendationViewMode, setRecommendationViewMode] = useState<'both' | 'portfolios' | 'slate_3way'>('both');

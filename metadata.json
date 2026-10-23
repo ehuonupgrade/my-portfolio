@@ -1,6 +1,6 @@
 {
-  "name": "Terminal Portfolio Hub",
-  "description": "High-speed developer portfolio and subdomain application hub with high-end terminal aesthetic, interactive CLI, and Astro project architecture.",
+  "name": "OmniSend Messaging Gateway",
+  "description": "Universal multi-channel notification and messaging gateway service with Facebook Messenger Graph API integration, Slack/Telegram adapters, live dispatch console, webhook processing, client API keys, and SDK code generators.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

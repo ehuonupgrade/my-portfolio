@@ -3,7 +3,7 @@ import { GameMarket } from '../types/sportsBetting';
 import { TrackedBetRecommendation } from '../types/sportsBettingTracker';
 import { MOCK_GAMES_MARKETS } from '../data/sportsBettingData';
 import { purifyAndRealignGame } from '../utils/gameAlignmentGuard';
-import { getUniversalGameMarketOpinions } from '../data/nflMarketOpinionsData';
+import { getUniversalGameMarketOpinions, reassignSlateRanks } from '../data/nflMarketOpinionsData';
 import { getTrackedBets, saveTrackedBets, recalibrateTrackedBetsWithLiveMarket, autoGradeTrackedBetsWithLiveGames } from '../utils/bettingTrackerStore';
 import { getGameDisplayStatus, GameStatusMetadata, DisplayGameStatus } from '../components/common/GameStatusBadge';
 import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
@@ -97,7 +97,7 @@ function normalizeGameStatus(game: GameMarket): GameMarket {
 
 export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children }) => {
   const [games, setGames] = useState<GameMarket[]>(() =>
-    MOCK_GAMES_MARKETS.map(purifyAndRealignGame).map(normalizeGameStatus)
+    reassignSlateRanks(MOCK_GAMES_MARKETS.map(purifyAndRealignGame).map(normalizeGameStatus))
   );
   const [trackedBets, setTrackedBets] = useState<TrackedBetRecommendation[]>(() =>
     getTrackedBets()
@@ -233,7 +233,8 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
         `[SportsDataProvider:API] 📊 Cycle #${cycle} Verification Summary: Week=${activeWeek}, Total=${finalMergedSlate.length} games (In Progress: ${inProgressCount}, Completed: ${completedCount}, Upcoming: ${upcomingCount})`
       );
 
-      setGames(finalMergedSlate);
+      const rankedSlate = reassignSlateRanks(finalMergedSlate);
+      setGames(rankedSlate);
       // Compute recalibrated and auto-graded bets outside state updater
       const currentTracked = getTrackedBets();
       const recalibrated = recalibrateTrackedBetsWithLiveMarket(currentTracked, finalMergedSlate);

@@ -1,5 +1,39 @@
 [
   {
+    "version": "v1.0.0",
+    "date": "October 21, 2026",
+    "title": "OmniSend Messaging Gateway: Standalone Multi-Channel Router & Meta Graph API v19.0 Launch",
+    "summary": "Engineered OmniSend Messaging Gateway as a standalone multi-channel notification and messaging gateway service. Provides a single unified REST API endpoint (/api/v1/messages/send) allowing any application to dispatch alerts, rich card templates, CTA buttons, and transaction updates through Facebook Messenger Graph API v19.0, Slack Incoming Webhooks, Telegram Bot API, WhatsApp Business API, and Twilio SMS. Features interactive Live Dispatcher Studio, Facebook Messenger Webhook verification handshake (GET /api/v1/webhooks/messenger), inbound webhook simulator, client application API key generator (omni_live_...), notification template library, real-time audit logs inspector with JSON payload viewer, and auto-generated cURL / Node.js / Python / React SDK code snippets.",
+    "tag": "Messaging & Meta Gateway",
+    "changes": [
+      {
+        "type": "feature",
+        "description": "Core Dispatch Gateway API: Built POST /api/v1/messages/send with support for real Facebook Graph API v19.0 calls or high-fidelity sandbox simulation mode when tokens are unconfigured."
+      },
+      {
+        "type": "feature",
+        "description": "Facebook Messenger Webhook Handshake: Implemented GET /api/v1/webhooks/messenger for Meta developer console subscription verification and POST webhook event receiver."
+      },
+      {
+        "type": "feature",
+        "description": "Interactive Live Dispatch Studio: Built real-time payload builder with live smartphone preview rendering Facebook Messenger media cards, text body, and CTA web buttons."
+      },
+      {
+        "type": "feature",
+        "description": "Facebook Manager & Handshake Tester: Built dedicated setup panel for Page Access Tokens, Webhook Verify Tokens, 1-click handshake verification tester, and inbound event simulator."
+      },
+      {
+        "type": "feature",
+        "description": "Channels Registry & Client App Manager: Integrated configuration drawers for 6 providers and multi-tenant app registration with secure omni_live_... API keys."
+      },
+      {
+        "type": "feature",
+        "description": "Dispatch Audit Inspector & SDK Generator: Built real-time audit logs grid with raw JSON payload modal inspector, 1-click retry dispatch, and multi-language SDK code generator."
+      }
+    ],
+    "commits": ["f1a098b", "b28c31e"]
+  },
+  {
     "version": "v0.9.25",
     "date": "October 17, 2026",
     "title": "A.J. Brown (New England Patriots) IR Activation & Market Recalibration vs Jets",

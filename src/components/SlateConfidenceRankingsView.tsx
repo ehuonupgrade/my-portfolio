@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { GameMarket } from '../types/sportsBetting';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
-import { getCleanTeamName } from '../data/nflMarketOpinionsData';
+import { getCleanTeamName, reassignSlateRanks } from '../data/nflMarketOpinionsData';
 import { formatToLocalUserTime } from '../utils/timeZoneUtils';
 
 interface SlateConfidenceRankingsViewProps {
@@ -12,10 +12,11 @@ interface SlateConfidenceRankingsViewProps {
 }
 
 export const SlateConfidenceRankingsView: React.FC<SlateConfidenceRankingsViewProps> = ({
-  games,
+  games: rawGames,
   onSelectGame,
   onOpenLiveShifts,
 }) => {
+  const games = useMemo(() => reassignSlateRanks(rawGames), [rawGames]);
   const [filterType, setFilterType] = useState<'ALL' | 'TOP_5' | 'SPREADS' | 'MONEYLINE' | 'TOTALS'>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [expandedGameId, setExpandedGameId] = useState<string | null>(null);
