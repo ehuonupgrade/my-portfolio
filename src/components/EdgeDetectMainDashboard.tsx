@@ -15,7 +15,6 @@ import {
   simulateTonightOutcome,
   resetTrackedBetsToSeed,
   exportTrackedBetsToCSV,
-  autoGradeTrackedBetsWithLiveGames,
 } from '../utils/bettingTrackerStore';
 import { calculatePerformanceSummary } from '../utils/bettingPatternEngine';
 import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
