@@ -3,7 +3,7 @@ import { GameMarket, VolumeTickPulse } from '../types/sportsBetting';
 import { DAILY_SLATE_PORTFOLIOS, getActiveDailyPortfolio } from '../data/sportsBettingData';
 import { NFL_MARKET_OPINIONS_MAP, getUniversalGameMarketOpinions, getCleanTeamName, reassignSlateRanks } from '../data/nflMarketOpinionsData';
 import { useSportsData } from '../context/SportsDataContext';
-import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, SUPERSTAR_BREAKING_MEDICAL_WIRE, MovementAlertItem } from './LineMovementAlertBanner';
+import { LineMovementAlertBanner, ACTIVE_MOVEMENT_ALERTS, MovementAlertItem } from './LineMovementAlertBanner';
 import {
   TrackedBetRecommendation,
   BetOutcome,
