@@ -1381,6 +1381,13 @@ app.get(['/api/edgedetect/live/news', '/api/linepulse/live/news'], async (req, r
 // POST: Ingest external breaking news/alert directly into the live feed
 app.post(['/api/edgedetect/live/alerts/ingest', '/api/linepulse/live/alerts/ingest'], (req, res) => {
   try {
+    const apiKey = req.headers['x-api-key'];
+    const validKey = process.env.INGEST_API_KEY || process.env.ADMIN_SECRET;
+
+    if (!validKey || apiKey !== validKey) {
+      return res.status(401).json({ success: false, error: 'Unauthorized: Invalid API Key' });
+    }
+
     const { headline, description, league = 'NFL', wireType = 'ROSTER_ACTIVATION', impactLevel = 'CRITICAL' } = req.body;
     if (!headline) {
       return res.status(400).json({ success: false, error: 'Headline is required' });
@@ -1402,6 +1409,12 @@ app.post(['/api/edgedetect/live/alerts/ingest', '/api/linepulse/live/alerts/inge
 
     if (cachedLiveNews && Array.isArray(cachedLiveNews.data.articles)) {
       cachedLiveNews.data.articles.unshift(newArticle);
+
+      // Prevent unbounded array growth
+      if (cachedLiveNews.data.articles.length > 200) {
+        cachedLiveNews.data.articles.length = 200;
+      }
+
       cachedLiveNews.data.totalArticles = cachedLiveNews.data.articles.length;
       cachedLiveNews.data.lastSyncedAt = new Date().toISOString();
     }
