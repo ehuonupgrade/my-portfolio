@@ -156,21 +156,21 @@ export const SportsBettingEdgeHub: React.FC<SportsBettingEdgeHubProps> = ({
     // 1. Look for unplayed game explicitly marked as prime opportunity in allAvailableGames
     const activePrime = allAvailableGames.find((g) => {
       const meta = getGameDisplayStatus(g);
-      return !meta.isCompleted && g.isPrimeOpportunity && g.primeStrategy;
+      return !meta.isCompleted && g.status !== 'FINAL' && g.isPrimeOpportunity && g.primeStrategy;
     });
     if (activePrime) return activePrime;
 
     // 2. Look for any unplayed game that has a prime strategy
     const unplayedWithStrat = allAvailableGames.find((g) => {
       const meta = getGameDisplayStatus(g);
-      return !meta.isCompleted && g.primeStrategy;
+      return !meta.isCompleted && g.status !== 'FINAL' && g.primeStrategy;
     });
     if (unplayedWithStrat) return unplayedWithStrat;
 
     // 3. Fallback to first unplayed upcoming game on schedule
     const nextUpcoming = allAvailableGames.find((g) => {
       const meta = getGameDisplayStatus(g);
-      return !meta.isCompleted;
+      return !meta.isCompleted && g.status !== 'FINAL';
     });
     if (nextUpcoming) return nextUpcoming;
 

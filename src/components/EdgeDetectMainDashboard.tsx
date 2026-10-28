@@ -73,11 +73,26 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
   }, [selectedWeek, weekNumber, games]);
 
   const nearestUpcomingGame = useMemo(() => {
-    return (
-      games.find((g) => getGameDisplayStatus(g).isUpcoming) ||
-      games.find((g) => getGameDisplayStatus(g).isLive) ||
-      games[0]
-    );
+    // Strictly find upcoming, unplayed games on active schedule (never past/completed games)
+    const upcoming = games.filter((g) => {
+      const statusMeta = getGameDisplayStatus(g);
+      return statusMeta.isUpcoming && !statusMeta.isCompleted && g.status !== 'FINAL';
+    });
+    if (upcoming.length > 0) return upcoming[0];
+
+    const live = games.filter((g) => {
+      const statusMeta = getGameDisplayStatus(g);
+      return statusMeta.isLive;
+    });
+    if (live.length > 0) return live[0];
+
+    const uncompleted = games.filter((g) => {
+      const statusMeta = getGameDisplayStatus(g);
+      return !statusMeta.isCompleted && g.status !== 'FINAL';
+    });
+    if (uncompleted.length > 0) return uncompleted[0];
+
+    return games[0];
   }, [games]);
 
   const topLockInfo = useMemo(() => {
@@ -88,9 +103,11 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
         gameId: 'nfl-wsh-sf-w6',
       };
     }
+    const lockPick = nearestUpcomingGame?.marketOpinions?.spreadOpinion?.pick || nearestUpcomingGame?.consensus?.spread || 'Bears -3.0';
+    const rawTimeStr = nearestUpcomingGame?.scheduledTime || 'Thursday, Oct 22 · 8:15 PM EDT';
     return {
-      label: 'Bears -3.0 (95%)',
-      sub: 'Thursday Night Football',
+      label: `${lockPick} (${nearestUpcomingGame?.marketOpinions?.overallConfidenceScore || 95}%)`,
+      sub: formatToLocalUserTime(rawTimeStr),
       gameId: nearestUpcomingGame?.id || 'nfl-ne-chi-w7',
     };
   }, [selectedWeek, nearestUpcomingGame]);
@@ -103,7 +120,15 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
         gameId: 'nfl-wsh-sf-w6',
       };
     }
-    const spreadStr = nearestUpcomingGame?.consensus?.spread || 'Bears -3.0';
+    const statusMeta = getGameDisplayStatus(nearestUpcomingGame);
+    if (statusMeta.isCompleted || nearestUpcomingGame?.status === 'FINAL') {
+      return {
+        label: 'Active Slate Concluded',
+        sub: 'All Games Final',
+        gameId: nearestUpcomingGame?.id || 'nfl-ne-chi-w7',
+      };
+    }
+    const spreadStr = nearestUpcomingGame?.marketOpinions?.spreadOpinion?.pick || nearestUpcomingGame?.consensus?.spread || 'Bears -3.0';
     const rawTimeStr = nearestUpcomingGame?.scheduledTime || 'Thursday, Oct 22 · 8:15 PM EDT';
     const timeStr = formatToLocalUserTime(rawTimeStr);
     return {
