@@ -1614,6 +1614,9 @@ app.get(['/api/edgedetect/live/medical-wire', '/api/linepulse/live/medical-wire'
                 isArchived: false,
                 source: 'ESPN Live Sports Wire Gateway',
               });
+              if (liveMedicalWireRegistry.length > 500) {
+                liveMedicalWireRegistry.length = 500;
+              }
             }
           }
         });
@@ -1676,6 +1679,9 @@ app.post(['/api/edgedetect/live/medical-wire/ingest', '/api/linepulse/live/medic
     };
 
     liveMedicalWireRegistry.unshift(newItem);
+    if (liveMedicalWireRegistry.length > 500) {
+      liveMedicalWireRegistry.length = 500;
+    }
 
     res.json({
       success: true,
