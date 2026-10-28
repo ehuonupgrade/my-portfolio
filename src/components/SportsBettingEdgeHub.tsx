@@ -17,7 +17,6 @@ import { LiveVerificationModal } from './LiveVerificationModal';
 import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { useLiveVerification } from '../utils/useLiveVerification';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
-import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
 import { purifyAndRealignGame, auditAllGamesInSlate } from '../utils/gameAlignmentGuard';
 import { useSportsData } from '../context/SportsDataContext';
 import { GameStatusBadge, getGameDisplayStatus } from './common/GameStatusBadge';
