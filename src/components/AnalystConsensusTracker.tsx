@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   MOCK_ANALYST_CONSENSUS_DATA,
   TRACKED_SPORTS_ANALYSTS,
-  getTriggeredContrarianFades,
   getUniversalAnalystConsensus,
 } from '../data/sportsAnalystsData';
 import { AnalystMarketConsensus, AnalystPick } from '../types/sportsBetting';
