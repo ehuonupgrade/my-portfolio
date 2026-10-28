@@ -1,6 +1,6 @@
 import { GameMarket, DailySlatePortfolio, PlayerInjuryItem } from '../types/sportsBetting';
 import { MOCK_ANALYST_CONSENSUS_DATA } from './sportsAnalystsData';
-import { NFL_MARKET_OPINIONS_MAP, NFL_LIVE_VOLUME_SHIFTS_MAP, getUniversalGameMarketOpinions, getCleanTeamName } from './nflMarketOpinionsData';
+import { NFL_LIVE_VOLUME_SHIFTS_MAP, getUniversalGameMarketOpinions, getCleanTeamName } from './nflMarketOpinionsData';
 
 export const PUBLIC_SPORTSBOOKS = [
   { name: 'DraftKings', code: 'DK', color: '#53d337' },
