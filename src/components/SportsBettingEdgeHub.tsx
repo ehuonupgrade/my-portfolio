@@ -6,7 +6,6 @@ import { DailyBettingTiersDeck } from './DailyBettingTiersDeck';
 import { BetTrackerAndPatternView } from './BetTrackerAndPatternView';
 import { AnalystConsensusTracker } from './AnalystConsensusTracker';
 import { BettingPerformanceCharts } from './BettingPerformanceCharts';
-import { LineMovementAlertBanner } from './LineMovementAlertBanner';
 import { AlertHistoryLogViewer } from './AlertHistoryLogViewer';
 import { LiveNewsWireView } from './LiveNewsWireView';
 import { SlateConfidenceRankingsView } from './SlateConfidenceRankingsView';
