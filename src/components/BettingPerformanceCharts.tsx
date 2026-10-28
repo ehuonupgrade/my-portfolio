@@ -78,15 +78,30 @@ const CustomChartTooltip: React.FC<CustomTooltipProps> = ({ active, payload, lab
 
 interface BettingPerformanceChartsProps {
   onBackToBoard?: () => void;
+  selectedStrategy?: StrategyKey;
+  onSelectStrategy?: (strategy: StrategyKey) => void;
 }
 
-export const BettingPerformanceCharts: React.FC<BettingPerformanceChartsProps> = ({ onBackToBoard }) => {
+export const BettingPerformanceCharts: React.FC<BettingPerformanceChartsProps> = ({
+  onBackToBoard,
+  selectedStrategy: externalSelectedStrategy,
+  onSelectStrategy,
+}) => {
   const [activeChartType, setActiveChartType] = useState<'cumulative' | 'edge' | 'distribution'>('cumulative');
-  const [selectedStrategy, setSelectedStrategy] = useState<StrategyKey>('ALL');
+  const [internalStrategy, setInternalStrategy] = useState<StrategyKey>('ALL');
   const [showSimulatedOct12, setShowSimulatedOct12] = useState<boolean>(true);
   const [trackedBets, setTrackedBets] = useState<any[]>(() => getTrackedBets());
   const [showLedgerModal, setShowLedgerModal] = useState<boolean>(false);
   const [ledgerSearch, setLedgerSearch] = useState<string>('');
+
+  const selectedStrategy = externalSelectedStrategy !== undefined ? externalSelectedStrategy : internalStrategy;
+
+  const handleStrategyClick = (key: StrategyKey) => {
+    playKeyClick();
+    const nextKey = selectedStrategy === key ? 'ALL' : key;
+    setInternalStrategy(nextKey);
+    onSelectStrategy?.(nextKey);
+  };
 
   const { lastSyncTimestamp } = useLiveTelemetryEngine(3000);
 
@@ -287,8 +302,7 @@ export const BettingPerformanceCharts: React.FC<BettingPerformanceChartsProps> =
         <span className="text-slate-500 uppercase text-[11px] font-bold shrink-0">Filter Strategy:</span>
         <button
           onClick={() => {
-            playKeyClick();
-            setSelectedStrategy('ALL');
+            handleStrategyClick('ALL');
           }}
           className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
             selectedStrategy === 'ALL'
@@ -303,8 +317,7 @@ export const BettingPerformanceCharts: React.FC<BettingPerformanceChartsProps> =
           <button
             key={strat.key}
             onClick={() => {
-              playKeyClick();
-              setSelectedStrategy(strat.key);
+              handleStrategyClick(strat.key);
             }}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
               selectedStrategy === strat.key
@@ -647,8 +660,7 @@ export const BettingPerformanceCharts: React.FC<BettingPerformanceChartsProps> =
             <div
               key={strat.key}
               onClick={() => {
-                playKeyClick();
-                setSelectedStrategy(strat.key);
+                handleStrategyClick(strat.key);
                 setActiveChartType('cumulative');
               }}
               className={`p-4 rounded-xl border transition-all cursor-pointer space-y-3 ${

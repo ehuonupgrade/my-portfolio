@@ -208,8 +208,12 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
 
   // Filtered bets for ongoing & historical ledger
   const ongoingBets = useMemo(() => {
-    return bets.filter((b) => b.status === 'PENDING');
-  }, [bets]);
+    return bets.filter((b) => {
+      if (b.status !== 'PENDING') return false;
+      if (ledgerTierFilter !== 'ALL' && b.tier !== ledgerTierFilter) return false;
+      return true;
+    });
+  }, [bets, ledgerTierFilter]);
 
   const settledBets = useMemo(() => {
     return bets.filter((b) => {
@@ -1591,9 +1595,71 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
           {/* RECHARTS PERFORMANCE TRENDS CHART */}
           {isPerformanceChartExpanded && (
             <div className="p-2 sm:p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80">
-              <BettingPerformanceCharts />
+              <BettingPerformanceCharts
+                selectedStrategy={ledgerTierFilter}
+                onSelectStrategy={(strat) => setLedgerTierFilter(strat as TrackedBetTier | 'ALL')}
+              />
             </div>
           )}
+
+          {/* STRATEGY FILTER & ACTIVE STRATEGY BANNER */}
+          <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 font-mono text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-amber-400 font-bold uppercase text-[11px]">Filter By Bet Type / Strategy:</span>
+                {[
+                  { id: 'ALL', label: 'All Strategies' },
+                  { id: 'SINGLE_GAME', label: '1 Straight' },
+                  { id: 'PARLAY_3LEG', label: '1 3-Leg Parlay' },
+                  { id: 'TEASER_3TEAM_10', label: '1 3-Team +10 Teaser' },
+                  { id: 'TEASER_4TEAM_13', label: '1 4-Team +13 Teaser' },
+                  { id: 'PRIME_1GAME', label: 'Prime 1-Game' },
+                  { id: 'CONTRARIAN_FADE', label: 'Contrarian Fade' },
+                ].map((strat) => (
+                  <button
+                    key={strat.id}
+                    onClick={() => {
+                      playKeyClick();
+                      setLedgerTierFilter(strat.id as TrackedBetTier | 'ALL');
+                    }}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                      ledgerTierFilter === strat.id
+                        ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20 ring-1 ring-amber-300'
+                        : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                    }`}
+                  >
+                    {strat.label}
+                  </button>
+                ))}
+              </div>
+
+              {ledgerTierFilter !== 'ALL' && (
+                <button
+                  onClick={() => {
+                    playKeyClick();
+                    setLedgerTierFilter('ALL');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-600/80 text-rose-300 hover:text-white font-bold cursor-pointer shrink-0 transition-colors"
+                >
+                  ✕ Reset Filter
+                </button>
+              )}
+            </div>
+
+            {ledgerTierFilter !== 'ALL' && (
+              <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/40 text-amber-200 text-xs flex items-center justify-between gap-3 animate-fadeIn">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                  <span className="font-bold">
+                    Active Strategy Filter Isolation: {ledgerTierFilter.replace(/_/g, ' ')}
+                  </span>
+                  <span className="text-slate-400">
+                    &bull; Showing {ongoingBets.length} pending and {settledBets.length} settled wagers for this strategy
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* 3A. CURRENT & ONGOING BETS (ACTIVE / PENDING SLATE) */}
           <div className="space-y-3">
@@ -1605,93 +1671,104 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
               <span className="text-slate-500">Live games &amp; upcoming slates</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {ongoingBets.map((bet) => (
-                <div
-                  key={bet.id}
-                  className="p-5 rounded-2xl bg-slate-900/80 border border-amber-500/40 shadow-lg space-y-3 font-sans"
-                >
-                  <div className="flex items-start justify-between gap-2 border-b border-slate-800/80 pb-2.5">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-950 border border-amber-600 text-amber-300">
-                          {bet.legs.filter((l) => l.status === 'WON').length > 0
-                            ? `IN PROGRESS • ${bet.legs.filter((l) => l.status === 'WON').length}/${bet.legs.length} CASHED`
-                            : 'PENDING • ONGOING'}
-                        </span>
-                        <span className="text-xs font-mono text-slate-400">{bet.dateLabel}</span>
+            {ongoingBets.length === 0 ? (
+              <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 text-center font-mono text-xs text-slate-400 space-y-1">
+                <span>No pending wagers found for selected filter ({ledgerTierFilter.replace(/_/g, ' ')}).</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {ongoingBets.map((bet) => (
+                  <div
+                    key={bet.id}
+                    className="p-5 rounded-2xl bg-slate-900/80 border border-amber-500/40 shadow-lg space-y-3 font-sans"
+                  >
+                    <div className="flex items-start justify-between gap-2 border-b border-slate-800/80 pb-2.5">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-950 border border-amber-600 text-amber-300">
+                            {bet.legs.filter((l) => l.status === 'WON').length > 0
+                              ? `IN PROGRESS • ${bet.legs.filter((l) => l.status === 'WON').length}/${bet.legs.length} CASHED`
+                              : 'PENDING • ONGOING'}
+                          </span>
+                          <span className="text-xs font-mono text-slate-400">{bet.dateLabel}</span>
+                        </div>
+                        <h4 className="text-base font-bold text-white tracking-tight pt-1">
+                          {bet.title}
+                        </h4>
                       </div>
-                      <h4 className="text-base font-bold text-white tracking-tight pt-1">
-                        {bet.title}
-                      </h4>
+
+                      <div className="text-right font-mono text-xs">
+                        <span className="text-emerald-400 font-bold block">{bet.payoutOdds}</span>
+                        <span className="text-slate-400 text-[10px]">{bet.unitsStaked} U Staked</span>
+                      </div>
                     </div>
 
-                    <div className="text-right font-mono text-xs">
-                      <span className="text-emerald-400 font-bold block">{bet.payoutOdds}</span>
-                      <span className="text-slate-400 text-[10px]">{bet.unitsStaked} U Staked</span>
-                    </div>
-                  </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {bet.subtitle}
+                    </p>
 
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    {bet.subtitle}
-                  </p>
-
-                  {/* Legs breakdown */}
-                  <div className="space-y-1.5 pt-1">
-                    {bet.legs.map((leg) => (
-                      <div
-                        key={leg.id}
-                        className={`p-2 rounded-xl bg-slate-950/80 border text-xs font-mono flex items-center justify-between ${
-                          leg.status === 'WON'
-                            ? 'border-emerald-600/40'
-                            : leg.status === 'LOST'
-                            ? 'border-rose-600/40'
-                            : 'border-slate-800'
-                        }`}
-                      >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-white">{leg.targetSelection}</span>
-                            {leg.status === 'WON' ? (
-                              <span className="px-1.5 py-0.2 rounded bg-emerald-950 border border-emerald-600 text-emerald-300 font-bold text-[9px]">
-                                ✅ CASHED
-                              </span>
-                            ) : leg.status === 'LOST' ? (
-                              <span className="px-1.5 py-0.2 rounded bg-rose-950 border border-rose-600 text-rose-300 font-bold text-[9px]">
-                                ❌ LOST
-                              </span>
-                            ) : (
-                              <span className="px-1.5 py-0.2 rounded bg-amber-950 border border-amber-600 text-amber-300 font-bold text-[9px]">
-                                ⏳ PENDING
+                    {/* Legs breakdown */}
+                    <div className="space-y-1.5 pt-1">
+                      {bet.legs.map((leg) => (
+                        <div
+                          key={leg.id}
+                          className={`p-2.5 rounded-xl bg-slate-950/80 border text-xs font-mono flex items-center justify-between ${
+                            leg.status === 'WON'
+                              ? 'border-emerald-600/40'
+                              : leg.status === 'LOST'
+                              ? 'border-rose-600/40'
+                              : 'border-slate-800'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white">{leg.targetSelection}</span>
+                              {leg.status === 'WON' ? (
+                                <span className="px-1.5 py-0.2 rounded bg-emerald-950 border border-emerald-600 text-emerald-300 font-bold text-[9px]">
+                                  ✅ CASHED
+                                </span>
+                              ) : leg.status === 'LOST' ? (
+                                <span className="px-1.5 py-0.2 rounded bg-rose-950 border border-rose-600 text-rose-300 font-bold text-[9px]">
+                                  ❌ LOST
+                                </span>
+                              ) : (
+                                <span className="px-1.5 py-0.2 rounded bg-amber-950 border border-amber-600 text-amber-300 font-bold text-[9px]">
+                                  ⏳ PENDING
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-slate-400 block pt-0.5">
+                              {leg.gameMatchup} &bull; {leg.finalScore || leg.gameDate}
+                            </span>
+                            {leg.rationale && (
+                              <span className="text-[10px] text-slate-300 block pt-0.5 italic">
+                                Rationale: {leg.rationale}
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] text-slate-400 block">
-                            {leg.gameMatchup} &bull; {leg.finalScore || leg.gameDate}
-                          </span>
+                          <div className="text-right text-[11px] shrink-0">
+                            <span className="text-emerald-400 font-bold block">{leg.bestOdds}</span>
+                            <span className="text-[10px] text-slate-400 block">{leg.bestSportsbook}</span>
+                          </div>
                         </div>
-                        <div className="text-right text-[11px]">
-                          <span className="text-emerald-400 font-bold">{leg.bestOdds}</span>
-                          <span className="text-[10px] text-slate-400 block">{leg.bestSportsbook}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
 
-                  <div className="pt-1 text-[11px] font-mono text-slate-400 flex items-center justify-between border-t border-slate-800/80">
-                    <span>Key Signal: <span className="text-cyan-300">{bet.signalsTagged.join(', ')}</span></span>
-                    <span className="text-amber-400 font-bold">In Play / Upcoming</span>
+                    <div className="pt-1 text-[11px] font-mono text-slate-400 flex items-center justify-between border-t border-slate-800/80">
+                      <span>Key Signal: <span className="text-cyan-300">{bet.signalsTagged.join(', ')}</span></span>
+                      <span className="text-amber-400 font-bold">In Play / Upcoming</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* 3B. HISTORICAL LOG OF SETTLED BETS */}
           <div className="space-y-3 pt-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-900 border border-slate-800 font-mono text-xs">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-slate-500 uppercase font-bold shrink-0">Filter Settled Bets:</span>
+                <span className="text-slate-500 uppercase font-bold shrink-0">Filter Settled Status:</span>
                 {(['ALL', 'WON', 'LOST'] as const).map((st) => (
                   <button
                     key={st}
@@ -1716,79 +1793,147 @@ export const EdgeDetectMainDashboard: React.FC<EdgeDetectMainDashboardProps> = (
             </div>
 
             {/* Settled Bets Table / List */}
-            <div className="space-y-3">
-              {settledBets.map((bet) => {
-                const isWin = bet.status === 'WON';
-                const isLoss = bet.status === 'LOST';
+            {settledBets.length === 0 ? (
+              <div className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 text-center font-mono text-xs text-slate-400">
+                No settled wagers found matching active filters.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {settledBets.map((bet) => {
+                  const isWin = bet.status === 'WON';
+                  const isLoss = bet.status === 'LOST';
 
-                return (
-                  <div
-                    key={bet.id}
-                    className={`p-5 rounded-2xl border transition-all space-y-3 font-sans ${
-                      isWin
-                        ? 'bg-gradient-to-br from-emerald-950/30 via-slate-900 to-slate-950 border-emerald-500/60 shadow-md'
-                        : isLoss
-                        ? 'bg-gradient-to-br from-rose-950/30 via-slate-900 to-slate-950 border-rose-500/60 shadow-md'
-                        : 'bg-slate-900/60 border-slate-800'
-                    }`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
-                      <div className="flex items-center gap-2.5">
-                        <span className={`px-2.5 py-0.5 rounded-full font-mono text-xs font-black uppercase ${
-                          isWin
-                            ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                            : isLoss
-                            ? 'bg-rose-500 text-white shadow-sm'
-                            : 'bg-slate-700 text-white'
-                        }`}>
-                          {bet.status}
-                        </span>
+                  return (
+                    <div
+                      key={bet.id}
+                      className={`p-5 rounded-2xl border transition-all space-y-3 font-sans ${
+                        isWin
+                          ? 'bg-gradient-to-br from-emerald-950/30 via-slate-900 to-slate-950 border-emerald-500/60 shadow-md'
+                          : isLoss
+                          ? 'bg-gradient-to-br from-rose-950/30 via-slate-900 to-slate-950 border-rose-500/60 shadow-md'
+                          : 'bg-slate-900/60 border-slate-800'
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className={`px-2.5 py-0.5 rounded-full font-mono text-xs font-black uppercase ${
+                            isWin
+                              ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                              : isLoss
+                              ? 'bg-rose-500 text-white shadow-sm'
+                              : 'bg-slate-700 text-white'
+                          }`}>
+                            {bet.status}
+                          </span>
 
-                        <h4 className="text-base font-bold text-white tracking-tight">
-                          {bet.title}
-                        </h4>
+                          <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[10px] font-mono text-cyan-300 font-bold uppercase">
+                            {bet.tier.replace(/_/g, ' ')}
+                          </span>
+
+                          <h4 className="text-base font-bold text-white tracking-tight">
+                            {bet.title}
+                          </h4>
+                        </div>
+
+                        <div className="flex items-center gap-3 font-mono text-xs">
+                          <span className="text-slate-400">{bet.dateLabel}</span>
+                          <span className={`font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {bet.unitsWonLost >= 0 ? `+${bet.unitsWonLost}` : bet.unitsWonLost} Units
+                          </span>
+                        </div>
                       </div>
 
-                      <div className="flex items-center gap-3 font-mono text-xs">
-                        <span className="text-slate-400">{bet.dateLabel}</span>
-                        <span className={`font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {bet.unitsWonLost >= 0 ? `+${bet.unitsWonLost}` : bet.unitsWonLost} Units
-                        </span>
-                      </div>
-                    </div>
+                      <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                        {bet.subtitle}
+                      </p>
 
-                    <p className="text-xs text-slate-300 leading-relaxed">
-                      {bet.subtitle}
-                    </p>
-
-                    {/* Post-Game Analysis & Learned Takeaway */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 text-xs">
-                      {bet.postGameAnalysis && (
-                        <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-                          <strong className="font-mono text-[10px] text-cyan-300 uppercase block">
-                            🏁 Outcome Analysis:
-                          </strong>
-                          <p className="text-slate-300 leading-relaxed">
-                            {bet.postGameAnalysis}
-                          </p>
+                      {/* Legs breakdown on settled bets */}
+                      {bet.legs && bet.legs.length > 0 && (
+                        <div className="space-y-1.5 pt-1">
+                          <span className="font-mono text-[10px] text-slate-400 uppercase font-bold block">
+                            Wager Strategy Legs ({bet.legs.length} Legs):
+                          </span>
+                          {bet.legs.map((leg) => (
+                            <div
+                              key={leg.id}
+                              className={`p-2.5 rounded-xl bg-slate-950/80 border text-xs font-mono flex items-center justify-between ${
+                                leg.status === 'WON'
+                                  ? 'border-emerald-600/40'
+                                  : leg.status === 'LOST'
+                                  ? 'border-rose-600/40'
+                                  : 'border-slate-800'
+                              }`}
+                            >
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-white">{leg.targetSelection}</span>
+                                  {leg.status === 'WON' ? (
+                                    <span className="px-1.5 py-0.2 rounded bg-emerald-950 border border-emerald-600 text-emerald-300 font-bold text-[9px]">
+                                      ✅ CASHED
+                                    </span>
+                                  ) : leg.status === 'LOST' ? (
+                                    <span className="px-1.5 py-0.2 rounded bg-rose-950 border border-rose-600 text-rose-300 font-bold text-[9px]">
+                                      ❌ LOST
+                                    </span>
+                                  ) : (
+                                    <span className="px-1.5 py-0.2 rounded bg-amber-950 border border-amber-600 text-amber-300 font-bold text-[9px]">
+                                      ⏳ PENDING
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[10px] text-slate-400 block pt-0.5">
+                                  {leg.gameMatchup} &bull; {leg.finalScore || leg.gameDate}
+                                </span>
+                                {leg.rationale && (
+                                  <span className="text-[10px] text-slate-300 block pt-0.5 italic">
+                                    Rationale: {leg.rationale}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-right text-[11px] shrink-0">
+                                <span className="text-emerald-400 font-bold block">{leg.bestOdds}</span>
+                                <span className="text-[10px] text-slate-400 block">{leg.bestSportsbook}</span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
 
-                      {bet.learnedTakeaway && (
-                        <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-                          <strong className="font-mono text-[10px] text-purple-300 uppercase block">
-                            🧠 Adaptive Model Takeaway:
-                          </strong>
-                          <p className="text-slate-300 leading-relaxed">
-                            {bet.learnedTakeaway}
-                          </p>
-                        </div>
-                      )}
+                      {/* Signals & Odds info */}
+                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-1 border-t border-slate-800/60">
+                        <span>Key Signals: <span className="text-cyan-300">{bet.signalsTagged.join(', ')}</span></span>
+                        <span>Payout: <span className="text-emerald-400 font-bold">{bet.payoutOdds}</span></span>
+                      </div>
+
+                      {/* Post-Game Analysis & Learned Takeaway */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 text-xs font-sans">
+                        {bet.postGameAnalysis && (
+                          <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                            <strong className="font-mono text-[10px] text-cyan-300 uppercase block">
+                              🏁 Outcome Analysis:
+                            </strong>
+                            <p className="text-slate-300 leading-relaxed">
+                              {bet.postGameAnalysis}
+                            </p>
+                          </div>
+                        )}
+
+                        {bet.learnedTakeaway && (
+                          <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
+                            <strong className="font-mono text-[10px] text-purple-300 uppercase block">
+                              🧠 Adaptive Model Takeaway:
+                            </strong>
+                            <p className="text-slate-300 leading-relaxed">
+                              {bet.learnedTakeaway}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

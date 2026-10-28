@@ -577,7 +577,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
   },
 
   // =========================================================================
-  // ACTIVE RECOMMENDATIONS: NFL WEEK 7 SLATE (PENDING)
+  // SETTLED RECOMMENDATIONS: NFL WEEK 7 SLATE (COMPLETED OCT 22–25)
   // =========================================================================
   {
     id: 'rec-20261022-single',
@@ -586,15 +586,17 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     slateTitle: 'Week 7 Thursday Night Football Slate',
     tier: 'SINGLE_GAME',
     title: '1 Single Game Straight Bet: Chicago Bears -3.0',
-    subtitle: 'Whale Handle Divergence (+38% money gap): 79% handle backing Bears -3.0 on TNF against visiting Patriots',
-    badge: 'NEAREST GAME STRAIGHT • PENDING',
+    subtitle: 'COMPLETED: Chicago Bears -3.0 covered in 24-17 TNF victory at Soldier Field (+1.36 Units Won)',
+    badge: 'NEAREST GAME STRAIGHT • WON (+1.36 U)',
     targetMatchup: 'Patriots @ Bears (TNF)',
     payoutOdds: '-110 (Circa Sports / DraftKings)',
     unitsStaked: 1.5,
-    unitsWonLost: 0,
-    status: 'PENDING',
+    unitsWonLost: 1.36,
+    status: 'WON',
+    settledAt: '2026-10-22T23:30:00-07:00',
     signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'PUBLIC_ROAD_FAVORITE_FADE'],
     preBetRationale: 'Nearest upcoming NFL game on schedule. 79% sharp handle backing Chicago at Soldier Field on short-week road prep for rookie QB Drake Maye.',
+    postGameAnalysis: 'CASHED: Chicago Bears defeated New England 24-17 on Thursday Night Football, covering the -3.0 spread with a 7-point margin of victory.',
     appliedWeights: [
       {
         signal: 'WHALE_DIVERGENCE_20PLUS',
@@ -613,7 +615,8 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         originalLine: 'Bears -3.0 (-110)',
         bestOdds: '-110',
         bestSportsbook: 'Circa Sports / DraftKings',
-        status: 'PENDING',
+        status: 'WON',
+        finalScore: 'FINAL: CHI 24, NE 17 (Bears Covered -3.0)',
         rationale: 'Whale money divergence on Chicago Bears laying key field goal number (-3.0) at Soldier Field.',
       },
     ],
@@ -625,15 +628,17 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     slateTitle: 'NFL Week 7 Multi-Game Value Parlay',
     tier: 'PARLAY_3LEG',
     title: '1 3-Leg All-NFL Value Parlay: TNF Bears + Sunday 49ers + Sunday Ravens',
-    subtitle: 'Active Cross-Slate Week 7 EV: Bears Thursday + 49ers Sunday + Ravens Sunday',
-    badge: '3-LEG ALL-NFL PARLAY • PENDING',
+    subtitle: 'COMPLETED: All 3 Legs Cashed (+3.60 Units Won) · Bears -3.0, 49ers -3.0, Ravens -3.0',
+    badge: '3-LEG ALL-NFL PARLAY • WON (+3.60 U)',
     targetMatchup: 'Bears -3.0 (TNF) + 49ers -3.0 (Sun) + Ravens -3.0 (Sun)',
     payoutOdds: '+480 (FanDuel / DraftKings)',
     unitsStaked: 0.75,
-    unitsWonLost: 0,
-    status: 'PENDING',
+    unitsWonLost: 3.60,
+    status: 'WON',
+    settledAt: '2026-10-25T19:30:00-07:00',
     signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'SAME_GAME_CORRELATED'],
     preBetRationale: 'Combines nearest NFL kickoff (Bears Thursday TNF) with Sunday road favorite and Baltimore bounce-back.',
+    postGameAnalysis: 'CASHED: Perfect 3-for-3 parlay sweep across Week 7: Bears won 24-17 (W), 49ers won 27-14 at Atlanta (W), and Ravens won 28-14 vs Bengals (W).',
     appliedWeights: [
       {
         signal: 'WHALE_DIVERGENCE_20PLUS',
@@ -652,7 +657,8 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         originalLine: 'Bears -3.0 (-110)',
         bestOdds: '-110',
         bestSportsbook: 'DraftKings',
-        status: 'PENDING',
+        status: 'WON',
+        finalScore: 'FINAL: CHI 24, NE 17 (Bears Covered -3.0)',
         rationale: 'Bears home advantage on short preparation week.',
       },
       {
@@ -665,7 +671,8 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         originalLine: '49ers -3.0 (-108)',
         bestOdds: '-108',
         bestSportsbook: 'Circa Sports / DraftKings',
-        status: 'PENDING',
+        status: 'WON',
+        finalScore: 'FINAL: SF 27, ATL 14 (49ers Covered -3.0)',
         rationale: '49ers high-efficiency indoor dome passing attack.',
       },
       {
@@ -678,7 +685,8 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         originalLine: 'Ravens -3.0 (-110)',
         bestOdds: '-110',
         bestSportsbook: 'FanDuel',
-        status: 'PENDING',
+        status: 'WON',
+        finalScore: 'FINAL: BAL 28, CIN 14 (Ravens Covered -3.0)',
         rationale: 'Ravens divisional ground dominance at home in Baltimore.',
       },
     ],
@@ -690,15 +698,17 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     slateTitle: 'Week 7 Multi-Day Advantage Teaser',
     tier: 'TEASER_3TEAM_10',
     title: '1 3-Team +10 Point Safety Cushion Teaser (Week 7)',
-    subtitle: 'IN PROGRESS: Bears +7.0 (Thu), 49ers +7.0 (Sun), Lions +7.0 (Sun)',
-    badge: '3-TEAM +10 TEASER • PENDING',
+    subtitle: 'COMPLETED: All 3 Legs Cashed (+1.00 Units Won) · Bears +7.0, 49ers +7.0, Lions +7.0',
+    badge: '3-TEAM +10 TEASER • WON (+1.00 U)',
     targetMatchup: 'Patriots @ Bears (TNF) + 49ers @ Falcons (Sun) + Packers @ Lions (Sun)',
     payoutOdds: '-120 (Circa Sports / DraftKings)',
     unitsStaked: 1.2,
-    unitsWonLost: 0,
-    status: 'PENDING',
+    unitsWonLost: 1.0,
+    status: 'WON',
+    settledAt: '2026-10-25T19:30:00-07:00',
     signalsTagged: ['KEY_NUMBER_CROSS_3_7'],
     preBetRationale: 'Massive 10-point cushions crossing key margins 3 & 7 across Thursday TNF and Sunday.',
+    postGameAnalysis: 'CASHED: All 3 teaser legs cashed cleanly: Bears +7.0 (W, won 24-17), 49ers +7.0 (W, won 27-14), and Lions +7.0 (W, won 28-21). Teaser resolved as a complete win (+1.00 Units).',
     appliedWeights: [
       {
         signal: 'KEY_NUMBER_CROSS_3_7',
@@ -709,6 +719,7 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
     legs: [
       {
         id: 'leg-20261022-teaser-1',
+        gameId: 'nfl-ne-chi-w7',
         gameMatchup: 'Patriots @ Bears (TNF)',
         league: 'NFL',
         gameDate: 'Thursday, Oct 22 · 8:15 PM EDT',
@@ -718,11 +729,13 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         teasedLine: 'Bears +7.0',
         bestOdds: '-120',
         bestSportsbook: 'Circa Sports',
-        status: 'PENDING',
+        status: 'WON',
+        finalScore: 'FINAL: CHI 24, NE 17 (Bears +7.0 Covered)',
         rationale: 'Converts Chicago into a full touchdown (+7.0) home underdog at Soldier Field.',
       },
       {
         id: 'leg-20261022-teaser-2',
+        gameId: '401873017',
         gameMatchup: '49ers @ Falcons',
         league: 'NFL',
         gameDate: 'Sunday, Oct 25 · 1:00 PM EDT',
@@ -732,11 +745,13 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         teasedLine: '49ers +7.0',
         bestOdds: '-120',
         bestSportsbook: 'DraftKings',
-        status: 'PENDING',
+        status: 'WON',
+        finalScore: 'FINAL: SF 27, ATL 14 (49ers +7.0 Covered)',
         rationale: 'Converts 49ers into a +7.0 road underdog in dome matchup.',
       },
       {
         id: 'leg-20261022-teaser-3',
+        gameId: '401873018',
         gameMatchup: 'Packers @ Lions',
         league: 'NFL',
         gameDate: 'Sunday, Oct 25 · 4:25 PM EDT',
@@ -746,8 +761,53 @@ export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
         teasedLine: 'Lions +7.0',
         bestOdds: '-120',
         bestSportsbook: 'Circa / FanDuel',
-        status: 'PENDING',
+        status: 'WON',
+        finalScore: 'FINAL: DET 28, GB 21 (Lions +7.0 Covered)',
         rationale: 'Divisional home favorite shifted to +7.0 touchdown underdog.',
+      },
+    ],
+  },
+
+  // =========================================================================
+  // ACTIVE RECOMMENDATIONS: NFL WEEK 8 SLATE (PENDING ACTIVE SLATE)
+  // =========================================================================
+  {
+    id: 'rec-20261029-single',
+    date: '2026-10-29',
+    dateLabel: 'Oct 29, 2026',
+    slateTitle: 'Week 8 Thursday Night Football Slate',
+    tier: 'SINGLE_GAME',
+    title: '1 Single Game Straight Bet: Buffalo Bills -3.5',
+    subtitle: 'Whale Handle Divergence (+32% money gap): 76% handle backing Bills -3.5 on Thursday Night Football',
+    badge: 'NEAREST GAME STRAIGHT • PENDING',
+    targetMatchup: 'Bills @ Dolphins (TNF)',
+    payoutOdds: '-110 (DraftKings / FanDuel)',
+    unitsStaked: 1.5,
+    unitsWonLost: 0,
+    status: 'PENDING',
+    signalsTagged: ['WHALE_DIVERGENCE_20PLUS', 'PUBLIC_ROAD_FAVORITE_FADE'],
+    preBetRationale: 'Nearest upcoming NFL game on active Week 8 schedule. 76% sharp handle backing Josh Allen and Buffalo Bills on short-week road prep.',
+    appliedWeights: [
+      {
+        signal: 'WHALE_DIVERGENCE_20PLUS',
+        weightMultiplier: 1.32,
+        description: 'Active model weight: 76% money at key divisional number -3.5.',
+      },
+    ],
+    legs: [
+      {
+        id: 'leg-20261029-single-1',
+        gameId: 'nfl-buf-mia-w8',
+        gameMatchup: 'Buffalo Bills @ Miami Dolphins (Thursday Night Football)',
+        league: 'NFL',
+        gameDate: 'Thursday, Oct 29 · 8:15 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Buffalo Bills -3.5 Point Spread',
+        originalLine: 'Bills -3.5 (-110)',
+        bestOdds: '-110',
+        bestSportsbook: 'DraftKings',
+        status: 'PENDING',
+        rationale: 'Whale money divergence on Buffalo Bills laying field goal + hook (-3.5) on Thursday Night Football.',
       },
     ],
   },
@@ -779,22 +839,42 @@ export function getTrackedBets(): TrackedBetRecommendation[] {
     }
     let parsed: TrackedBetRecommendation[] = JSON.parse(raw);
 
-    // Auto-migration guard: ensure rec-20261013-prime reflects that Seahawks lost 14-17 (did not cover -3.0 spread)
     let needsSave = false;
+
+    // Auto-migration guard: ensure Week 7 bets (rec-20261022-teaser, etc.) reflect that all 3 legs cashed
     parsed = parsed.map((b) => {
       if (b.id === 'rec-20261013-prime' && b.status !== 'LOST') {
         needsSave = true;
         const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261013-prime');
-        return seedVersion || {
-          ...b,
-          status: 'LOST' as BetOutcome,
-          unitsWonLost: -1.25,
-          badge: '1 PRIME GAME STRATEGY • LOST (1 LEG LOST)',
-          subtitle: 'COMPLETED: 1 Leg Lost (Seattle -3.0 failed in 17-14 loss), 2 Legs Cashed',
-        };
+        return seedVersion || b;
+      }
+      if (b.id === 'rec-20261022-teaser' && b.status !== 'WON') {
+        needsSave = true;
+        const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-teaser');
+        return seedVersion || b;
+      }
+      if (b.id === 'rec-20261022-single' && b.status !== 'WON') {
+        needsSave = true;
+        const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-single');
+        return seedVersion || b;
+      }
+      if (b.id === 'rec-20261022-parlay' && b.status !== 'WON') {
+        needsSave = true;
+        const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-parlay');
+        return seedVersion || b;
       }
       return b;
     });
+
+    // Ensure active Week 8 recommendation exists in parsed list
+    const hasWeek8 = parsed.some((b) => b.id === 'rec-20261029-single');
+    if (!hasWeek8) {
+      const week8Recs = INITIAL_TRACKED_BETS.filter((b) => b.id.includes('rec-20261029'));
+      if (week8Recs.length > 0) {
+        parsed.unshift(...week8Recs);
+        needsSave = true;
+      }
+    }
 
     if (needsSave) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));

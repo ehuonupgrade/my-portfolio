@@ -116,13 +116,13 @@ export const SportsDataProvider: React.FC<SportsDataProviderProps> = ({ children
   const [statusFilter, setStatusFilter] = useState<GameStatusFilter>('ALL');
 
   // Dynamic NFL Week Progression & Rollover State
-  const [selectedWeek, setSelectedWeekState] = useState<number>(7);
-  const selectedWeekRef = useRef<number>(7);
-  const [weekNumber, setWeekNumber] = useState<number>(7);
-  const [availableWeeks, setAvailableWeeks] = useState<number[]>([6, 7]);
+  const [selectedWeek, setSelectedWeekState] = useState<number>(8);
+  const selectedWeekRef = useRef<number>(8);
+  const [weekNumber, setWeekNumber] = useState<number>(8);
+  const [availableWeeks, setAvailableWeeks] = useState<number[]>([6, 7, 8]);
   const [isAutoRolledOver, setIsAutoRolledOver] = useState<boolean>(true);
   const [rolloverNotice, setRolloverNotice] = useState<string | null>(
-    'NFL Week 6 concluded with Monday Night Football. Automatically advanced to active NFL Week 7 upcoming slate (14 matchups).'
+    'NFL Week 7 concluded. Automatically advanced to active NFL Week 8 upcoming slate (14 matchups).'
   );
 
   const gamesRef = useRef<GameMarket[]>(games);
