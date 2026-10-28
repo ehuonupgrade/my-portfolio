@@ -14,7 +14,6 @@ import { LiveVolumeShiftDashboard } from './LiveVolumeShiftDashboard';
 import { EdgeDetectMainDashboard } from './EdgeDetectMainDashboard';
 import { GameLineMovementView } from './GameLineMovementView';
 import { LiveVerificationModal } from './LiveVerificationModal';
-import { analyzeGameLineMovement } from '../utils/lineMovementAnalyzer';
 import { useLiveVerification } from '../utils/useLiveVerification';
 import { playKeyClick, playSuccessChime } from '../utils/audio';
 import { fetchLiveGamesWithFallback } from '../utils/liveSportsFeed';
