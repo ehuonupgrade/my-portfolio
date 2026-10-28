@@ -29,7 +29,7 @@ import {
   ChartGroupingMode,
   AggregatedTokenBucket,
 } from '../types/tokenUsage';
-import { playKeyClick, playSuccessChime, playBeep } from '../utils/audio';
+import { playKeyClick, playSuccessChime } from '../utils/audio';
 
 interface TokenUsageAnalyticsViewProps {
   onBack?: () => void;
