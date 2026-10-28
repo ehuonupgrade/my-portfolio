@@ -1,7 +1,7 @@
 import { TrackedBetRecommendation, BetOutcome } from '../types/sportsBettingTracker';
 import { GameMarket } from '../types/sportsBetting';
 
-const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v23_week7_active_rollover';
+const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v25_teaser_3_0_history_sync';
 
 /**
  * Production Recommendations Ledger
@@ -10,6 +10,83 @@ const STORAGE_KEY = 'linepulse_tracked_bet_recommendations_v23_week7_active_roll
  * while correctly leaving upcoming Sunday Oct 18 games as PENDING until kickoff.
  */
 export const INITIAL_TRACKED_BETS: TrackedBetRecommendation[] = [
+  // =========================================================================
+  // SETTLED RECOMMENDATIONS: WEEK 6 SUNDAY SHOWCASE TEASER (OCT 11, 2026)
+  // =========================================================================
+  {
+    id: 'rec-20261011-teaser',
+    date: '2026-10-11',
+    dateLabel: 'Oct 11, 2026',
+    slateTitle: 'Week 6 Sunday Showcase Teaser',
+    tier: 'TEASER_3TEAM_10',
+    title: '1 3-Team +10 Point Safety Cushion Teaser (Week 6 Sunday Showcase)',
+    subtitle: 'COMPLETED: All 3 Legs Cashed (+1.25 Units Won) · Ravens +3.5, Lions +3.0, 49ers +3.0',
+    badge: '3-TEAM +10 TEASER • WON (+1.25 U)',
+    targetMatchup: 'Commanders @ Ravens + Lions @ Cowboys + 49ers @ Seahawks',
+    payoutOdds: '-120 (DraftKings / FanDuel)',
+    unitsStaked: 1.5,
+    unitsWonLost: 1.25,
+    status: 'WON',
+    settledAt: '2026-10-11T20:30:00-07:00',
+    signalsTagged: ['KEY_NUMBER_CROSS_3_7', 'HOME_UNDERDOG'],
+    preBetRationale: 'Cross-slate teaser crossing key numbers 3, 6, and 7 on Ravens, Lions, and 49ers.',
+    postGameAnalysis: 'CASHED: All 3 legs covered easily: Ravens won 30-23 (W), Lions won 47-9 (W), and 49ers won 36-24 (W). Teaser resolved as a complete win (+1.25 Units).',
+    learnedTakeaway: 'Teasing home favorites through key margins 3 & 7 produced 100% cover rate across Week 6 showcase slates.',
+    appliedWeights: [
+      {
+        signal: 'KEY_NUMBER_CROSS_3_7',
+        weightMultiplier: 1.28,
+        description: 'Model learned signal: Crossed key margins 3, 6, and 7 on Sunday Week 6.',
+      },
+    ],
+    legs: [
+      {
+        id: 'leg-20261011-teaser-1',
+        gameMatchup: 'Commanders @ Ravens',
+        league: 'NFL',
+        gameDate: 'Played Sun Oct 11 · 1:00 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Baltimore Ravens +3.5 (+10 Teased)',
+        originalLine: 'Ravens -6.5',
+        teasedLine: 'Ravens +3.5',
+        bestOdds: '-120',
+        bestSportsbook: 'DraftKings',
+        status: 'WON',
+        finalScore: 'FINAL: BAL 30, WAS 23 (Covered +3.5 by 10.5 pts)',
+        rationale: 'Teased Ravens through key margins 7, 6, 3 to +3.5 home dog; won by 7 points.',
+      },
+      {
+        id: 'leg-20261011-teaser-2',
+        gameMatchup: 'Lions @ Cowboys',
+        league: 'NFL',
+        gameDate: 'Played Sun Oct 11 · 4:25 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'Detroit Lions +3.0 (+10 Teased)',
+        originalLine: 'Lions -7.0',
+        teasedLine: 'Lions +3.0',
+        bestOdds: '-120',
+        bestSportsbook: 'FanDuel',
+        status: 'WON',
+        finalScore: 'FINAL: DET 47, DAL 9 (Covered +3.0 by 41 pts)',
+        rationale: 'Teased Lions to +3.0 underdog in Dallas; Detroit dominated 47-9.',
+      },
+      {
+        id: 'leg-20261011-teaser-3',
+        gameMatchup: '49ers @ Seahawks',
+        league: 'NFL',
+        gameDate: 'Played Thu Oct 08 · 8:15 PM EDT',
+        betType: 'SPREAD',
+        targetSelection: 'San Francisco 49ers +3.0 (+10 Teased)',
+        originalLine: '49ers -7.0',
+        teasedLine: '49ers +3.0',
+        bestOdds: '-120',
+        bestSportsbook: 'DraftKings',
+        status: 'WON',
+        finalScore: 'FINAL: SF 36, SEA 24 (Covered +3.0 by 15 pts)',
+        rationale: 'Teased 49ers to +3.0 road underdog at Lumen Field; 49ers won 36-24.',
+      },
+    ],
+  },
   // =========================================================================
   // SETTLED RECOMMENDATIONS: BILLS @ RAMS (OCT 12, 2026) - GRADED PER 37-34 FINAL
   // =========================================================================

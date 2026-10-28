@@ -558,32 +558,15 @@ export function computeDynamicStrategyBenchmarks(
     let totalUnits = 0;
     let totalStaked = 0;
 
-    // 1. Tally from verified historical slates 1 through 7
-    VERIFIED_HISTORICAL_SLATES.forEach((r) => {
-      if (r.slateNumber <= 3) {
-        const matches =
-          key === 'CONTRARIAN_FADE'
-            ? r.strategyTier === 'CONTRARIAN_FADE' || r.sharpSignal.toLowerCase().includes('fade')
-            : r.strategyTier === key;
-
-        if (matches) {
-          if (r.outcome === 'WON') wins++;
-          else if (r.outcome === 'LOST') losses++;
-          else if (r.outcome === 'PUSH') pushes++;
-          totalUnits += r.unitsWonLost;
-          totalStaked += r.unitsStaked;
-        }
-      }
-    });
-
-    // 2. Tally from live settled tracked bets in store
+    // Tally from live settled tracked bets in store (single source of truth for tracked bets)
     if (settledTracked.length > 0) {
       settledTracked.forEach((b) => {
         const matches =
           key === 'CONTRARIAN_FADE'
             ? b.signalsTagged?.includes('PUBLIC_HOME_FAVORITE_FADE') ||
               b.signalsTagged?.includes('PUBLIC_ROAD_FAVORITE_FADE') ||
-              b.signalsTagged?.includes('ROAD_UNDERDOG')
+              b.signalsTagged?.includes('ROAD_UNDERDOG') ||
+              (b.tier as string) === 'CONTRARIAN_FADE'
             : b.tier === key;
 
         if (matches) {
@@ -595,16 +578,17 @@ export function computeDynamicStrategyBenchmarks(
         }
       });
     } else {
-      // Fallback: tally historical slate 8
-      VERIFIED_HISTORICAL_SLATES.filter((r) => r.slateNumber === 8).forEach((r) => {
+      // Fallback if store is empty: Tally from verified historical slates
+      VERIFIED_HISTORICAL_SLATES.forEach((r) => {
         const matches =
           key === 'CONTRARIAN_FADE'
-            ? r.strategyTier === 'CONTRARIAN_FADE'
+            ? r.strategyTier === 'CONTRARIAN_FADE' || r.sharpSignal.toLowerCase().includes('fade')
             : r.strategyTier === key;
 
         if (matches) {
           if (r.outcome === 'WON') wins++;
           else if (r.outcome === 'LOST') losses++;
+          else if (r.outcome === 'PUSH') pushes++;
           totalUnits += r.unitsWonLost;
           totalStaked += r.unitsStaked;
         }
