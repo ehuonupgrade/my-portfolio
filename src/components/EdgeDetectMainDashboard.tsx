@@ -11,7 +11,6 @@ import {
 } from '../types/sportsBettingTracker';
 import {
   getTrackedBets,
-  updateBetStatus,
   simulateTonightOutcome,
   resetTrackedBetsToSeed,
   exportTrackedBetsToCSV,
