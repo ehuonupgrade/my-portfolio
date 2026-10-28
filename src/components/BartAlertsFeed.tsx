@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { playKeyClick, playSuccessChime } from '../utils/audio';
+import { playKeyClick } from '../utils/audio';
 
 interface ServiceAdvisory {
   id: string;
