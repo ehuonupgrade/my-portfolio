@@ -1745,7 +1745,7 @@ app.get('/api/v1/channels', (req, res) => {
       settings: {
         pageAccessToken: process.env.FB_MESSENGER_PAGE_ACCESS_TOKEN || process.env.FB_PAGE_ACCESS_TOKEN || '',
         pageId: process.env.FB_MESSENGER_PAGE_ID || '',
-        verifyToken: process.env.FB_MESSENGER_VERIFY_TOKEN || 'omnisend_verify_token_2026',
+        verifyToken: process.env.FB_MESSENGER_VERIFY_TOKEN || '',
         webhookUrl: `${req.protocol}://${req.get('host')}/api/v1/webhooks/messenger`,
         graphApiVersion: 'v19.0',
       },
@@ -1864,17 +1864,16 @@ app.get('/api/v1/webhooks/messenger', (req, res) => {
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
 
-  const defaultVerifyToken = 'omnisend_verify_token_2026';
-  const configuredToken = process.env.FB_MESSENGER_VERIFY_TOKEN || defaultVerifyToken;
+  const configuredToken = process.env.FB_MESSENGER_VERIFY_TOKEN;
 
   console.log(`[Facebook Webhook Verification] Mode: ${mode}, Token Provided: ${token}`);
 
-  if (mode === 'subscribe' && (token === configuredToken || token === 'omnisend_verify_token_2026' || token === 'my_secure_verify_token')) {
+  if (mode === 'subscribe' && configuredToken && token === configuredToken) {
     console.log('✅ Facebook Messenger Webhook Verified Handshake Succeeded!');
     return res.status(200).send(challenge);
   } else {
-    console.warn('❌ Facebook Messenger Webhook Handshake Failed: Token mismatch');
-    return res.status(403).json({ error: 'Forbidden: Verify token mismatch' });
+    console.warn('❌ Facebook Messenger Webhook Handshake Failed: Token mismatch or unconfigured');
+    return res.status(403).json({ error: 'Forbidden: Verify token mismatch or unconfigured' });
   }
 });
 
