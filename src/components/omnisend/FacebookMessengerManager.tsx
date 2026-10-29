@@ -15,7 +15,7 @@ export const FacebookMessengerManager: React.FC<FacebookMessengerManagerProps> =
   );
   const [pageId, setPageId] = useState<string>(channelConfig.settings?.pageId || '');
   const [verifyToken, setVerifyToken] = useState<string>(
-    channelConfig.settings?.verifyToken || 'omnisend_verify_token_2026'
+    channelConfig.settings?.verifyToken || ''
   );
   const [copiedToken, setCopiedToken] = useState<boolean>(false);
 
