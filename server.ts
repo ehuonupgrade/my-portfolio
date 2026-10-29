@@ -112,11 +112,9 @@ function readTraffic(): any {
 }
 
 function writeTraffic(data: any): void {
-  try {
-    fs.writeFileSync(TRAFFIC_FILE, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (err) {
+  fs.promises.writeFile(TRAFFIC_FILE, JSON.stringify(data, null, 2), 'utf-8').catch((err) => {
     console.error('Error writing traffic file', err);
-  }
+  });
 }
 
 function readFeedback(): any[] {
