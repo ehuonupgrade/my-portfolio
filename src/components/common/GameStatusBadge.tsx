@@ -134,7 +134,7 @@ export function getGameDisplayStatus(game?: Partial<GameMarket> | any): GameStat
 
 export interface GameStatusBadgeProps {
   game?: Partial<GameMarket> | any;
-  statusOverride?: DisplayGameStatus | 'IN_PROGRESS' | 'COMPLETED' | 'UPCOMING';
+  statusOverride?: DisplayGameStatus | 'IN_PROGRESS' | 'COMPLETED' | 'UPCOMING' | 'LIVE' | 'FINAL' | 'SCHEDULED' | (string & {});
   size?: 'xs' | 'sm' | 'md' | 'lg';
   showDetail?: boolean;
   showDot?: boolean;
