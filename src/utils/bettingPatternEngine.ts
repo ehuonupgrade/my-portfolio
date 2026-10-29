@@ -76,23 +76,34 @@ export const PATTERN_SIGNAL_METADATA: Record<
   },
 };
 
+export interface BettingAnalysis {
+  totalBets: number;
+  winRate: number;
+  roi: number;
+  profitableSports: string[];
+  leakSports: string[];
+  summary: TrackerPerformanceSummary;
+  signals: PatternSignalMetric[];
+}
+
 /**
  * Computes performance KPI summary from a list of tracked bets
  */
 export function calculatePerformanceSummary(
-  bets: TrackedBetRecommendation[]
+  bets?: TrackedBetRecommendation[] | null
 ): TrackerPerformanceSummary {
-  const settled = bets.filter((b) => b.status !== 'PENDING');
+  const safeBets = bets || [];
+  const settled = safeBets.filter((b) => b && b.status !== 'PENDING');
   const wins = settled.filter((b) => b.status === 'WON').length;
   const losses = settled.filter((b) => b.status === 'LOST').length;
   const pushes = settled.filter((b) => b.status === 'PUSH').length;
 
-  const totalUnitsStaked = bets.reduce((acc, b) => acc + b.unitsStaked, 0);
-  const netUnitsWon = settled.reduce((acc, b) => acc + b.unitsWonLost, 0);
+  const totalUnitsStaked = safeBets.reduce((acc, b) => acc + (b?.unitsStaked || 0), 0);
+  const netUnitsWon = settled.reduce((acc, b) => acc + (b?.unitsWonLost || 0), 0);
 
   const decidedCount = wins + losses;
   const winRate = decidedCount > 0 ? (wins / decidedCount) * 100 : 0;
-  const settledStaked = settled.reduce((acc, b) => acc + b.unitsStaked, 0);
+  const settledStaked = settled.reduce((acc, b) => acc + (b?.unitsStaked || 0), 0);
   const roi = settledStaked > 0 ? (netUnitsWon / settledStaked) * 100 : 0;
 
   // Streak calculation (from most recent settled bet backward)
@@ -139,13 +150,13 @@ export function calculatePerformanceSummary(
   };
 
   const tierBreakdown = tiers.map((tier) => {
-    const tierBets = bets.filter((b) => b.tier === tier);
+    const tierBets = safeBets.filter((b) => b && b.tier === tier);
     const tierSettled = tierBets.filter((b) => b.status !== 'PENDING');
     const tWins = tierSettled.filter((b) => b.status === 'WON').length;
     const tLosses = tierSettled.filter((b) => b.status === 'LOST').length;
     const tPushes = tierSettled.filter((b) => b.status === 'PUSH').length;
     const tPending = tierBets.filter((b) => b.status === 'PENDING').length;
-    const tNet = tierSettled.reduce((acc, b) => acc + b.unitsWonLost, 0);
+    const tNet = tierSettled.reduce((acc, b) => acc + (b?.unitsWonLost || 0), 0);
     const tDecided = tWins + tLosses;
     const tWinRate = tDecided > 0 ? (tWins / tDecided) * 100 : 0;
 
@@ -163,9 +174,9 @@ export function calculatePerformanceSummary(
   });
 
   return {
-    totalRecommendations: bets.length,
+    totalRecommendations: safeBets.length,
     settledCount: settled.length,
-    pendingCount: bets.length - settled.length,
+    pendingCount: safeBets.length - settled.length,
     wins,
     losses,
     pushes,
@@ -186,24 +197,25 @@ export function calculatePerformanceSummary(
  * Underperforming patterns get penalized.
  */
 export function calculateLearnedPatternSignals(
-  bets: TrackedBetRecommendation[]
+  bets?: TrackedBetRecommendation[] | null
 ): PatternSignalMetric[] {
-  const settled = bets.filter((b) => b.status !== 'PENDING');
+  const safeBets = bets || [];
+  const settled = safeBets.filter((b) => b && b.status !== 'PENDING');
   const allSignalKeys = Object.keys(PATTERN_SIGNAL_METADATA) as PatternSignalType[];
 
   return allSignalKeys.map((sig) => {
     const meta = PATTERN_SIGNAL_METADATA[sig];
-    const matchingBets = settled.filter((b) => b.signalsTagged.includes(sig));
+    const matchingBets = settled.filter((b) => b.signalsTagged && b.signalsTagged.includes(sig));
 
     const totalBets = matchingBets.length;
     const wins = matchingBets.filter((b) => b.status === 'WON').length;
     const losses = matchingBets.filter((b) => b.status === 'LOST').length;
     const pushes = matchingBets.filter((b) => b.status === 'PUSH').length;
-    const netUnits = matchingBets.reduce((acc, b) => acc + b.unitsWonLost, 0);
+    const netUnits = matchingBets.reduce((acc, b) => acc + (b?.unitsWonLost || 0), 0);
 
     const decided = wins + losses;
     const winRate = decided > 0 ? (wins / decided) * 100 : 0;
-    const staked = matchingBets.reduce((acc, b) => acc + b.unitsStaked, 0);
+    const staked = matchingBets.reduce((acc, b) => acc + (b?.unitsStaked || 0), 0);
     const roi = staked > 0 ? (netUnits / staked) * 100 : 0;
 
     // Adaptive Weight Calculation Formula:
@@ -220,15 +232,15 @@ export function calculateLearnedPatternSignals(
       learnedWeight = 1.0;
       strategyImpactNote = "Day 1 Baseline (1.00x): Awaiting first settled game outcome from today's active slate to begin statistical adaptation.";
     } else if (winRate >= 75 && netUnits > 0) {
-      learnedWeight = parseFloat((1.0 + Math.min(0.35, (winRate - 50) / 100 * 0.8)).toFixed(2));
+      learnedWeight = parseFloat((1.0 + Math.min(0.35, ((winRate - 50) / 100) * 0.8)).toFixed(2));
       weightStatus = 'BOOSTED';
       strategyImpactNote = `🔥 High-Predictive Signal: ${wins}-${losses} record (${winRate.toFixed(1)}%). Weight amplified to ${learnedWeight}x in selection model.`;
     } else if (winRate >= 58 && netUnits > 0) {
-      learnedWeight = parseFloat((1.0 + (winRate - 50) / 100 * 0.4).toFixed(2));
+      learnedWeight = parseFloat((1.0 + ((winRate - 50) / 100) * 0.4).toFixed(2));
       weightStatus = 'MODERATE_BOOST';
       strategyImpactNote = `✅ Profitable Pattern: ${winRate.toFixed(1)}% win rate generates +${netUnits.toFixed(1)}u. Boosted to ${learnedWeight}x.`;
     } else if (winRate < 45 || netUnits < -1.5) {
-      learnedWeight = parseFloat(Math.max(0.6, 1.0 - (50 - winRate) / 100 * 0.7).toFixed(2));
+      learnedWeight = parseFloat(Math.max(0.6, 1.0 - ((50 - winRate) / 100) * 0.7).toFixed(2));
       weightStatus = 'PENALIZED';
       strategyImpactNote = `⚠️ Underperforming Pattern: Only ${winRate.toFixed(1)}% hit rate (-${Math.abs(netUnits).toFixed(1)}u). Weight reduced to ${learnedWeight}x; model actively screens against this.`;
     } else {
@@ -255,4 +267,33 @@ export function calculateLearnedPatternSignals(
       strategyImpactNote,
     };
   });
+}
+
+/**
+ * Higher-level function to analyze betting patterns with empty/null/undefined support
+ */
+export function analyzeBettingPatterns(
+  bets?: TrackedBetRecommendation[] | null
+): BettingAnalysis {
+  const safeBets = bets || [];
+  const summary = calculatePerformanceSummary(safeBets);
+  const signals = calculateLearnedPatternSignals(safeBets);
+
+  const profitableSports = signals
+    .filter((s) => s.weightStatus === 'BOOSTED' || s.weightStatus === 'MODERATE_BOOST')
+    .map((s) => s.label);
+
+  const leakSports = signals
+    .filter((s) => s.weightStatus === 'PENALIZED')
+    .map((s) => s.label);
+
+  return {
+    totalBets: summary.totalRecommendations,
+    winRate: summary.winRate,
+    roi: summary.roi,
+    profitableSports,
+    leakSports,
+    summary,
+    signals,
+  };
 }
