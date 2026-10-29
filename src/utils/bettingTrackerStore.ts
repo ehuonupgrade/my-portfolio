@@ -919,26 +919,27 @@ export function getTrackedBets(): TrackedBetRecommendation[] {
     let needsSave = false;
 
     // Auto-migration guard: ensure Week 7 bets (rec-20261022-teaser, etc.) reflect that all 3 legs cashed
+    const seedPrime = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261013-prime');
+    const seedTeaser = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-teaser');
+    const seedSingle = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-single');
+    const seedParlay = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-parlay');
+
     parsed = parsed.map((b) => {
       if (b.id === 'rec-20261013-prime' && b.status !== 'LOST') {
         needsSave = true;
-        const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261013-prime');
-        return seedVersion || b;
+        return seedPrime || b;
       }
       if (b.id === 'rec-20261022-teaser' && b.status !== 'WON') {
         needsSave = true;
-        const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-teaser');
-        return seedVersion || b;
+        return seedTeaser || b;
       }
       if (b.id === 'rec-20261022-single' && b.status !== 'WON') {
         needsSave = true;
-        const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-single');
-        return seedVersion || b;
+        return seedSingle || b;
       }
       if (b.id === 'rec-20261022-parlay' && b.status !== 'WON') {
         needsSave = true;
-        const seedVersion = INITIAL_TRACKED_BETS.find((x) => x.id === 'rec-20261022-parlay');
-        return seedVersion || b;
+        return seedParlay || b;
       }
       return b;
     });
