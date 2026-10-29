@@ -119,22 +119,32 @@ function writeTraffic(data: any): void {
   }
 }
 
+let feedbackCache: any[] | null = null;
+
 function readFeedback(): any[] {
+  if (feedbackCache !== null) {
+    return feedbackCache;
+  }
   try {
     if (fs.existsSync(FEEDBACK_FILE)) {
       const content = fs.readFileSync(FEEDBACK_FILE, 'utf-8');
       const parsed = JSON.parse(content);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed)) {
+        feedbackCache = parsed;
+        return feedbackCache;
+      }
     }
   } catch (err) {
     console.error('Error reading feedback file', err);
   }
-  return [];
+  feedbackCache = [];
+  return feedbackCache;
 }
 
 function writeFeedback(data: any[]): void {
   try {
     fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    feedbackCache = data;
   } catch (err) {
     console.error('Error writing feedback file', err);
   }
