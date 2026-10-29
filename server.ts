@@ -381,7 +381,7 @@ app.post('/api/tokens/real-count', async (req, res) => {
   });
 });
 
-app.post('/api/tokens/sync-log', (req, res) => {
+app.post('/api/tokens/sync-log', async (req, res) => {
   const record = req.body;
   if (!record || !record.date) {
     return res.status(400).json({ error: 'Invalid record' });
@@ -389,7 +389,7 @@ app.post('/api/tokens/sync-log', (req, res) => {
   try {
     let logs: any[] = [];
     if (fs.existsSync(TOKEN_LOGS_FILE)) {
-      logs = JSON.parse(fs.readFileSync(TOKEN_LOGS_FILE, 'utf-8'));
+      logs = JSON.parse(await fs.promises.readFile(TOKEN_LOGS_FILE, 'utf-8'));
     }
     const existingIndex = logs.findIndex((l) => l.date === record.date);
     if (existingIndex >= 0) {
@@ -397,7 +397,7 @@ app.post('/api/tokens/sync-log', (req, res) => {
     } else {
       logs.unshift({ ...record, syncedAt: new Date().toISOString() });
     }
-    fs.writeFileSync(TOKEN_LOGS_FILE, JSON.stringify(logs.slice(0, 100), null, 2), 'utf-8');
+    await fs.promises.writeFile(TOKEN_LOGS_FILE, JSON.stringify(logs.slice(0, 100), null, 2), 'utf-8');
     res.json({ success: true, count: logs.length });
   } catch (err) {
     res.status(500).json({ error: 'Failed to write token logs' });
