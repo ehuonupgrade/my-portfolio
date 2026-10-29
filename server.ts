@@ -381,27 +381,44 @@ app.post('/api/tokens/real-count', async (req, res) => {
   });
 });
 
-app.post('/api/tokens/sync-log', (req, res) => {
+let tokenLogsMutex = Promise.resolve();
+
+app.post('/api/tokens/sync-log', async (req, res) => {
   const record = req.body;
   if (!record || !record.date) {
     return res.status(400).json({ error: 'Invalid record' });
   }
-  try {
-    let logs: any[] = [];
-    if (fs.existsSync(TOKEN_LOGS_FILE)) {
-      logs = JSON.parse(fs.readFileSync(TOKEN_LOGS_FILE, 'utf-8'));
+
+  const task = tokenLogsMutex.then(async () => {
+    try {
+      let logs: any[] = [];
+      if (fs.existsSync(TOKEN_LOGS_FILE)) {
+        try {
+          const content = await fs.promises.readFile(TOKEN_LOGS_FILE, 'utf-8');
+          if (content.trim()) {
+            logs = JSON.parse(content);
+          }
+        } catch {
+          logs = [];
+        }
+      }
+      const existingIndex = logs.findIndex((l) => l.date === record.date);
+      if (existingIndex >= 0) {
+        logs[existingIndex] = { ...logs[existingIndex], ...record, syncedAt: new Date().toISOString() };
+      } else {
+        logs.unshift({ ...record, syncedAt: new Date().toISOString() });
+      }
+      const tmpFile = `${TOKEN_LOGS_FILE}.${Date.now()}.${Math.random().toString(36).substring(2, 6)}.tmp`;
+      await fs.promises.writeFile(tmpFile, JSON.stringify(logs.slice(0, 100), null, 2), 'utf-8');
+      await fs.promises.rename(tmpFile, TOKEN_LOGS_FILE);
+      res.json({ success: true, count: logs.length });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to write token logs' });
     }
-    const existingIndex = logs.findIndex((l) => l.date === record.date);
-    if (existingIndex >= 0) {
-      logs[existingIndex] = { ...logs[existingIndex], ...record, syncedAt: new Date().toISOString() };
-    } else {
-      logs.unshift({ ...record, syncedAt: new Date().toISOString() });
-    }
-    fs.writeFileSync(TOKEN_LOGS_FILE, JSON.stringify(logs.slice(0, 100), null, 2), 'utf-8');
-    res.json({ success: true, count: logs.length });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to write token logs' });
-  }
+  });
+
+  tokenLogsMutex = task.catch(() => {});
+  await task;
 });
 
 // ----------------- LINEPULSE SMS ALERTS -----------------
