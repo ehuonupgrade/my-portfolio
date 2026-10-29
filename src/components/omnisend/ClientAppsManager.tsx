@@ -14,18 +14,23 @@ export const ClientAppsManager: React.FC<ClientAppsManagerProps> = ({
   const [appName, setAppName] = useState<string>('');
   const [appDescription, setAppDescription] = useState<string>('');
   const [rateLimit, setRateLimit] = useState<number>(180);
-  const [selectedChannels, setSelectedChannels] = useState<MessageChannel[]>([
-    'facebook_messenger',
-    'slack',
-  ]);
+  const [selectedChannels, setSelectedChannels] = useState<Set<MessageChannel>>(
+    new Set(['facebook_messenger', 'slack'])
+  );
 
   const [visibleKeyAppId, setVisibleKeyAppId] = useState<string | null>(null);
   const [copiedAppId, setCopiedAppId] = useState<string | null>(null);
 
   const toggleChannelSelection = (ch: MessageChannel) => {
-    setSelectedChannels((prev) =>
-      prev.includes(ch) ? prev.filter((c) => c !== ch) : [...prev, ch]
-    );
+    setSelectedChannels((prev) => {
+      const next = new Set(prev);
+      if (next.has(ch)) {
+        next.delete(ch);
+      } else {
+        next.add(ch);
+      }
+      return next;
+    });
   };
 
   const handleCopyKey = (app: ClientApp) => {
@@ -49,7 +54,7 @@ export const ClientAppsManager: React.FC<ClientAppsManagerProps> = ({
       apiKey: `omni_live_${randomHex}`,
       description: appDescription.trim() || 'Internal consumer application.',
       createdDate: new Date().toISOString().split('T')[0],
-      activeChannels: selectedChannels,
+      activeChannels: Array.from(selectedChannels),
       rateLimitPerMin: rateLimit,
       totalSent: 0,
       lastUsedAt: null,
@@ -235,7 +240,7 @@ export const ClientAppsManager: React.FC<ClientAppsManagerProps> = ({
                       'custom_webhook',
                     ] as MessageChannel[]
                   ).map((ch) => {
-                    const isChecked = selectedChannels.includes(ch);
+                    const isChecked = selectedChannels.has(ch);
                     return (
                       <button
                         type="button"
