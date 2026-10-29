@@ -452,7 +452,8 @@ export const BartPlannerView: React.FC<BartPlannerViewProps> = ({ onBack }) => {
       list = directs.length > 0 ? directs : list;
     }
     if (selectedLines.length < ALL_LINES.length) {
-      list = list.filter((d) => selectedLines.includes(d.color.toLowerCase()));
+      const selectedLinesSet = new Set(selectedLines);
+      list = list.filter((d) => selectedLinesSet.has(d.color.toLowerCase()));
     }
     return list;
   }, [originDepartures, departureFilter, selectedLines]);
