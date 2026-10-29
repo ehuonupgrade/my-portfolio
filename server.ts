@@ -111,12 +111,19 @@ function readTraffic(): any {
   };
 }
 
-function writeTraffic(data: any): void {
-  try {
-    fs.writeFileSync(TRAFFIC_FILE, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (err) {
-    console.error('Error writing traffic file', err);
-  }
+let trafficWriteQueue: Promise<void> = Promise.resolve();
+
+async function writeTraffic(data: any): Promise<void> {
+  trafficWriteQueue = trafficWriteQueue.then(async () => {
+    try {
+      const tempFile = `${TRAFFIC_FILE}.tmp.${Date.now()}.${Math.random().toString(36).substring(2, 8)}`;
+      await fs.promises.writeFile(tempFile, JSON.stringify(data, null, 2), 'utf-8');
+      await fs.promises.rename(tempFile, TRAFFIC_FILE);
+    } catch (err) {
+      console.error('Error writing traffic file', err);
+    }
+  });
+  return trafficWriteQueue;
 }
 
 function readFeedback(): any[] {
@@ -148,7 +155,7 @@ app.get('/api/traffic', (req, res) => {
 });
 
 // Global Traffic: Record view or dwell time from any user
-app.post('/api/traffic/record', (req, res) => {
+app.post('/api/traffic/record', async (req, res) => {
   const { route, projectId, isMobile, isNewSession, dwellSeconds } = req.body;
   const data = readTraffic();
   const now = new Date().toISOString();
@@ -179,12 +186,12 @@ app.post('/api/traffic/record', (req, res) => {
     }
   }
 
-  writeTraffic(data);
+  await writeTraffic(data);
   res.json({ success: true, data });
 });
 
 // Global Traffic: Reset endpoint
-app.post('/api/traffic/reset', (req, res) => {
+app.post('/api/traffic/reset', async (req, res) => {
   const resetData = {
     totalPageViews: 0,
     totalSessions: 0,
@@ -193,7 +200,7 @@ app.post('/api/traffic/reset', (req, res) => {
     projects: { ...DEFAULT_PROJECTS },
     pageViewsByRoute: {},
   };
-  writeTraffic(resetData);
+  await writeTraffic(resetData);
   res.json({ success: true, data: resetData });
 });
 
