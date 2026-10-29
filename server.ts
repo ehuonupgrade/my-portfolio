@@ -1810,10 +1810,10 @@ app.get('/api/v1/channels', (req, res) => {
       name: 'Custom HTTP Webhooks',
       icon: '🔗',
       description: 'Generic JSON HTTP POST dispatcher with signature signing (HMAC-SHA256).',
-      isConfigured: true,
+      isConfigured: !!(process.env.WEBHOOK_SECRET_SIGNING_KEY || process.env.CUSTOM_WEBHOOK_SECRET),
       isActive: true,
       settings: {
-        secretSigningKey: 'whsec_omnisend_default_key_2026',
+        secretSigningKey: process.env.WEBHOOK_SECRET_SIGNING_KEY || process.env.CUSTOM_WEBHOOK_SECRET || '',
       },
       supportedFeatures: { media: true, buttons: true, quickReplies: true, markdown: true, webhooks: true },
     },
