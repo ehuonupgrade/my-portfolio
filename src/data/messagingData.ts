@@ -114,10 +114,10 @@ export const INITIAL_CHANNELS: ChannelConfig[] = [
     name: 'Custom HTTP Webhooks',
     icon: '🔗',
     description: 'Generic JSON HTTP POST dispatcher with signature signing (HMAC-SHA256) and custom headers for third-party endpoints.',
-    isConfigured: true,
+    isConfigured: false,
     isActive: true,
     settings: {
-      secretSigningKey: 'whsec_omnisend_default_key_2026',
+      secretSigningKey: '',
       defaultMethod: 'POST',
     },
     supportedFeatures: {
