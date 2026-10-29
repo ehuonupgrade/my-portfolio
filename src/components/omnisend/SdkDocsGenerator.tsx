@@ -72,7 +72,6 @@ async function dispatchOmniSendNotification() {
   });
 
   const result = await response.json();
-  console.log('Dispatch Outcome:', result);
 }
 
 dispatchOmniSendNotification();`,
